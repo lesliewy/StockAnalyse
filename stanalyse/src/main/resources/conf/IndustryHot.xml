@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="IndustryHot">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="IndustryHot" type="com.wy.stock.domain.IndustryHot" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="IndustryHotResult" class="IndustryHot">
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="rank" column="RANK" />
+		<result property="industryName" column="INDUSTRY_NAME" />
+		<result property="changePercent" column="CHANGE_PCT" />
+		<result property="totalMarketCap" column="TOT_MARKET_CAP" />
+		<result property="turnoverRate" column="TURNOVER_RATE" />
+		<result property="riseStocksNum" column="RISE_STOCKS_NUM" />
+		<result property="fallStocksNum" column="FALL_STOCKS_NUM" />
+		<result property="riseLeadStockName" column="RISE_LEAD_STOCK_NAME" />
+		<result property="riseLeadStockChangePercent" column="RISE_LEAD_STOCK_CHANGE_PCT" />
+		<result property="timestamp" column="TIMESTAMP" />
+		<result property="source" column="SOURCE" />
+		<result property="avgPrice" column="AVG_PRICE" />
+		<result property="industryUrl" column="INDUSTRY_URL" />
+		<result property="corpsNum" column="CORPS_NUM" />
+	</resultMap>
+	
+    <resultMap id="IndustryHotResult2" class="IndustryHot">
+        <result property="tradeDate" column="TRADE_DATE" />
+        <result property="rank" column="RANK" />
+        <result property="industryName" column="INDUSTRY_NAME" />
+        <result property="changePercent" column="CHANGE_PCT" />
+        <result property="riseLeadStockName" column="RISE_LEAD_STOCK_NAME" />
+        <result property="riseLeadStockChangePercent" column="RISE_LEAD_STOCK_CHANGE_PCT" />
+        <result property="timestamp" column="TIMESTAMP" />
+    </resultMap>
+
+	<insert id="insertIndustryHot" parameterClass="IndustryHot">
+		insert into ST_INDUSTRY_HOT (
+		TRADE_DATE,
+		RANK,
+		INDUSTRY_NAME,
+		CHANGE_PCT,
+		TOT_MARKET_CAP,
+		TURNOVER_RATE,
+		RISE_STOCKS_NUM,
+		FALL_STOCKS_NUM,
+		RISE_LEAD_STOCK_NAME,
+		RISE_LEAD_STOCK_CHANGE_PCT,
+		TIMESTAMP,
+		SOURCE,
+		AVG_PRICE)
+		values (
+		#tradeDate#, #rank#, #industryName#, #changePercent#, #totalMarketCap#, #turnoverRate#, #riseStocksNum#, #fallStocksNum#,
+		#riseLeadStockName#, #riseLeadStockChangePercent#, #timestamp#, #source#, #avgPrice#
+		)
+	</insert>
+	
+    <delete id="deleteIndustryHotByTradeDateStr" parameterClass="IndustryHot">
+        delete from ST_INDUSTRY_HOT where LEFT(TRADE_DATE, 10)=#tradeDateStr# AND SOURCE = #source#
+    </delete>
+    
+    <select id="queryIndustryHotByDate" parameterClass="java.lang.String" resultMap="IndustryHotResult">
+        select *
+        from ST_INDUSTRY_HOT
+       where TRADE_DATE = #tradeDate#
+       ORDER BY RANK
+    </select>
+    
+    <select id="queryIndustryHotInfoByDateStr" parameterClass="IndustryHot" resultMap="IndustryHotResult">
+        select a.*, b.INDUSTRY_URL, b.CORPS_NUM
+        from ST_INDUSTRY_HOT a, ST_INDUSTRY_INFO b
+       where a.INDUSTRY_NAME = b.INDUSTRY_NAME 
+             AND a.TRADE_DATE like CONCAT(#tradeDateStr# , '%')
+             AND a.SOURCE = #source#
+             AND a.SOURCE = b.SOURCE
+       ORDER BY a.RANK
+    </select>
+    
+    <select id="queryIndustryHotForCsv" parameterClass="IndustryHot" resultMap="IndustryHotResult2">
+        SELECT TRADE_DATE, RANK, INDUSTRY_NAME, CHANGE_PCT, RISE_LEAD_STOCK_NAME, RISE_LEAD_STOCK_CHANGE_PCT, TIMESTAMP
+          FROM ST_INDUSTRY_HOT 
+         WHERE (RANK &lt;= 80 OR RANK &gt; 120) 
+           AND TRADE_DATE &gt;= #lowTradeDateStr#
+           AND TRADE_DATE &lt;= #highTradeDateStr#
+           AND SOURCE='THS' 
+          ORDER BY LEFT(TRADE_DATE, 10), RANK
+    </select>
+    
+    <select id="queryIndustryHotByDateStr" parameterClass="IndustryHot" resultMap="IndustryHotResult2">
+        select *
+        from ST_INDUSTRY_HOT
+       where TRADE_DATE like CONCAT(#tradeDateStr# , '%')
+             AND SOURCE = #source#
+       ORDER BY RANK
+    </select>
+    
+    <select id="queryIndustryHotByDateStrBetween" parameterClass="IndustryHot" resultMap="IndustryHotResult2">
+        SELECT *
+        FROM ST_INDUSTRY_HOT
+       WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+             AND TRADE_DATE &lt;= #highTradeDateStr#
+             AND SOURCE = #source#
+       ORDER BY TRADE_DATE, RANK
+    </select>
+    
+</sqlMap>

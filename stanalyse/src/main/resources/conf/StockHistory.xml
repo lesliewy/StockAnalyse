@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockHistory">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockHistory" type="com.wy.stock.domain.StockHistory" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockHistoryResult" class="StockHistory">
+		<result property="code" column="CODE" />
+		<result property="type" column="TYPE" />
+		<result property="exchange" column="EXCHANGE" />
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="open" column="OPEN" />
+		<result property="high" column="HIGH" />
+		<result property="low" column="LOW" />
+		<result property="close" column="CLOSE" />
+		<result property="volumn" column="VOLUMN" />
+		<result property="adjClose" column="ADJ_CLOSE" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+	
+    <resultMap id="StockInfoResult1" class="StockInfo">
+        <result property="code" column="CODE" />
+        <result property="type" column="TYPE" />
+        <result property="exchange" column="EXCHANGE" />
+    </resultMap>
+    
+    <resultMap id="StockInfoResult2" class="StockHistory">
+        <result property="code" column="CODE" />
+        <result property="type" column="TYPE" />
+        <result property="exchange" column="EXCHANGE" />
+        <result property="tradeDate" column="TRADE_DATE" />
+    </resultMap>
+
+	<insert id="insertStockHistory" parameterClass="StockHistory">
+		insert into ST_HISTORY (
+		CODE,
+		TYPE,
+		EXCHANGE,
+		TRADE_DATE,
+		OPEN,
+		HIGH,
+		LOW,
+		CLOSE,
+		VOLUMN,
+		ADJ_CLOSE,
+		TIMESTAMP)
+		values (
+		#code#, #type#, #exchange#, #tradeDate#, #open#, #high#, #low#, #close#, #volumn#, #adjClose#, #timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteHistoryByKey" parameterClass="StockHistory">
+        delete from ST_HISTORY where EXCHANGE = #exchange# AND CODE = #code# AND TYPE = #type# AND TRADE_DATE = #tradeDate#
+    </delete>
+    
+    <select id="queryAllHistStock" resultMap="StockInfoResult1">
+        select distinct EXCHANGE, CODE, TYPE
+        from ST_HISTORY
+    </select>
+    
+    <select id="queryHistListByKey" parameterClass="StockHistory" resultMap="StockHistoryResult">
+        select *
+          from ST_HISTORY
+         where CODE = #code#
+               AND EXCHANGE = #exchange#
+               AND TYPE = #type#
+               ORDER BY TRADE_DATE
+    </select>
+    
+    <select id="queryHistListByKeyRange" parameterClass="StockHistory" resultMap="StockHistoryResult">
+        select *
+          from ST_HISTORY
+         where CODE = #code#
+               AND EXCHANGE = #exchange#
+               AND TYPE = #type#
+               AND TRADE_DATE &gt;= #tradeDate#
+               ORDER BY TRADE_DATE
+    </select>
+    
+    <select id="queryAllHistStockMaxDate" resultMap="StockInfoResult2">
+        select CODE, EXCHANGE, TYPE, max(TRADE_DATE)
+          FROM ST_HISTORY
+               GROUP BY CODE, EXCHANGE, TYPE
+    </select>
+    
+</sqlMap>

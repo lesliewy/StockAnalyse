@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockNotion">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockNotion" type="com.wy.stock.domain.StockNotion" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockNotionResult" class="StockNotion">
+        <result property="code" column="CODE" />
+        <result property="stockName" column="STOCK_NAME" />
+		<result property="notionCodes" column="NOTION_CODES" />
+		<result property="notionNames" column="NOTION_NAMES" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insertStockNotion" parameterClass="StockNotion">
+		insert into ST_STOCK_NOTION (
+		CODE,
+        STOCK_NAME,
+		NOTION_CODES,
+		NOTION_NAMES,
+		TIMESTAMP)
+		values (
+		#code#, #stockName#, #notionCodes#, #notionNames#, #timestamp#
+		)
+	</insert>
+	
+	<delete id="deleteAllStockNotion">
+        delete from ST_STOCK_NOTION
+    </delete>
+    
+    <delete id="deleteStockNotionByCode" parameterClass="java.lang.String">
+        delete from ST_STOCK_NOTION where CODE = #code#
+    </delete>
+    
+    <select id="queryStockNotionByCode" parameterClass="java.lang.String" resultMap="StockNotionResult">
+        select *
+        from ST_STOCK_NOTION
+       where CODE = #code#
+    </select>
+    
+    <select id="queryAllStockNotion" resultMap="StockNotionResult">
+        select *
+        from ST_STOCK_NOTION
+    </select>
+    
+</sqlMap>

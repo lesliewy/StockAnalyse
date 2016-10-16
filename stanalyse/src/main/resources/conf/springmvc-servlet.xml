@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">                    
+
+    <!-- scan the package and the sub package
+        开启注解: 自动去扫描base-package下面或者子包下面的Java文件，如果扫描到有@Component @Controller @Service等这些注解的类，
+        则把这些类注册为bean, 没有的话，这些配置不生效.
+        controller中的service 要使用 AutoWired 方式才能获取到Spring IOC中的service.
+        这里只扫描controller注解, 保持控制器的纯洁性.
+     -->
+    <context:component-scan base-package="com.wy.stock.controller">
+	    <context:include-filter type="annotation"
+	        expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+    
+    <!-- 访问静态资源-->
+    <!--
+    <mvc:resources mapping="/views/**" location="/views/" />
+    <mvc:resources mapping="/bootstrap-3.3.6/**" location="/bootstrap-3.3.6/" />
+    <mvc:default-servlet-handler />
+    -->
+    <!-- 
+    <bean id="simpleUrlHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">  
+        <property name="urlMap">  
+            <map>       
+                <entry key="/views/**" value-ref="views"/>       
+            </map>  
+        </property>  
+    </bean>  
+    <bean id="imageResource" class="org.springframework.web.servlet.resource.ResourceHttpRequestHandler">  
+        <property name="locations">  
+            <list>  
+                <value>/views/</value>  
+            </list>  
+        </property>  
+    </bean>  
+    <bean id="httpHandlerAdapter" class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter" />
+    -->
+
+    <!-- if you use annotation you must configure following setting 
+        Restful 中直接返回对象时，必须转换成JSON格式, 否则，前端访问时报错: No converter found for return value of type
+    -->
+	<mvc:annotation-driven>
+	     <mvc:message-converters>
+	            <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+	            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+	   </mvc:message-converters>
+	</mvc:annotation-driven>
+    
+    <!-- configure the InternalResourceViewResolver 
+        Spring MVC 中的view，转向页面的路径解析。
+        当访问controller返回 stanalyse/greeting 时, 会自动转向 /stanalyse/WEB-INF/jsp/greeting.jsp
+    -->
+    <!--
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" 
+            id="internalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+     -->
+</beans>

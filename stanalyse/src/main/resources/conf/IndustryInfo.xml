@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="IndustryInfo">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="IndustryInfo" type="com.wy.stock.domain.IndustryInfo" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="IndustryInfoResult" class="IndustryInfo">
+		<result property="industryUrl" column="INDUSTRY_URL" />
+		<result property="industryName" column="INDUSTRY_NAME" />
+		<result property="timestamp" column="TIMESTAMP" />
+		<result property="source" column="SOURCE" />
+		<result property="industryCode" column="INDUSTRY_CODE" />
+		<result property="corpsNum" column="CORPS_NUM" />
+	</resultMap>
+
+	<insert id="insertIndustryInfo" parameterClass="IndustryInfo">
+		insert into ST_INDUSTRY_INFO (
+		INDUSTRY_URL,
+		INDUSTRY_NAME,
+		TIMESTAMP,
+		SOURCE,
+		INDUSTRY_CODE,
+		CORPS_NUM)
+		values (
+		#industryUrl#, #industryName#, #timestamp#, #source#, #industryCode#, #corpsNum#
+		)
+	</insert>
+	
+    <delete id="deleteAllIndustryInfo">
+        delete from ST_INDUSTRY_INFO
+    </delete>
+    
+    <delete id="deleteIndustryInfoBySource" parameterClass="java.lang.String">
+        delete from ST_INDUSTRY_INFO where SOURCE = #source#
+    </delete>
+    
+    <select id="queryAllIndustryInfo" parameterClass="java.lang.String" resultMap="IndustryInfoResult">
+        select *
+        from ST_INDUSTRY_INFO
+       where SOURCE = #source#
+    </select>
+    
+    <update id="updateByIndustryName" parameterClass="IndustryInfo">
+        UPDATE ST_INDUSTRY_INFO SET INDUSTRY_URL = #industryUrl#, TIMESTAMP = #timestamp#, CORPS_NUM = #corpsNum#
+         WHERE INDUSTRY_NAME = #industryName#
+               AND SOURCE = #source#
+    </update>
+    
+    <update id="updateIndustryCodeByIndustryName" parameterClass="IndustryInfo">
+        UPDATE ST_INDUSTRY_INFO SET INDUSTRY_CODE = #industryCode#
+         WHERE INDUSTRY_NAME = #industryName#
+               AND SOURCE = #source#
+    </update>
+    
+    <update id="updateCorpsNumByIndustryName" parameterClass="IndustryInfo">
+        UPDATE ST_INDUSTRY_INFO SET TIMESTAMP = #timestamp#, CORPS_NUM = #corpsNum#
+         WHERE INDUSTRY_NAME = #industryName#
+               AND SOURCE = #source#
+    </update>
+
+    <select id="queryIndustryInfoByName" parameterClass="IndustryInfo" resultMap="IndustryInfoResult">
+        select *
+        from ST_INDUSTRY_INFO
+       where INDUSTRY_NAME = #industryName#
+         AND SOURCE = #source#
+    </select>
+
+    
+</sqlMap>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="NotionStock">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="NotionStock" type="com.wy.stock.domain.NotionStock" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="NotionStockResult" class="NotionStock">
+		<result property="notionCode" column="NOTION_CODE" />
+		<result property="notionName" column="NOTION_NAME" />
+		<result property="code" column="CODE" />
+		<result property="stockName" column="STOCK_NAME" />
+		<result property="timestamp" column="TIMESTAMP" />
+		<result property="source" column="SOURCE" />
+	</resultMap>
+	
+	<resultMap id="NotionStockResult1" class="NotionStock">
+        <result property="code" column="CODE" />
+    </resultMap>
+    
+    <resultMap id="NotionStockResult2" class="NotionStock">
+        <result property="code" column="CODE" />
+        <result property="stockName" column="STOCK_NAME" />
+        <result property="notionCodes" column="NOTION_CODES" />
+        <result property="notionNames" column="NOTION_NAMES" />
+    </resultMap>
+	
+
+	<insert id="insertNotionStock" parameterClass="NotionStock">
+		insert into ST_NOTION_STOCK (
+		NOTION_CODE,
+		NOTION_NAME,
+		CODE,
+		STOCK_NAME,
+		TIMESTAMP,
+		SOURCE)
+		values (
+		#notionCode#, #notionName#, #code#, #stockName#, #timestamp#, #source#
+		)
+	</insert>
+	
+	<delete id="deleteAllNotionStock" parameterClass="java.lang.String">
+        delete from ST_NOTION_STOCK WHERE SOURCE = #source#
+    </delete>
+    
+    <delete id="deleteNotionStockByNotionCode" parameterClass="java.lang.String">
+        delete from ST_NOTION_STOCK where NOTION_CODE = #notionCode#
+    </delete>
+    
+    <select id="queryNotionStockByCode" parameterClass="java.lang.String" resultMap="NotionStockResult">
+        select *
+        from ST_NOTION_STOCK
+       where CODE = #code#
+    </select>
+    
+    <select id="queryNotionStockByNotionCode" parameterClass="NotionStock" resultMap="NotionStockResult">
+        select *
+        from ST_NOTION_STOCK
+       where NOTION_CODE = #notionCode#
+             AND SOURCE = #source#
+    </select>
+    
+    <select id="queryAllCodeInNotionStock" resultMap="NotionStockResult1">
+        select DISTINCT CODE
+        from ST_NOTION_STOCK
+    </select>
+    
+    <select id="queryNotionCodesNames" parameterClass="java.lang.String" resultMap="NotionStockResult2">
+        select CODE, STOCK_NAME, group_concat(NOTION_CODE separator '|') NOTION_CODES,
+               group_concat(NOTION_NAME separator '|') NOTION_NAMES
+          FROM ST_NOTION_STOCK
+         WHERE SOURCE = #source#
+        group by CODE, STOCK_NAME
+    </select>
+
+</sqlMap>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="NotionHotStocks">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="NotionHotStocks" type="com.wy.stock.domain.NotionHotStocks" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="NotionHotStocksResult" class="NotionHotStocks">
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="rank" column="RANK" />
+		<result property="notionName" column="NOTION_NAME" />
+		<result property="code" column="CODE" />
+		<result property="stockName" column="STOCK_NAME" />
+		<result property="newPrice" column="NEW" />
+		<result property="changePercent" column="CHANGE_PCT" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+	
+    <resultMap id="NotionHotStocksResult2" class="NotionHotStocks">
+        <result property="tradeDate" column="TRADE_DATE" />
+        <result property="notionName" column="NOTION_NAME" />
+        <result property="code" column="CODE" />
+        <result property="rank" column="RANK" />
+        <result property="stockName" column="STOCK_NAME" />
+        <result property="newPrice" column="NEW" />
+        <result property="changePercent" column="CHANGE_PCT" />
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="notionRank" column="NOTION_RANK" />
+        <result property="notionChangePercent" column="NOTION_CHANGE_PCT" />
+    </resultMap>
+    
+    <resultMap id="NotionHotStocksResult3" class="NotionHotStocks">
+        <result property="stockName" column="STOCK_NAME" />
+        <result property="notionNames" column="NOTION_NAMES" />
+    </resultMap>
+    
+    <resultMap id="NotionHotStocksResult4" class="NotionHotStocks">
+        <result property="stockName" column="STOCK_NAME" />
+        <result property="totalChangePercent" column="TOTAL_CHANGE_PCT" />
+    </resultMap>
+
+	<insert id="insertNotionHotStocks" parameterClass="NotionHotStocks">
+		insert into ST_NOTION_HOT_STOCKS (
+		TRADE_DATE,
+		RANK,
+		NOTION_NAME,
+		CODE,
+		STOCK_NAME,
+		NEW,
+		CHANGE_PCT,
+		TIMESTAMP)
+		values (
+		#tradeDate#, #rank#, #notionName#, #code#, #stockName#, #newPrice#, #changePercent#, #timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteNotionHotStocksByNotionName" parameterClass="java.lang.String">
+        delete from ST_NOTION_HOT_STOCKS where STOCK_NAME = #stockName#
+    </delete>
+    
+    <select id="queryNotionHotStocksByNotionName" parameterClass="java.lang.String" resultMap="NotionHotStocksResult">
+        SELECT *
+        from ST_NOTION_HOT_STOCKS
+       where NOTION_NAME = #notionName#
+       ORDER BY RANK
+    </select>
+    
+    <select id="queryStocksByNotionNameDateStr" parameterClass="NotionHotStocks" resultMap="NotionHotStocksResult">
+        SELECT *
+          FROM ST_NOTION_HOT_STOCKS
+         WHERE NOTION_NAME = #notionName#
+               AND LEFT(TRADE_DATE, 10) = #tradeDateStr#
+    </select>
+    
+    <select id="queryNotionHotStocksForCsv" parameterClass="NotionHotStocks" resultMap="NotionHotStocksResult2">
+		SELECT B.TRADE_DATE, A.RANK NOTION_RANK, B.NOTION_NAME, A.CHANGE_PCT NOTION_CHANGE_PCT, B.RANK, B.CODE, B.STOCK_NAME, B.NEW,
+		       B.CHANGE_PCT, B.TIMESTAMP 
+		  FROM ST_NOTION_HOT A, ST_NOTION_HOT_STOCKS B 
+		 WHERE A.TRADE_DATE = B.TRADE_DATE
+		   AND A.NOTION_NAME=B.NOTION_NAME     
+		   AND A.TRADE_DATE &gt;= #lowTradeDateStr#
+           AND A.TRADE_DATE &lt;= #highTradeDateStr#
+		   AND (A.RANK &lt;= 30 OR A.RANK &gt; 130) 
+		ORDER BY LEFT(B.TRADE_DATE, 10), A.RANK, B.RANK
+    </select>
+    
+    <select id="queryNotionHotStocksByDateStrBetween" parameterClass="NotionHotStocks" resultMap="NotionHotStocksResult">
+        SELECT *
+          FROM ST_NOTION_HOT_STOCKS
+         WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+               AND TRADE_DATE &lt;= #highTradeDateStr#
+         ORDER BY TRADE_DATE, RANK
+    </select>
+    
+    <select id="queryStocksNotionsBetween" parameterClass="NotionHotStocks" resultMap="NotionHotStocksResult3">
+        SELECT STOCK_NAME, GROUP_CONCAT(DISTINCT NOTION_NAME SEPARATOR ' | ') NOTION_NAMES
+          FROM ST_NOTION_HOT_STOCKS
+         WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+               AND TRADE_DATE &lt;= #highTradeDateStr#
+               GROUP BY STOCK_NAME
+    </select>
+    
+    <select id="queryStocksChangePctBetween" parameterClass="NotionHotStocks" resultMap="NotionHotStocksResult4">
+        SELECT STOCK_NAME, SUM(DISTINCT CHANGE_PCT) TOTAL_CHANGE_PCT
+          FROM ST_NOTION_HOT_STOCKS
+         WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+               AND TRADE_DATE &lt;= #highTradeDateStr#
+               GROUP BY STOCK_NAME
+    </select>
+</sqlMap>

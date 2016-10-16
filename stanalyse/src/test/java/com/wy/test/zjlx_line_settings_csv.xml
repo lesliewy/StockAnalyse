@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings> 
+  <data_type>csv</data_type>                                     
+  <csv_separator>;</csv_separator>                             
+  <skip_rows>2</skip_rows>                                            
+  <font>Tahoma</font>                                               
+  <text_size></text_size>                                     
+  <text_color></text_color>                                   
+  <decimals_separator>.</decimals_separator>                   
+  <thousands_separator>none</thousands_separator>                 
+  <digits_after_decimal>2</digits_after_decimal>              
+  <scientific_min></scientific_min>                           
+  <scientific_max></scientific_max>                           
+  <redraw></redraw>                                           
+                                                                
+  <reload_data_interval></reload_data_interval>               
+  <preloader_on_reload></preloader_on_reload>                 
+  <add_time_stamp></add_time_stamp>                           
+  <precision></precision>                                     
+  <connect></connect>                                         
+  <hide_bullets_count></hide_bullets_count>                   
+  <link_target></link_target>                                 
+  <start_on_axis></start_on_axis>                             
+  <colors></colors>                                             
+  <rescale_on_hide></rescale_on_hide>                         
+  <js_enabled></js_enabled>                                   
+
+  <background>                                                
+    <color></color>                                           
+    <alpha></alpha>                                           
+    <border_color></border_color>                             
+    <border_alpha></border_alpha>                             
+    <file></file>                                             
+                                                              
+  </background>
+  
+ 
+  <plot_area>                                                 
+    <color></color>                                           
+    <alpha></alpha>                                           
+    <border_color></border_color>                                                                     
+    <border_alpha></border_alpha>                             
+    <margins>                                                 
+      <left>50</left>                                            
+      <top>10</top>                                              
+      <right>35</right>                                          
+      <bottom>30</bottom>                                        
+    </margins>
+  </plot_area>
+
+  <scroller>
+    <enabled>false</enabled>                                       
+    <y></y>                                                       
+    <color></color>                                           
+    <alpha></alpha>                                           
+    <bg_color></bg_color>                                     
+    <bg_alpha></bg_alpha>                                     
+    <height></height>                                             
+  </scroller>
+  
+  <grid>                                                      
+    <x>                                                       
+      <enabled></enabled>                                                                                          
+      <color></color>                                         
+      <alpha></alpha>                                         
+      <dashed></dashed>                                       
+      <dash_length></dash_length>                               
+      <approx_count></approx_count>                           
+    </x>
+    <y_left>                                                  
+      <enabled></enabled>                                               
+      <color></color>                                         
+      <alpha></alpha>                                         
+      <dashed></dashed>                                       
+      <dash_length></dash_length>                             
+      <approx_count>8</approx_count>                           
+      <fill_color></fill_color>                               
+      <fill_alpha></fill_alpha>                                     
+    </y_left>
+    <y_right>                                                 
+      <enabled></enabled>                                               
+      <color></color>                                         
+      <alpha></alpha>                                         
+      <dashed></dashed>                                       
+      <dash_length></dash_length>                             
+      <approx_count></approx_count>                           
+      <fill_color></fill_color>                               
+      <fill_alpha></fill_alpha>                                     
+    </y_right>        
+  </grid>
+  
+  <values>                                                    
+    <x>                                                       
+      <enabled></enabled>                                     
+      <rotate></rotate>                                             
+      <frequency></frequency>                                 
+      <skip_first></skip_first>                               
+      <skip_last></skip_last>                                 
+      <color></color>                                         
+      <text_size></text_size>                                 
+      <inside></inside>                                           
+    </x>
+    <y_left>                                                  
+      <enabled></enabled>                                     
+      <reverse></reverse>                                         
+      <rotate></rotate>                                       
+      <min></min>                                             
+      <max></max>                                             
+      <strict_min_max></strict_min_max>                       
+      <frequency>2</frequency>                                 
+      <skip_first>false</skip_first>                               
+      <skip_last></skip_last>                                 
+      <color>#333</color>                                          
+      <text_size>11</text_size>                                 
+      <unit></unit>                                           
+      <unit_position></unit_position>                         
+      <integers_only></integers_only>                         
+      <inside></inside>                                       
+      <duration></duration>                                   
+    </y_left>
+    <y_right>                                                 
+      <enabled></enabled>                                     
+      <reverse></reverse>                                         
+      <rotate></rotate>                                       
+      <min></min>                                             
+      <max></max>                                                 
+      <strict_min_max></strict_min_max>                       
+      <frequency></frequency>                                 
+      <skip_first></skip_first>                               
+      <skip_last></skip_last>                                 
+      <color></color>                                         
+      <text_size></text_size>                                 
+      <unit></unit>                                           
+      <unit_position></unit_position>                         
+      <integers_only></integers_only>                         
+      <inside></inside>                                       
+      <duration></duration>                                                     
+    </y_right>
+  </values>
+  
+  <axes>                                                      
+    <x>                                                       
+      <color>#666666</color>                                         
+      <alpha></alpha>                                         
+      <width>0</width>                                         
+      <tick_length></tick_length>                             
+    </x>
+    <y_left>                                                  
+      <type></type>                                               
+      <color>#666666</color>                                         
+      <alpha></alpha>                                         
+      <width>1</width>                                         
+      <tick_length>3</tick_length>                             
+      <logarithmic></logarithmic>                             
+    </y_left>
+    <y_right>                                                 
+      <type></type>                                               
+      <color></color>                                         
+      <alpha></alpha>                                         
+      <width></width>                                         
+      <tick_length></tick_length>                             
+      <logarithmic></logarithmic>                             
+    </y_right>
+  </axes>  
+  
+  <indicator>                                                 
+    <enabled></enabled>                                       
+    <zoomable></zoomable>                                     
+    <color>#e2e2e2</color>                                           
+    <line_alpha></line_alpha>                                 
+    <selection_color></selection_color>                       
+    <selection_alpha></selection_alpha>                       
+    <x_balloon_enabled></x_balloon_enabled>                   
+    <x_balloon_text_color>#999999</x_balloon_text_color>             
+  </indicator>
+    
+  <balloon>                                                   
+    <enabled></enabled>                                       
+    <only_one></only_one>                                     
+    <on_off>false</on_off>                                         
+    <color></color>                                           
+    <alpha></alpha>                                           
+    <text_color></text_color>                                 
+    <text_size></text_size>                                   
+    <max_width></max_width>                                   
+    <corner_radius></corner_radius>                           
+    <border_width></border_width>                             
+    <border_alpha></border_alpha>                             
+    <border_color></border_color>                             
+  </balloon>    
+    
+  <legend>                                                    
+    <enabled></enabled>                                       
+    <x>3</x>                                                   
+    <y></y>                                                   
+    <width>430</width>                                           
+    <max_columns></max_columns>                                
+    <color></color>                                           
+    <alpha></alpha>                                           
+    <border_color></border_color>                             
+    <border_alpha></border_alpha>                             
+    <text_color></text_color>                                    
+    <text_color_hover></text_color_hover>                         
+    <text_size>10</text_size>                                   
+    <spacing>-2</spacing>                                       
+    <margins></margins>                                           
+    <graph_on_off></graph_on_off>                             
+    <reverse_order></reverse_order>                           
+    <align></align>                                               
+    <key>                                                     
+      <size></size>                                           
+      <border_color></border_color>                           
+      <key_mark_color></key_mark_color>                       
+    </key>
+    <values>                                                            
+      <enabled>false</enabled>                                 
+      <width></width>                                       
+      <align></align>                                     
+      <text><![CDATA[: ${value}]]></text>                     
+     </values>
+  </legend>
+  
+  <vertical_lines>                                            
+    <width></width>                                           
+    <alpha></alpha>                                           
+    <clustered></clustered>                                   
+    <mask></mask>                                             
+  </vertical_lines>    
+  
+  <zoom_out_button>
+    <x></x>                                                   
+    <y></y>                                                   
+    <color></color>                                           
+    <alpha></alpha>                                           
+    <text_color></text_color>                                 
+    <text_color_hover></text_color_hover>                         
+    <text_size></text_size>                                   
+    <text></text>                                                 
+  </zoom_out_button> 
+  <error_messages>                                            
+    <enabled>false</enabled>                                                                         
+  </error_messages>   
+  <strings>
+    <no_data></no_data>                                       
+    <export_as_image></export_as_image>                       
+    <error_in_data_file></error_in_data_file>                 
+    <collecting_data></collecting_data>                       
+    <wrong_zoom_value></wrong_zoom_value>                     
+    
+    <ss></ss>                                                
+    <mm></mm>                                                
+    <hh></hh>                                                
+    <DD></DD>                                                        
+  </strings>
+  
+  <context_menu>                                                                                                            
+                                                              
+                                                              
+                                                              
+     
+     
+     
+     <default_items>
+       <zoom></zoom>                                          
+       <print></print>                                        
+     </default_items>
+  </context_menu>  
+  
+  
+  
+  
+  
+  <graphs>                                                    
+    <graph gid="0">                                                            
+      <axis>left</axis>
+      <title>主力净流入</title>              
+      <color>#FE3EE1</color>
+      <selected></selected>                     
+      <balloon_text>
+        <![CDATA[主力净流入:{value}万元]]>
+      </balloon_text>
+    </graph>
+
+    <graph gid="1">
+      <axis>left</axis>
+      <title>超大单净流入</title>
+      <color>#650000</color>
+      <selected></selected>
+      <balloon_text>
+        <![CDATA[超大单净流入:{value}万元]]>
+      </balloon_text>
+    </graph>
+
+    <graph gid="2">                                                            
+      <axis>left</axis>
+      <title>大单净流入</title>              
+      <color>#FF1117</color>
+      <selected></selected>                     
+      <balloon_text>
+         <![CDATA[大单净流入:{value}万元]]>
+      </balloon_text>
+    </graph>
+    
+    <graph gid="3">                                                            
+      <axis>left</axis>
+      <title>中单净流入</title>              
+      <color>#FFB83D</color>
+      <selected></selected>                     
+      <balloon_text>
+         <![CDATA[中单净流入:{value}万元]]>
+      </balloon_text>
+    </graph>
+
+    <graph gid="4">                                                            
+      <axis>left</axis>
+      <title>小单净流入</title>              
+      <color>#94C4EE</color>
+      <selected></selected>                     
+      <balloon_text>
+         <![CDATA[小单净流入:{value}万元]]>
+      </balloon_text>
+    </graph>
+
+  </graphs>  
+  
+    <guides>                                                     
+     <max_min></max_min>                                        
+     <guide>                                                   
+       <axis></axis>                                            
+       <start_value></start_value>                             
+       <end_value></end_value>                                 
+       <title></title>                                         
+       <width></width>                                         
+       <color></color>                                            
+       <alpha></alpha>                                         
+       <fill_color></fill_color>                               
+       <fill_alpha></fill_alpha>                                                                 
+       <inside></inside>                                       
+       <centered></centered>                                   
+       <rotate></rotate>                                       
+       <text_size></text_size>                                 
+       <text_color></text_color>                               
+     <dashed></dashed>                                       
+     <dash_length></dash_length>                                       
+     </guide>  
+    </guides>
+    
+    
+    
+    <!--<data>
+    </data> --> 
+</settings>

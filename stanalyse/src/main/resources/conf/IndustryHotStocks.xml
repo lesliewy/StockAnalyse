@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="IndustryHotStocks">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="IndustryHotStocks" type="com.wy.stock.domain.IndustryHotStocks" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="IndustryHotStocksResult" class="IndustryHotStocks">
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="rank" column="RANK" />
+		<result property="industryName" column="INDUSTRY_NAME" />
+		<result property="code" column="CODE" />
+		<result property="stockName" column="STOCK_NAME" />
+		<result property="newPrice" column="NEW" />
+		<result property="changePercent" column="CHANGE_PCT" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+	
+    <resultMap id="IndustryHotStocksResult2" class="IndustryHotStocks">
+        <result property="tradeDate" column="TRADE_DATE" />
+        <result property="industryName" column="INDUSTRY_NAME" />
+        <result property="code" column="CODE" />
+        <result property="rank" column="RANK" />
+        <result property="stockName" column="STOCK_NAME" />
+        <result property="newPrice" column="NEW" />
+        <result property="changePercent" column="CHANGE_PCT" />
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="industryRank" column="INDUSTRY_RANK" />
+        <result property="industryChangePercent" column="INDUSTRY_CHANGE_PCT" />
+    </resultMap>
+    
+    <resultMap id="IndustryHotStocksResult3" class="IndustryHotStocks">
+        <result property="stockName" column="STOCK_NAME" />
+        <result property="industryNames" column="INDUSTRY_NAMES" />
+    </resultMap>
+
+	<insert id="insertIndustryHotStocks" parameterClass="IndustryHotStocks">
+		insert into ST_INDUSTRY_HOT_STOCKS (
+		TRADE_DATE,
+		RANK,
+		INDUSTRY_NAME,
+		CODE,
+		STOCK_NAME,
+		NEW,
+		CHANGE_PCT,
+		TIMESTAMP)
+		values (
+		#tradeDate#, #rank#, #industryName#, #code#, #stockName#, #newPrice#, #changePercent#, #timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteIndustryHotStocksByIndustryName" parameterClass="java.lang.String">
+        delete from ST_INDUSTRY_HOT_STOCKS where STOCK_NAME = #stockName#
+    </delete>
+    
+    <select id="queryIndustryHotStocksByIndustryName" parameterClass="java.lang.String" resultMap="IndustryHotStocksResult">
+        select *
+        from ST_INDUSTRY_HOT_STOCKS
+       where INDUSTRY_NAME = #industryName#
+       ORDER BY RANK
+    </select>
+    
+    <select id="queryIndustryHotStocksForCsv" parameterClass="IndustryHotStocks" resultMap="IndustryHotStocksResult2">
+        SELECT B.TRADE_DATE, A.RANK INDUSTRY_RANK, B.INDUSTRY_NAME, A.CHANGE_PCT INDUSTRY_CHANGE_PCT, B.RANK, B.CODE, B.STOCK_NAME, B.NEW,
+               B.CHANGE_PCT, B.TIMESTAMP 
+          FROM ST_INDUSTRY_HOT A, ST_INDUSTRY_HOT_STOCKS B 
+         WHERE A.TRADE_DATE = B.TRADE_DATE
+           AND A.INDUSTRY_NAME=B.INDUSTRY_NAME     
+           AND A.TRADE_DATE &gt;= #lowTradeDateStr#
+           AND A.TRADE_DATE &lt;= #highTradeDateStr#
+           AND (A.RANK &lt;= 30 OR A.RANK &gt; 130) 
+        ORDER BY LEFT(B.TRADE_DATE, 10), A.RANK, B.RANK
+    </select>
+    
+    <select id="queryIndustryHotStocksByDateStrBetween" parameterClass="IndustryHotStocks" resultMap="IndustryHotStocksResult">
+        SELECT *
+          FROM ST_INDUSTRY_HOT_STOCKS
+         WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+               AND TRADE_DATE &lt;= #highTradeDateStr#
+         ORDER BY TRADE_DATE, RANK
+    </select>
+    
+    <select id="queryStocksIndustriesBetween" parameterClass="IndustryHotStocks" resultMap="IndustryHotStocksResult3">
+        SELECT STOCK_NAME, GROUP_CONCAT(DISTINCT INDUSTRY_NAME SEPARATOR ' | ') INDUSTRY_NAMES
+          FROM ST_INDUSTRY_HOT_STOCKS
+         WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+               AND TRADE_DATE &lt;= #highTradeDateStr#
+               GROUP BY STOCK_NAME
+    </select>
+    
+</sqlMap>

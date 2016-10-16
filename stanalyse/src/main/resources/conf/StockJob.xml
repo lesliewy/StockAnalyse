@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockJob">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockJob" type="com.wy.stock.domain.StockJob" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockJobResult" class="StockJob">
+		<result property="jobDate" column="JOB_DATE" />
+		<result property="jobType" column="JOB_TYPE" />
+		<result property="status" column="STATUS" />
+		<result property="remark" column="REMARK" />
+		<result property="beginTime" column="BEGIN_TIME" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insertStockJob" parameterClass="StockJob">
+		insert into ST_JOB (
+		JOB_DATE,
+		JOB_TYPE,
+		STATUS,
+		REMARK,
+		BEGIN_TIME,
+		TIMESTAMP)
+		values (
+		#jobDate#, #jobType#, #status#, #remark#, #beginTime#, #timestamp#
+		)
+	</insert>
+	
+    <update id="updateR2D" parameterClass="StockJob">
+        UPDATE ST_JOB SET STATUS = 'D', REMARK = #remark#, TIMESTAMP = #timestamp#
+        WHERE STATUS='R' AND TIME_TO_SEC(TIMEDIFF(NOW(),  BEGIN_TIME)) > #delRUpperLimit# 
+              AND LEFT(JOB_TYPE, 1)= #jobFlag#
+    </update>
+    
+    <update id="updateRunningJob" parameterClass="StockJob">
+        UPDATE ST_JOB SET STATUS = #status#, REMARK = #remark#, TIMESTAMP = #timestamp#
+         WHERE JOB_DATE = #jobDate#
+               AND STATUS='R'
+               AND JOB_TYPE = #jobType#
+    </update>
+    
+    <select id="queryStockJobByDateStatus" parameterClass="StockJob" resultMap="StockJobResult">
+        select *
+        from ST_JOB
+        WHERE LEFT(JOB_DATE, 6) = #date#
+              AND JOB_TYPE = #jobType#
+              AND STATUS = #status#
+    </select>
+    
+    <select id="queryStockJobByDate" parameterClass="StockJob" resultMap="StockJobResult">
+        select *
+        from ST_JOB
+        WHERE LEFT(JOB_DATE, 6) = #jobDate#
+              AND JOB_TYPE = #jobType#
+    </select>
+    
+    <delete id="deleteByDateType" parameterClass="StockJob">
+        delete from ST_JOB
+        WHERE LEFT(JOB_DATE, 6) = #date#
+              AND JOB_TYPE = #jobType#
+              AND STATUS = 'S'
+    </delete>
+    
+    <select id="queryLastStockJob" parameterClass="StockJob" resultMap="StockJobResult">
+        SELECT * 
+          FROM ST_JOB
+         WHERE JOB_TYPE=#jobType# 
+               AND STATUS=#status#
+               ORDER BY JOB_DATE DESC LIMIT 1
+    </select>
+    
+</sqlMap>

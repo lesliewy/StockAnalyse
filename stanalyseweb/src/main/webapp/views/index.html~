@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>by leslie</title>
+		<link href="../bootstrap-3.3.6/css/bootstrap.min.css"  rel="stylesheet"  type="text/css">
+		<style type="text/css">
+			body{
+				 padding-left:5px;
+			}
+		</style>
+		<script type="text/javascript" src="../jquery-1.11.1.js"></script>
+	   <script src="../angular-1.2.13.js"></script>
+   	<script type="text/javascript" src="../scripts/app.js"></script>
+		<script type="text/javascript" src="../ui-bootstrap-tpls.js"></script> 
+		<!--
+		<script type="text/javascript" src="../bootstrap-2.3.1/js/bootstrap-datetimepicker.min.js"></script>
+		-->
+	</head>
+<body>
+	<div ng-app="capFlow" ng-controller="capHistController">
+	<div class="input-prepend input-append">
+		<input type="button" class="btn" value="个股资金流向:" />
+		<input type="text" ng-model="code" placeholder="输代码、名称或拼音"/>
+	</div>
+	<div id="datetimepicker" class="input-append date">
+		<input type="button" class="btn" value="日期:" />
+		<div ng-controller="dateControl">
+			<div class="col-md-6">
+			   <p class="input-group">
+				<input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="tradeDate" is-open="opened" min-date="minDate" max-date="{{today}}" datepicker-options="dateOptions" date-disabled = "disabled(date,mode)" ng-required="true" close-text="Close"/>
+   	         <span class="input-group-btn">
+			         <button type="button" class="btn btn-default" ng-click="open($event)">
+			            <i class="glyphicon glyphicon-calendar"></i>
+			         </button>
+			      </span>
+			   </p>
+         </div>
+      </div>
+		<!--
+		<input type="text" ng-model="tradeDate"></input>  
+		-->
+		<span class="add-on">
+		   <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>  
+		</span>
+		<button class="btn" ng-click="allCapsQuery()">查询</button>
+	</div>
+	  
+	<h4>历史资金流向:</h4>
+	<table class="table table-striped table-bordered table-hover table-condensed">
+		<thead>
+		   <tr>
+		      <th rowspan="2">日期</th>
+		      <th rowspan="2">收盘价</th>
+		      <th rowspan="2">涨跌幅</th>
+		      <th colspan="2">主力净流入</th>
+		      <th colspan="2">超大单净流入<i title="因为存在一笔大额的委托单仅成交小部分的情况，所以会导致超大单或者大单流入/流出的数额极小。">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i></th>
+		      <th colspan="2">大单净流入</th>
+		      <th colspan="2">中单净流入</th>
+		      <th colspan="2">小单净流入</th>
+		   </tr>
+		   <tr>
+		      <th>净额</th>
+		      <th>净占比</th>
+		      <th>净额</th>
+		      <th>净占比</th>
+		      <th>净额</th>
+		      <th>净占比</th>
+		      <th>净额</th>
+		      <th>净占比</th>
+		      <th>净额</th>
+		      <th>净占比</th>
+		   </tr>
+		</thead>
+		<tbody>
+		   <tr ng-repeat="cap in allCaps">
+		      <td>{{ cap.tradeDate|date:'yyyy-MM-dd HH:mm:ss' }}</td>
+		      <td>{{ cap.close }}</td>
+		      <td>{{ cap.changePercent }}</td>
+		      <td>{{ cap.mainNetIn }}</td>
+		      <td>{{ cap.mainNetInPercent }}</td>
+		      <td>{{ cap.superLarge }}</td>
+		      <td>{{ cap.superLargePercent }}</td>
+		      <td>{{ cap.large }}</td>
+		      <td>{{ cap.largePercent }}</td>
+		      <td>{{ cap.middle }}</td>
+		      <td>{{ cap.middlePercent }}</td>
+		      <td>{{ cap.small }}</td>
+		      <td>{{ cap.smallPercent }}</td>
+		   </tr>
+		  </tbody>
+	 </table>
+	</div>
+	<script type="text/javascript">
+		/*
+		$('#datetimepicker').datetimepicker({  
+		  format: 'yyyy-MM-dd 15:00:00',
+		  language: 'en',  
+		  pickDate: true,  
+		  pickTime: true,  
+		  hourStep: 1,  
+		  minuteStep: 15,  
+		  secondStep: 30,  
+		  inputMask: true  
+		});  
+		*/
+	</script>
+
+</body>
+</html>

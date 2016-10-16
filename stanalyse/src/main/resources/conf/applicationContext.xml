@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<!-- Configurer that replaces ${...} placeholders with values from properties 
+		files -->
+	<!-- (in this case, mail and JDBC related properties) -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:conf/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--  Spring IOC 这里不使用注解的方式 -->
+	<!-- 
+    <context:component-scan base-package="com.wy.stock">
+        <context:exclude-filter type="annotation" 
+            expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" 
+            expression="org.springframework.web.bind.annotation.ControllerAdvice"/>  
+    </context:component-scan>
+    -->
+
+	<!-- DAO begin -->
+	<bean id="stockInfoDao" class="com.wy.stock.dao.impl.StockInfoDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="stockHistoryDao" class="com.wy.stock.dao.impl.StockHistoryDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="stockJobDao" class="com.wy.stock.dao.impl.StockJobDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="maDao" class="com.wy.stock.dao.impl.StockMovingAvgDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="notionHotDao" class="com.wy.stock.dao.impl.NotionHotDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="industryHotDao" class="com.wy.stock.dao.impl.IndustryHotDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="notionInfoDao" class="com.wy.stock.dao.impl.NotionInfoDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="industryInfoDao" class="com.wy.stock.dao.impl.IndustryInfoDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="notionHotStocksDao" class="com.wy.stock.dao.impl.NotionHotStocksDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="industryHotStocksDao" class="com.wy.stock.dao.impl.IndustryHotStocksDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="indexDao" class="com.wy.stock.dao.impl.IndexDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="notionStockDao" class="com.wy.stock.dao.impl.NotionStockDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="industryStockDao" class="com.wy.stock.dao.impl.IndustryStockDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="stockFiveChangeDao" class="com.wy.stock.dao.impl.StockFiveChangeDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="stockNotionDao" class="com.wy.stock.dao.impl.StockNotionDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="stockCapFlowDao" class="com.wy.stock.dao.impl.StockCapFlowDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="configDao" class="com.wy.stock.dao.impl.ConfigDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+	<!-- DAO end -->
+
+	<!-- Service begin -->
+    <bean id="stockInfoService" class="com.wy.stock.service.impl.StockInfoServiceImpl">
+        <property name="stockInfoDao" ref="stockInfoDao" />
+    </bean>
+    <bean id="stockHistoryService" class="com.wy.stock.service.impl.StockHistoryServiceImpl">
+        <property name="stockHistoryDao" ref="stockHistoryDao" />
+    </bean>
+    <bean id="stockDownloadTool" class="com.wy.stock.tools.StockDownloadToolImpl">
+        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="notionInfoService" ref="notionInfoService" />
+        <property name="industryInfoService" ref="industryInfoService" />
+        <property name="notionHotService" ref="notionHotService" />
+        <property name="industryHotService" ref="industryHotService" />
+    </bean>
+    <bean id="stockDownloadToolTHS" class="com.wy.stock.tools.StockDownloadToolTHSImpl">
+        <property name="notionHotService" ref="notionHotService" />
+        <property name="industryHotService" ref="industryHotService" />
+    </bean>
+    <bean id="stockParseTool" class="com.wy.stock.tools.StockParseToolImpl">
+        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="stockHistoryService" ref="stockHistoryService" />
+        <property name="notionInfoService" ref="notionInfoService" />
+        <property name="industryInfoService" ref="industryInfoService" />
+        <property name="notionHotStocksService" ref="notionHotStocksService" />
+        <property name="industryHotStocksService" ref="industryHotStocksService" />
+        <property name="indexService" ref="indexService" />
+        <property name="notionStockService" ref="notionStockService" />
+        <property name="industryStockService" ref="industryStockService" />
+        <property name="stockFiveChangeService" ref="stockFiveChangeService" />
+    </bean>
+    <bean id="stockParseToolTHS" class="com.wy.stock.tools.StockParseToolTHSImpl">
+        <property name="notionInfoService" ref="notionInfoService" />
+        <property name="industryInfoService" ref="industryInfoService" />
+        <property name="notionHotService" ref="notionHotService" />
+        <property name="industryHotService" ref="industryHotService" />
+        <property name="notionHotStocksService" ref="notionHotStocksService" />
+        <property name="industryHotStocksService" ref="industryHotStocksService" />
+        <property name="indexService" ref="indexService" />
+        <property name="notionStockService" ref="notionStockService" />
+        <property name="industryStockService" ref="industryStockService" />
+        <property name="stockFiveChangeService" ref="stockFiveChangeService" />
+        <property name="stockInfoService" ref="stockInfoService" />
+    </bean>
+    <bean id="candlestickService" class="com.wy.stock.service.impl.CandlestickServiceImpl">
+        <property name="stockHistoryService" ref="stockHistoryService" />
+        <property name="stockInfoService" ref="stockInfoService" />
+    </bean>
+    <bean id="gapService" class="com.wy.stock.service.impl.GapServiceImpl">
+        <property name="stockHistoryService" ref="stockHistoryService" />
+        <property name="stockInfoService" ref="stockInfoService" />
+    </bean>
+    <bean id="stockJobService" class="com.wy.stock.service.impl.StockJobServiceImpl">
+        <property name="stockJobDao" ref="stockJobDao" />
+    </bean>
+    <bean id="maService" class="com.wy.stock.service.impl.StockMovingAvgServiceImpl">
+        <property name="maDao" ref="maDao" />
+    </bean>
+    <bean id="stockMovingAvgTool" class="com.wy.stock.tools.StockMovingAvgToolImpl">
+        <property name="maService" ref="maService" />
+        <property name="stockHistoryService" ref="stockHistoryService" />
+        <property name="stockInfoService" ref="stockInfoService" />
+    </bean>
+    <bean id="notionHotService" class="com.wy.stock.service.impl.NotionHotServiceImpl">
+        <property name="notionHotDao" ref="notionHotDao" />
+    </bean>
+    <bean id="industryHotService" class="com.wy.stock.service.impl.IndustryHotServiceImpl">
+        <property name="industryHotDao" ref="industryHotDao" />
+    </bean>
+    <bean id="notionInfoService" class="com.wy.stock.service.impl.NotionInfoServiceImpl">
+        <property name="notionInfoDao" ref="notionInfoDao" />
+    </bean>
+    <bean id="industryInfoService" class="com.wy.stock.service.impl.IndustryInfoServiceImpl">
+        <property name="industryInfoDao" ref="industryInfoDao" />
+    </bean>
+    <bean id="notionHotStocksService" class="com.wy.stock.service.impl.NotionHotStocksServiceImpl">
+        <property name="notionHotStocksDao" ref="notionHotStocksDao" />
+    </bean>
+    <bean id="industryHotStocksService" class="com.wy.stock.service.impl.IndustryHotStocksServiceImpl">
+        <property name="industryHotStocksDao" ref="industryHotStocksDao" />
+    </bean>
+    <bean id="indexService" class="com.wy.stock.service.impl.IndexServiceImpl">
+        <property name="indexDao" ref="indexDao" />
+    </bean>
+    <bean id="notionStockService" class="com.wy.stock.service.impl.NotionStockServiceImpl">
+        <property name="notionStockDao" ref="notionStockDao" />
+    </bean>
+    <bean id="industryStockService" class="com.wy.stock.service.impl.IndustryStockServiceImpl">
+        <property name="industryStockDao" ref="industryStockDao" />
+    </bean>
+    <bean id="stockFiveChangeService" class="com.wy.stock.service.impl.StockFiveChangeServiceImpl">
+        <property name="stockFiveChangeDao" ref="stockFiveChangeDao" />
+    </bean>
+    <bean id="stockNotionService" class="com.wy.stock.service.impl.StockNotionServiceImpl">
+        <property name="stockNotionDao" ref="stockNotionDao" />
+    </bean>
+    <bean id="fiveChangeService" class="com.wy.stock.service.impl.StockFiveChangeServiceImpl">
+        <property name="stockFiveChangeDao" ref="stockFiveChangeDao" />
+    </bean>
+    <bean id="analyseFiveChangeService" class="com.wy.stock.service.impl.AnalyseFiveChangeServiceImpl">
+        <property name="notionStockService" ref="notionStockService" />
+        <property name="industryStockService" ref="industryStockService" />
+        <property name="fiveChangeService" ref="fiveChangeService" />
+    </bean>
+    <bean id="stockCapFlowService" class="com.wy.stock.service.impl.StockCapFlowServiceImpl">
+        <property name="stockCapFlowDao" ref="stockCapFlowDao" />
+    </bean>
+    <bean id="configService" class="com.wy.stock.service.impl.ConfigServiceImpl">
+        <property name="configDao" ref="configDao" />
+    </bean>
+    <bean id="analyseStockTool" class="com.wy.stock.tools.AnalyseStockToolImpl">
+        <property name="stockCapFlowService" ref="stockCapFlowService" />
+        <property name="industryStockService" ref="industryStockService" />
+        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="notionHotService" ref="notionHotService" />
+        <property name="industryHotService" ref="industryHotService" />
+        <property name="industryHotStocksService" ref="industryHotStocksService" />
+        <property name="notionHotStocksService" ref="notionHotStocksService" />
+        <property name="notionInfoService" ref="notionInfoService" />
+        <property name="industryInfoService" ref="industryInfoService" />
+        <property name="indexService" ref="indexService" />
+    </bean>
+	<!-- Service end -->
+	
+	<!-- job service begin -->
+    <bean id="persistHistFilesJob" class="com.wy.stock.job.PersistHistFilesJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockDownloadTool" ref="stockDownloadTool" />
+        <property name="stockParseTool" ref="stockParseTool" />
+    </bean>
+    <bean id="persistBoardHotJob" class="com.wy.stock.job.PersistBoardHotJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockDownloadTool" ref="stockDownloadTool" />
+        <property name="stockParseTool" ref="stockParseTool" />
+        <property name="notionHotService" ref="notionHotService" />
+        <property name="industryHotService" ref="industryHotService" />
+    </bean>
+    <bean id="persistBoardHotTHSJob" class="com.wy.stock.job.PersistBoardHotTHSJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockDownloadToolTHS" ref="stockDownloadToolTHS" />
+        <property name="stockParseToolTHS" ref="stockParseToolTHS" />
+        <property name="analyseStockTool" ref="analyseStockTool" />
+    </bean>
+    <bean id="analyseStockDailyJob" class="com.wy.stock.job.AnalyseStockDailyJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockParseTool" ref="stockParseTool" />
+        <property name="candlestickService" ref="candlestickService" />
+    </bean>
+    <bean id="analyseFiveChangeJob" class="com.wy.stock.job.AnalyseFiveChangeJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockParseTool" ref="stockParseTool" />
+        <property name="stockDownloadTool" ref="stockDownloadTool" />
+        <property name="analyseFiveChangeService" ref="analyseFiveChangeService" />
+    </bean>
+    <bean id="persistStockCapFlowJob" class="com.wy.stock.job.PersistStockCapFlowJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="configService" ref="configService" />
+        <property name="stockDownloadTool" ref="stockDownloadTool" />
+        <property name="stockParseTool" ref="stockParseTool" />
+        <property name="stockCapFlowService" ref="stockCapFlowService" />
+        <property name="stockInfoService" ref="stockInfoService" />
+    </bean>
+    
+    <bean id="downloadStockCapFlowDetailJob" class="com.wy.stock.job.DownloadStockCapFlowDetailJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockDownloadTool" ref="stockDownloadTool" />
+        <property name="stockInfoService" ref="stockInfoService" />
+    </bean>
+    
+    <bean id="persistNotionIndustryInfoJob" class="com.wy.stock.job.PersistNotionIndustryInfoJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockParseToolTHS" ref="stockParseToolTHS" />
+    </bean>
+    <bean id="fetchStockInfoJob" class="com.wy.stock.job.FetchStockInfoJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockParseTool" ref="stockParseTool" />
+    </bean>
+	<!-- job service end -->
+
+	<!-- datasource begin -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<!-- datasource end -->
+
+	<!-- SqlMap setup for iBATIS Database Layer -->
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<!-- name 为configLocation或s 不可为其他 -->
+		<property name="configLocation" value="classpath:conf/SqlMapConfig.xml" />
+		<!-- dataSource不是必需 -->
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- JOB 配置 Begin -->
+    <!-- JOB P - 获取股票历史数据, csv文件. -->
+    <bean id="persistHistFilesJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="persistHistFilesJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="persistHistFiles" />  
+    </bean>
+    <!-- 1 秒 是 0-59  , - * / 
+         2 分 是 0-59  , - * / 
+         3 小时 是 0-23 , - * / 
+         4 日 是 1-31 , - * ? / L W 
+         5 月 是 1-12 or JAN-DEC , - * / 
+         6 周 是 1-7 or SUN-SAT , - * ? / L #  
+         7 年 否 empty 或 1970-2099 , - * /   
+    -->
+    <bean id="persistHistFilesJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="persistHistFilesJobDetail" />  
+        <property name="cronExpression" value="0 1 0,5 * * ?" />  
+    </bean>
+    
+    <!-- JOB - Q 分析数据 -->
+    <bean id="analyseStockDailyJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="analyseStockDailyJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="analyseStock" />  
+    </bean>
+    <bean id="analyseStockDailyJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="analyseStockDailyJobDetail" />
+        <property name="cronExpression" value="0 1 7 * * ?" />  
+    </bean>
+    
+    <!-- JOB - T 热点板块信息 -->
+    <bean id="persistBoardHotTHSJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="persistBoardHotTHSJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="persistBoardHot" />  
+    </bean>
+    <bean id="persistBoardHotTHSJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="persistBoardHotTHSJobDetail" />
+        <property name="cronExpression" value="0 0/7 17-23 * * ?" />
+    </bean>
+    
+    <!-- JOB - U 5分钟涨跌 -->
+    <bean id="analyseFiveChangeJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="analyseFiveChangeJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="analyseFiveChange" />  
+    </bean>
+    <bean id="analyseFiveChangeJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="analyseFiveChangeJobDetail" />
+        <property name="cronExpression" value="0 0/5 9-16 * * ?" />
+    </bean>
+    
+    <!-- JOB - C 资金流向情况 -->
+    <bean id="persistStockCapFlowJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="persistStockCapFlowJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="persistStockCapFlow" />  
+    </bean>
+    <bean id="persistStockCapFlowJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="persistStockCapFlowJobDetail" />
+        <property name="cronExpression" value="0 6/3 17-23 * * ?" />
+    </bean>
+    
+    <!-- JOB - E 下载个股资金明细 2016/08/15 取消.-->
+    <bean id="downloadStockCapFlowDetailJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="downloadStockCapFlowDetailJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="downloadStockCapFlowDetail" />  
+    </bean>
+    <bean id="downloadStockCapFlowDetailJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="downloadStockCapFlowDetailJobDetail" />
+        <property name="cronExpression" value="0 7/10 17-23 * * ?" />
+    </bean>
+    
+    <!-- JOB - I 更新ST_NOTION_INFO ST_INDUSTRY_INFO 中的URL, 同花顺. 每周三执行.
+         不需要了: persistBoardHotTHSJobTrigger 中更新/新增ST_NOTION_INFO,ST_INDUSTRY_INFO中的值.-->
+    <bean id="persistNotionIndustryInfoJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="persistNotionIndustryInfoJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="persistNotionIndustryInfo" />  
+    </bean>
+    <bean id="persistNotionIndustryInfoJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="persistNotionIndustryInfoJobDetail" />
+        <property name="cronExpression" value="0 5/10 20-23 ? * 4" />
+    </bean>
+    
+    <!-- JOB - G 更新ST_INFO -->
+    <bean id="fetchStockInfoJobDetail"  
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">  
+        <!-- 指定任务类 -->  
+        <property name="targetObject" ref="fetchStockInfoJob" />  
+        <!-- 指定任务执行的方法 execute processMatch-->  
+        <property name="targetMethod" value="fetchStockInfo" />  
+    </bean>
+    <bean id="fetchStockInfoJobTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">  
+        <property name="jobDetail" ref="fetchStockInfoJobDetail" />
+        <property name="cronExpression" value="0 0/5 * * * ?" />
+    </bean>
+    
+    <bean lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+        <property name="triggers">
+            <list>
+                <ref bean="persistBoardHotTHSJobTrigger" />
+                <ref bean="persistStockCapFlowJobTrigger" />
+                <ref bean="fetchStockInfoJobTrigger" />
+            </list>
+        </property>
+    </bean>
+    <!-- JOB 配置 END -->
+</beans>

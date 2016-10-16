@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockCapFlow">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockCapFlow" type="com.wy.stock.domain.StockCapFlow" />
+	<typeAlias alias="AnalyseCondition" type="com.wy.stock.domain.AnalyseCondition" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockCapFlowResult" class="StockCapFlow">
+	    <result property="tradeDate" column="TRADE_DATE" />
+		<result property="code" column="CODE" />
+		<result property="close" column="CLOSE" />
+		<result property="changePercent" column="CHANGE_PCT" />
+		<result property="mainNetIn" column="MAIN_NET_IN" />
+		<result property="mainNetInPercent" column="MAIN_NET_IN_PCT" />
+		<result property="superLarge" column="SUPER_LARGE" />
+		<result property="superLargePercent" column="SUPER_LARGE_PCT" />
+		<result property="large" column="LARGE" />
+        <result property="largePercent" column="LARGE_PCT" />
+		<result property="middle" column="MIDDLE" />
+		<result property="middlePercent" column="MIDDLE_PCT" />
+		<result property="small" column="SMALL" />
+		<result property="smallPercent" column="SMALL_PCT" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+	
+    <resultMap id="StockCapFlowResult1" class="StockCapFlow">
+        <result property="code" column="CODE" />
+        <result property="accumuChangePct" column="ACCUMU_CHANGE_PCT" />
+        <result property="accumuMainNetInPct" column="ACCUMU_MAIN_NET_IN_PCT" />
+    </resultMap>
+	
+	<insert id="insertStockCapFlow" parameterClass="StockCapFlow">
+		insert into ST_STOCK_CAP_FLOW (
+		TRADE_DATE,
+		CODE,
+		CLOSE,
+		CHANGE_PCT,
+		MAIN_NET_IN,
+		MAIN_NET_IN_PCT,
+		SUPER_LARGE,
+		SUPER_LARGE_PCT,
+		LARGE,
+		LARGE_PCT,
+		MIDDLE,
+		MIDDLE_PCT,
+		SMALL,
+		SMALL_PCT,
+		TIMESTAMP)
+		values (
+		#tradeDate#, #code#, #close#, #changePercent#, #mainNetIn#, #mainNetInPercent#, #superLarge#, #superLargePercent#, #large#, 
+		#largePercent#, #middle#, #middlePercent#, #small#, #smallPercent#, #timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteCapFlowByKey" parameterClass="StockCapFlow">
+        delete from ST_STOCK_CAP_FLOW where TRADE_DATE = #tradeDate# AND CODE = #code#
+    </delete>
+    
+    <delete id="deleteCapFlowByDate" parameterClass="java.sql.Timestamp">
+        delete from ST_STOCK_CAP_FLOW where TRADE_DATE = #tradeDate#
+    </delete>
+    
+    <select id="queryCapFlowByCode" parameterClass="java.lang.String" resultMap="StockCapFlowResult">
+        select * from ST_STOCK_CAP_FLOW where CODE = #code#
+    </select>
+    
+    <select id="queryCapFlowByDate" parameterClass="java.sql.Timestamp" resultMap="StockCapFlowResult">
+        select * from ST_STOCK_CAP_FLOW where TRADE_DATE = #tradeDate#
+    </select>
+    
+    <select id="analyseFall" parameterClass="AnalyseCondition" resultMap="StockCapFlowResult">
+        select *
+          from ST_STOCK_CAP_FLOW 
+         where TRADE_DATE = #tradeDate#
+           AND MAIN_NET_IN &gt; #capFlowLower#
+           AND MAIN_NET_IN &lt; #capFlowUpper#
+           AND CHANGE_PCT &gt; #changePctLower#
+           AND CHANGE_PCT &lt; #changePctUpper#
+    </select>
+    
+    <select id="queryCapFlowBefore" parameterClass="StockCapFlow" resultMap="StockCapFlowResult">
+        SELECT * FROM ST_STOCK_CAP_FLOW
+         WHERE TRADE_DATE &lt;= #tradeDate#
+           AND CODE = #code#
+               ORDER BY TRADE_DATE DESC LIMIT 50
+    </select>
+    
+    <select id="queryAllAccumuChangePct" parameterClass="StockCapFlow" resultMap="StockCapFlowResult1">
+        SELECT CODE, SUM(CHANGE_PCT) ACCUMU_CHANGE_PCT, SUM(MAIN_NET_IN_PCT) ACCUMU_MAIN_NET_IN_PCT
+          FROM ST_STOCK_CAP_FLOW
+         WHERE TRADE_DATE &lt;= #tradeDateUpper# AND TRADE_DATE &gt;= #tradeDateLower#
+               GROUP BY CODE;
+    </select>
+    
+    <select id="queryCapFlowByDateRange" parameterClass="StockCapFlow" resultMap="StockCapFlowResult">
+        SELECT *
+          FROM ST_STOCK_CAP_FLOW
+         WHERE TRADE_DATE &lt;= #tradeDateUpper# AND TRADE_DATE &gt;= #tradeDateLower#
+           AND CODE = #code#
+               ORDER BY TRADE_DATE DESC
+    </select>
+    
+</sqlMap>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Index">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="Index" type="com.wy.stock.domain.Index" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="IndexResult" class="Index">
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="indexCode" column="INDEX_CODE" />
+		<result property="indexName" column="INDEX_NAME" />
+		<result property="newPrice" column="NEW" />
+		<result property="changeAmount" column="CHANGE_AMOUNT" />
+		<result property="changePercent" column="CHANGE_PCT" />
+		<result property="open" column="OPEN" />
+		<result property="high" column="HIGH" />
+		<result property="low" column="LOW" />
+		<result property="close" column="CLOSE" />
+		<result property="lastClose" column="LAST_CLOSE" />
+		<result property="amplitude" column="AMPLITUDE" />
+		<result property="volumn" column="VOLUMN" />
+		<result property="volumnAmount" column="VOLUMN_AMOUNT" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+	
+    <resultMap id="IndexResult1" class="Index">
+        <result property="indexName" column="INDEX_NAME" />
+        <result property="totalChangePercent" column="TOTAL_CHANGE_PCT" />
+    </resultMap>
+
+	<insert id="insertIndex" parameterClass="Index">
+		insert into ST_INDEX (
+		TRADE_DATE,
+		INDEX_CODE,
+		INDEX_NAME,
+		NEW,
+		CHANGE_AMOUNT,
+		CHANGE_PCT,
+		OPEN,
+		HIGH,
+		LOW,
+		CLOSE,
+		LAST_CLOSE,
+		AMPLITUDE,
+		VOLUMN,
+		VOLUMN_AMOUNT,
+		TIMESTAMP)
+		values (
+		#tradeDate#, #indexCode#, #indexName#, #newPrice#, #changeAmount#, #changePercent#, #open#, #high#,
+		#low#, #close#, #lastClose#, #amplitude#, #volumn#, #volumnAmount#, #timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteIndexByDate" parameterClass="java.lang.String">
+        delete from ST_INDEX where TRADE_DATE like CONCAT(#tradeDate# , '%')
+    </delete>
+    
+    <select id="queryIndexByDate" parameterClass="java.lang.String" resultMap="IndexResult">
+        select *
+        from ST_INDEX
+       where TRADE_DATE like CONCAT(#tradeDate# , '%')
+    </select>
+    
+    <select id="queryAllIndex" resultMap="IndexResult">
+        SELECT *
+        FROM ST_INDEX
+    </select>
+    
+    <select id="queryTotalChangePctBetween" parameterClass="Index" resultMap="IndexResult1">
+        SELECT INDEX_NAME, SUM(CHANGE_PCT) TOTAL_CHANGE_PCT
+          FROM ST_INDEX
+         WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+               AND TRADE_DATE &lt;= #highTradeDateStr#
+               GROUP BY INDEX_NAME
+    </select>
+    
+</sqlMap>

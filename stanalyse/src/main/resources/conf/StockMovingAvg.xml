@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockMovingAvg">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockMovingAvg" type="com.wy.stock.domain.StockMovingAvg" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockMovingAvgResult" class="StockMovingAvg">
+		<result property="code" column="CODE" />
+		<result property="type" column="TYPE" />
+		<result property="exchange" column="EXCHANGE" />
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="period" column="PERIOD" />
+		<result property="value" column="VALUE" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+	
+    <resultMap id="StockMovingAvgResult1" class="StockMovingAvg">
+        <result property="code" column="CODE" />
+        <result property="type" column="TYPE" />
+        <result property="exchange" column="EXCHANGE" />
+        <result property="period" column="PERIOD" />
+    </resultMap>
+	
+	<insert id="insertStockMovingAvg" parameterClass="StockMovingAvg">
+		insert into ST_MA (
+		CODE,
+		TYPE,
+		EXCHANGE,
+		TRADE_DATE,
+		PERIOD,
+		VALUE,
+		TIMESTAMP)
+		values (
+		#code#, #type#, #exchange#, #tradeDate#, #period#, #value#, #timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteByCodePeriod" parameterClass="StockMovingAvg">
+        delete from ST_MA where EXCHANGE = #exchange# AND CODE = #code# AND TYPE = #type# AND PERIOD = #period#
+    </delete>
+    
+    <select id="queryAllDistinct" parameterClass="StockMovingAvg" resultMap="StockMovingAvgResult1">
+        select distinct CODE, EXCHANGE, TYPE, PERIOD
+        from ST_MA
+    </select>
+    
+    <select id="queryAllByCode" parameterClass="StockMovingAvg" resultMap="StockMovingAvgResult">
+        select *
+        from ST_MA
+         where CODE = #code#
+               AND EXCHANGE = #exchange#
+               AND TYPE = #type#
+               ORDER BY TRADE_DATE
+    </select>
+	
+</sqlMap>

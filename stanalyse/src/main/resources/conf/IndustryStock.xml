@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="IndustryStock">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="IndustryStock" type="com.wy.stock.domain.IndustryStock" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="IndustryStockResult" class="IndustryStock">
+		<result property="industryCode" column="INDUSTRY_CODE" />
+		<result property="industryName" column="INDUSTRY_NAME" />
+		<result property="code" column="CODE" />
+		<result property="stockName" column="STOCK_NAME" />
+		<result property="timestamp" column="TIMESTAMP" />
+		<result property="source" column="SOURCE" />
+	</resultMap>
+
+	<insert id="insertIndustryStock" parameterClass="IndustryStock">
+		insert into ST_INDUSTRY_STOCK (
+		INDUSTRY_CODE,
+		INDUSTRY_NAME,
+		CODE,
+		STOCK_NAME,
+		TIMESTAMP,
+		SOURCE)
+		values (
+		#industryCode#, #industryName#, #code#, #stockName#, #timestamp#, #source#
+		)
+	</insert>
+	
+	<delete id="deleteAllIndustryStock" parameterClass="java.lang.String">
+        delete from ST_INDUSTRY_STOCK WHERE SOURCE = #source#
+    </delete>
+    
+    <delete id="deleteIndustryStockByIndustryCode" parameterClass="java.lang.String">
+        delete from ST_INDUSTRY_STOCK where INDUSTRY_CODE = #industryCode#
+    </delete>
+    
+    <select id="queryIndustryStockByCode" parameterClass="java.lang.String" resultMap="IndustryStockResult">
+        select *
+        from ST_INDUSTRY_STOCK
+       where CODE = #code#
+    </select>
+    
+    <select id="queryIndustryStockByIndustryCode" parameterClass="IndustryStock" resultMap="IndustryStockResult">
+        select *
+        from ST_INDUSTRY_STOCK
+       where INDUSTRY_CODE = #industryCode#
+             AND SOURCE = #source#
+    </select>
+    
+    <select id="queryAllIndustryStock" parameterClass="java.lang.String" resultMap="IndustryStockResult">
+        select *
+        from ST_INDUSTRY_STOCK
+       where SOURCE = #source#
+    </select>
+    
+</sqlMap>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockInfo">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockInfo" type="com.wy.stock.domain.StockInfo" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockInfoResult" class="StockInfo">
+		<result property="name" column="NAME" />
+		<result property="code" column="CODE" />
+		<result property="type" column="TYPE" />
+		<result property="exchange" column="EXCHANGE" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insertStockInfo" parameterClass="StockInfo">
+		insert into ST_INFO (
+		NAME,
+		CODE,
+		TYPE,
+		EXCHANGE,
+		TIMESTAMP)
+		values (
+		#name#, #code#, #type#, #exchange#,#timestamp#
+		)
+	</insert>
+	
+    <delete id="deleteByExchangeType" parameterClass="StockInfo">
+        delete from ST_INFO where EXCHANGE = #exchange# AND TYPE = #type#
+    </delete>
+    
+    <delete id="deleteByExchange" parameterClass="java.lang.String">
+        delete from ST_INFO where EXCHANGE = #exchange#
+    </delete>
+    
+    <delete id="deleteByKey" parameterClass="StockInfo">
+        delete from ST_INFO where EXCHANGE = #exchange# AND CODE = #code# AND TYPE = #type#
+    </delete>
+    
+    <select id="queryAllStockInfo" resultMap="StockInfoResult">
+        select *
+        from ST_INFO
+    </select>
+    
+    <select id="queryStockInfoByExchange" resultMap="StockInfoResult">
+        select *
+        from ST_INFO
+       where EXCHANGE = #exchange#
+    </select>
+    
+    <select id="queryStockInfoByType" resultMap="StockInfoResult">
+        select *
+        from ST_INFO
+       where TYPE = #type#
+    </select>
+</sqlMap>

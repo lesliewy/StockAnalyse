@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="NotionHot">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="NotionHot" type="com.wy.stock.domain.NotionHot" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="NotionHotResult" class="NotionHot">
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="rank" column="RANK" />
+		<result property="notionName" column="NOTION_NAME" />
+		<result property="changePercent" column="CHANGE_PCT" />
+		<result property="totalMarketCap" column="TOT_MARKET_CAP" />
+		<result property="turnoverRate" column="TURNOVER_RATE" />
+		<result property="riseStocksNum" column="RISE_STOCKS_NUM" />
+		<result property="fallStocksNum" column="FALL_STOCKS_NUM" />
+		<result property="riseLeadStockName" column="RISE_LEAD_STOCK_NAME" />
+		<result property="riseLeadStockChangePercent" column="RISE_LEAD_STOCK_CHANGE_PCT" />
+		<result property="timestamp" column="TIMESTAMP" />
+		<result property="source" column="SOURCE" />
+		<result property="avgPrice" column="AVG_PRICE" />
+		<result property="notionUrl" column="NOTION_URL" />
+		<result property="corpsNum" column="CORPS_NUM" />
+	</resultMap>
+	
+    <resultMap id="NotionHotResult2" class="NotionHot">
+        <result property="tradeDate" column="TRADE_DATE" />
+        <result property="rank" column="RANK" />
+        <result property="notionName" column="NOTION_NAME" />
+        <result property="changePercent" column="CHANGE_PCT" />
+        <result property="riseLeadStockName" column="RISE_LEAD_STOCK_NAME" />
+        <result property="riseLeadStockChangePercent" column="RISE_LEAD_STOCK_CHANGE_PCT" />
+        <result property="timestamp" column="TIMESTAMP" />
+    </resultMap>
+
+	<insert id="insertNotionHot" parameterClass="NotionHot">
+		insert into ST_NOTION_HOT (
+		TRADE_DATE,
+		RANK,
+		NOTION_NAME,
+		CHANGE_PCT,
+		TOT_MARKET_CAP,
+		TURNOVER_RATE,
+		RISE_STOCKS_NUM,
+		FALL_STOCKS_NUM,
+		RISE_LEAD_STOCK_NAME,
+		RISE_LEAD_STOCK_CHANGE_PCT,
+		TIMESTAMP,
+		SOURCE,
+		AVG_PRICE)
+		values (
+		#tradeDate#, #rank#, #notionName#, #changePercent#, #totalMarketCap#, #turnoverRate#, #riseStocksNum#, #fallStocksNum#,
+		#riseLeadStockName#, #riseLeadStockChangePercent#, #timestamp#, #source#, #avgPrice#
+		)
+	</insert>
+	
+    <delete id="deleteNotionHotByTradeDateStr" parameterClass="NotionHot">
+        delete from ST_NOTION_HOT where LEFT(TRADE_DATE, 10)=#tradeDateStr# AND SOURCE = #source#
+    </delete>
+    
+    <select id="queryNotionHotByDate" parameterClass="java.lang.String" resultMap="NotionHotResult">
+        select *
+        from ST_NOTION_HOT
+       where TRADE_DATE = #tradeDate#
+       ORDER BY RANK
+    </select>
+    
+    <select id="queryNotionHotByDateStr" parameterClass="NotionHot" resultMap="NotionHotResult2">
+        select *
+        from ST_NOTION_HOT
+       where TRADE_DATE like CONCAT(#tradeDateStr# , '%')
+             AND SOURCE = #source#
+       ORDER BY RANK
+    </select>
+    
+    <select id="queryNotionHotInfoByDateStr" parameterClass="NotionHot" resultMap="NotionHotResult">
+        select a.*, b.NOTION_URL, b.CORPS_NUM
+        from ST_NOTION_HOT a, ST_NOTION_INFO b
+       where a.NOTION_NAME = b.NOTION_NAME 
+             AND a.TRADE_DATE like CONCAT(#tradeDateStr# , '%')
+             AND a.SOURCE = #source#
+             AND a.SOURCE = b.SOURCE
+             ORDER BY a.RANK
+    </select>
+    
+    <select id="queryNotionHotForCsv" parameterClass="NotionHot" resultMap="NotionHotResult2">
+        SELECT TRADE_DATE, RANK, NOTION_NAME, CHANGE_PCT, RISE_LEAD_STOCK_NAME, RISE_LEAD_STOCK_CHANGE_PCT, TIMESTAMP
+		  FROM ST_NOTION_HOT 
+		 WHERE (RANK &lt;= 50 OR RANK &gt; 120) 
+		   AND TRADE_DATE &gt;= #lowTradeDateStr#
+		   AND TRADE_DATE &lt;= #highTradeDateStr#
+		   AND SOURCE='THS' 
+		  ORDER BY LEFT(TRADE_DATE, 10), RANK
+    </select>
+    
+    <select id="queryNotionHotByDateStrBetween" parameterClass="NotionHot" resultMap="NotionHotResult2">
+        SELECT *
+        FROM ST_NOTION_HOT
+       WHERE TRADE_DATE &gt;= #lowTradeDateStr#
+             AND TRADE_DATE &lt;= #highTradeDateStr#
+             AND SOURCE = #source#
+       ORDER BY TRADE_DATE, RANK
+    </select>
+    
+</sqlMap>
