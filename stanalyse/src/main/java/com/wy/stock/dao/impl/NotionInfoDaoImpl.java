@@ -88,9 +88,10 @@ public class NotionInfoDaoImpl extends SqlMapClientDaoSupport implements NotionI
 		getSqlMapClientTemplate().update("updateNotionCodeByNotionName", notionInfo);
 	}
 
-	public NotionInfo queryNotionInfoByName(String notionName, String source) {
+	public NotionInfo queryNotionInfoByName(String notionName, String type, String source) {
 		NotionInfo query = new NotionInfo();
 		query.setNotionName(notionName);
+		query.setType(type);
 		query.setSource(source);
 		return (NotionInfo) getSqlMapClientTemplate().queryForObject("queryNotionInfoByName", query);
 	}

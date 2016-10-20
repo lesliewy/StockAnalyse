@@ -27,7 +27,7 @@ public interface NotionInfoDao {
 	
 	void updateNotionCodeByNotionName(NotionInfo notionInfo);
 	
-	NotionInfo queryNotionInfoByName(String notionName, String source);
+	NotionInfo queryNotionInfoByName(String notionName, String type,  String source);
 	
 	void updateCorpsNumByNotionName(NotionInfo notionInfo);
 	

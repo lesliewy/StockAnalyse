@@ -74,8 +74,8 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 		return map;
 	}
 	
-	public NotionInfo queryNotionInfoByName(String notionName, String source) {
-		return notionInfoDao.queryNotionInfoByName(notionName, source);
+	public NotionInfo queryNotionInfoByName(String notionName, String type, String source) {
+		return notionInfoDao.queryNotionInfoByName(notionName,  type, source);
 	}
 	
 	public Map<String, String> queryNotionInfoMap(String source) {

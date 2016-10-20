@@ -188,12 +188,74 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	 * 解析概念热点html文件 notionHot.html, 只解析第一页的数据，后面的暂时不考虑.
 	 * 
 	 */
-	public List<NotionHot> parseNotionHotFromHtml(File html) {
+	public void persistNotionHotFromHtml(File html) {
 		if(!html.exists()){
 			LOGGER.error(html.getAbsolutePath() + " not exists, return null now...");
-			return null;
+			return;
 		}
+		final String TYPE = "A1";
+		// 不存在corpsNum
+		int corpsNum = -1;
+		Timestamp timestamp = new Timestamp(Calendar.getInstance()
+				.getTimeInMillis());
 		Document notionDoc = getNotionIndustryDoc(html);
+		// body > div.container.w1200 > div.category.boxShadow.m_links > div > div:nth-child(1) > div > a:nth-child(1)
+		// body > div.container.w1200 > div.category.boxShadow.m_links > div > div:nth-child(1) > div > a:nth-child(5)
+		// body > div.container.w1200 > div.category.boxShadow.m_links > div > div:nth-child(2) > div > a:nth-child(1)
+		Iterator<Element> outerIter = notionDoc.select("body > div.container.w1200 > div.category.boxShadow.m_links > div > div").iterator();
+		if(outerIter == null){
+			LOGGER.error("outerIter is null, reutrn null now...");
+			return;
+		}
+		while(outerIter.hasNext()){
+		   	Element innerElement = outerIter.next();
+			Iterator<Element> innerIter = innerElement.select("> div > a").iterator();
+			if(innerIter == null){
+				LOGGER.error("innerIter is null, continue....");
+				continue;
+			}
+			while(innerIter.hasNext()){
+				Element element = innerIter.next();
+				String notionName = element.select(" > a").text();
+				String notionUrl = element.select(">a").attr("href");
+				if(StringUtils.isEmpty(notionUrl)){
+					LOGGER.error("notionUrl is empty, continue");
+					continue;
+				}
+				String notionCode = notionUrl.split("/")[6].replace("gn_", "");
+				
+				// 检查ST_NOTION_INFO中是否存在，不存在插入，存在更新.
+	    		NotionInfo notionInfo = notionInfoService.queryNotionInfoByName(notionName, TYPE, StockConstant.THS_FLAG);
+	    		if(notionInfo != null){
+	        		NotionInfo notionInfoNew = new NotionInfo();
+	        		notionInfoNew.setType(TYPE);
+	        		notionInfoNew.setNotionUrl(notionUrl);
+	        		notionInfoNew.setTimestamp(timestamp);
+	        		notionInfoNew.setCorpsNum(corpsNum);
+	        		notionInfoNew.setNotionName(notionName);
+	        		notionInfoNew.setSource(StockConstant.THS_FLAG);
+	        		notionInfoNew.setNotionCode(notionCode);
+	        		if(!StringUtils.isEmpty(notionUrl) && !StringUtils.isEmpty(notionCode)
+	        				&& !StringUtils.isEmpty(notionName)){
+	        			notionInfoService.updateByNotionName(notionInfoNew);
+	        		}
+	        		// 更新corpsNum
+	        		if(!StringUtils.isEmpty(notionName) && corpsNum > 0 && corpsNum != notionInfo.getCorpsNum()){
+	        			notionInfoService.updateCorpsNumByNotionName(notionInfoNew);
+	        		}
+	    		}else{
+	    			NotionInfo notionInfoNew = new NotionInfo();
+	    			notionInfoNew.setType(TYPE);
+	    			notionInfoNew.setNotionUrl(notionUrl);
+	    			notionInfoNew.setNotionName(notionName);
+	    			notionInfoNew.setTimestamp(timestamp);
+	    			notionInfoNew.setSource(StockConstant.THS_FLAG);
+	    			notionInfoNew.setCorpsNum(corpsNum);
+	    			notionInfoService.insertNotionInfo(notionInfoNew);
+	    		}
+			}
+		}
+		/*
 		Iterator<Element> trIter = notionDoc.select("body > div.wrap > div.page-main > div.clearfix > div > table > tbody > tr").iterator();
 		if(trIter == null){
 			LOGGER.error("trIter is null, reutrn null now...");
@@ -291,8 +353,9 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
     		}
 		}
 		return list;
+		*/
 	}
-
+	
 	/**
 	 * 解析概念热点html文件 industryHot.html, 只解析第一页的数据，后面的暂时不考虑.
 	 * 
@@ -877,6 +940,8 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
     	 * 对于概念页面，解析头部的概念名称及相关信息插入ST_NOTION_INFO.
     	 */
     	if("NOTION".equals(type)){
+    		persistNotionHotFromHtml(html);
+    		/*
     		List<NotionHot> notionHotList = parseNotionHotFromHtml(html);
     		if(notionHotList != null && !notionHotList.isEmpty()){
     			// 先根据tradeDate删除已有的.
@@ -884,6 +949,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
     			notionHotService.deleteNotionHotByTradeDateStr(tradeDateStr, StockConstant.THS_FLAG);
     			notionHotService.insertNotionHotBatch(notionHotList);
     		}
+    		*/
     	}else if("INDUSTRY".equals(type)){
     		List<IndustryHot> industryHotList = parseIndustryHotFromHtml(html);
     		if(industryHotList != null && !industryHotList.isEmpty()){
@@ -895,7 +961,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
     	}
 	}
 	
-	public void persistNotionIndustryHot(File saveDir, int totalPages, String type) {
+	public void persistNotionIndustryHot(File saveDir,  int totalPages, String type) {
 		Map<String, String> codeNameMap = stockInfoService.queryStockCodeNameMap();
 		Timestamp timestamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		if("NOTION".equalsIgnoreCase(type)){

@@ -34,7 +34,7 @@ public interface NotionInfoService {
 	
 	Map<String, String> queryNotionUrlNameMap(String source);
 	
-	NotionInfo queryNotionInfoByName(String notionName, String source);
+	NotionInfo queryNotionInfoByName(String notionName, String type, String source);
 	
 	Map<String, String> queryNotionInfoMap(String source);
 	

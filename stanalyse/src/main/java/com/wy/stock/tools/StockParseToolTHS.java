@@ -23,7 +23,7 @@ public interface StockParseToolTHS {
 	
 	List<NotionInfo> parseNotionInfoFromDoc(Document industryInfoDoc);
 	
-	List<NotionHot> parseNotionHotFromHtml(File html);
+	void  persistNotionHotFromHtml(File html);
 	
 	List<IndustryHot> parseIndustryHotFromHtml(File jsonfile);
 	

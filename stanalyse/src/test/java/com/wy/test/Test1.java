@@ -108,7 +108,12 @@ public class Test1 {
 		a.put("name", "leslie1");
 		a.put("age", 13);
 		System.out.println(a.toString());
-		
 	}
+	 @Test
+	 public void test10(){
+		 String notionUrl = "http://q.10jqka.com.cn/gn/detail/code/gn_300200/";
+		 String notionCode = notionUrl.split("/")[6].replace("gn_", "");
+		 System.out.println("notionCode: " + notionCode);
+	 }
 	
 }
