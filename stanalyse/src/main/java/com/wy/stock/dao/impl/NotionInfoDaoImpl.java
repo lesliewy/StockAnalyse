@@ -63,6 +63,17 @@ public class NotionInfoDaoImpl extends SqlMapClientDaoSupport implements NotionI
 		}
 		getSqlMapClientTemplate().delete("deleteNotionInfoBySource", source);
 	}
+	
+   public void deleteNotionInfoByType(String type, String source) {
+		if(StringUtils.isBlank(source) || StringUtils.isBlank(type)){
+			LOGGER.info("source or type is null, return now...");
+			return;
+		}
+		NotionInfo notionInfo = new NotionInfo();
+		notionInfo.setType(type);
+		notionInfo.setSource(source);
+		getSqlMapClientTemplate().delete("deleteNotionInfoByType", notionInfo);
+	}
 
 	public void updateByNotionName(NotionInfo notionInfo) {
 		if(notionInfo == null){

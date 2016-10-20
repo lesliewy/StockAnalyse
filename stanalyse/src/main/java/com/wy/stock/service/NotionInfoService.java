@@ -22,6 +22,8 @@ public interface NotionInfoService {
 	
 	void deleteNotionInfoBySource(String source);
 	
+	void deleteNotionInfoByType(String type, String source);
+	
 	void updateByNotionName(NotionInfo notionInfo);
 	
 	void updateNotionCodeByNotionName(NotionInfo notionInfo);

@@ -191,6 +191,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		if(!dir.exists()){
 			dir.mkdirs();
 		}
+		
+		// http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/3/ajax/1/code/300220  返回的是html
+		
+		
+		
+		
 		String commonUrl = "http://q.10jqka.com.cn/interface/stock/detail/zdf/desc/";
 		if("NOTION".equals(type)){
 			// 先查询ST_NOTION_HOT中热点板块, 关联 ST_NOTION_INFO, 根据url来下载.
@@ -207,7 +213,9 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				int corpsNum = notionHot.getCorpsNum();
 				// notionUrl 最后的部分，即板块名称的拼音缩写
 				String notionAlphabet = notionHotStockUrl.split("/")[5];
-				// 每页数据是50条记录，根据板块中股票个数，下载排名靠后的股票.   例如：123个股票，下载第2,3页;   76个股票，下载1,2页.
+				/*
+				 *  每页数据是50条记录，根据板块中股票个数，下载排名靠后的股票.   例如：123个股票，下载第2,3页;   76个股票，下载1,2页.
+				 */
 				int a = corpsNum / StockConstant.NOTION_HOT_PAGE_SIZE;  // 取整
 				float b = corpsNum / Float.valueOf(StockConstant.NOTION_HOT_PAGE_SIZE);  // 浮点数.
 				String url1 = "";

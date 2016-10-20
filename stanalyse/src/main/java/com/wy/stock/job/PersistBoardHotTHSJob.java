@@ -137,16 +137,14 @@ public class PersistBoardHotTHSJob {
 
 		/*
 		 * 获取概念、行业热点排名靠前的以及靠后的板块内的股票的文件. json文件.
-		 * 取消概念页面该操作.
+		 * 对于概念页面, 从ST_NOTION_INFO中获取notionUrl, 下载该URL对应的html.
 		 */
 		String dateStr = String.valueOf(cal.get(Calendar.YEAR)).substring(2, 4) +
 		StringUtils.leftPad(String.valueOf(cal.get(Calendar.MONTH) + 1), 2, "0") +
 		StringUtils.leftPad(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)), 2, "0");
-		/*
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "NOTION");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "NOTION");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "NOTION");
-		*/
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
@@ -154,6 +152,7 @@ public class PersistBoardHotTHSJob {
 		/*
 		 * 解析概念板块内的股票信息.
 		 */
+		
 		
 		/*
 		 * 解析行业板块热点排名靠前以及靠后的板块内的股票，json格式.

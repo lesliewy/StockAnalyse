@@ -36,6 +36,10 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 		notionInfoDao.deleteNotionInfoBySource(source);
 	}
 	
+	public void deleteNotionInfoByType(String type, String source) {
+		notionInfoDao.deleteNotionInfoByType(type, source);
+	}
+	
 	public void updateByNotionName(NotionInfo notionInfo) {
 		notionInfoDao.updateByNotionName(notionInfo);
 	}
@@ -134,5 +138,4 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 	public void setNotionInfoDao(NotionInfoDao notionInfoDao) {
 		this.notionInfoDao = notionInfoDao;
 	}
-
 }

@@ -44,6 +44,10 @@
         delete from ST_NOTION_INFO where SOURCE = #source#
     </delete>
     
+    <delete id="deleteNotionInfoByType" parameterClass="NotionInfo">
+        delete from ST_NOTION_INFO where TYPE = #type# AND SOURCE = #source#
+    </delete>
+    
     <select id="queryAllNotionInfo" parameterClass="java.lang.String" resultMap="NotionInfoResult">
         select *
         from ST_NOTION_INFO

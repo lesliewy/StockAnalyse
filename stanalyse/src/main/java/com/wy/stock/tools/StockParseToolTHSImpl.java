@@ -224,35 +224,17 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				}
 				String notionCode = notionUrl.split("/")[6].replace("gn_", "");
 				
-				// 检查ST_NOTION_INFO中是否存在，不存在插入，存在更新.
-	    		NotionInfo notionInfo = notionInfoService.queryNotionInfoByName(notionName, TYPE, StockConstant.THS_FLAG);
-	    		if(notionInfo != null){
-	        		NotionInfo notionInfoNew = new NotionInfo();
-	        		notionInfoNew.setType(TYPE);
-	        		notionInfoNew.setNotionUrl(notionUrl);
-	        		notionInfoNew.setTimestamp(timestamp);
-	        		notionInfoNew.setCorpsNum(corpsNum);
-	        		notionInfoNew.setNotionName(notionName);
-	        		notionInfoNew.setSource(StockConstant.THS_FLAG);
-	        		notionInfoNew.setNotionCode(notionCode);
-	        		if(!StringUtils.isEmpty(notionUrl) && !StringUtils.isEmpty(notionCode)
-	        				&& !StringUtils.isEmpty(notionName)){
-	        			notionInfoService.updateByNotionName(notionInfoNew);
-	        		}
-	        		// 更新corpsNum
-	        		if(!StringUtils.isEmpty(notionName) && corpsNum > 0 && corpsNum != notionInfo.getCorpsNum()){
-	        			notionInfoService.updateCorpsNumByNotionName(notionInfoNew);
-	        		}
-	    		}else{
-	    			NotionInfo notionInfoNew = new NotionInfo();
-	    			notionInfoNew.setType(TYPE);
-	    			notionInfoNew.setNotionUrl(notionUrl);
-	    			notionInfoNew.setNotionName(notionName);
-	    			notionInfoNew.setTimestamp(timestamp);
-	    			notionInfoNew.setSource(StockConstant.THS_FLAG);
-	    			notionInfoNew.setCorpsNum(corpsNum);
-	    			notionInfoService.insertNotionInfo(notionInfoNew);
-	    		}
+				// 先删除ST_NOTION_INFO中已经存在的，然后插入.
+				notionInfoService.deleteNotionInfoByType(TYPE, StockConstant.THS_FLAG);
+    			NotionInfo notionInfoNew = new NotionInfo();
+    			notionInfoNew.setType(TYPE);
+    			notionInfoNew.setNotionUrl(notionUrl);
+    			notionInfoNew.setNotionName(notionName);
+    			notionInfoNew.setNotionCode(notionCode);
+    			notionInfoNew.setTimestamp(timestamp);
+    			notionInfoNew.setSource(StockConstant.THS_FLAG);
+    			notionInfoNew.setCorpsNum(corpsNum);
+    			notionInfoService.insertNotionInfo(notionInfoNew);
 			}
 		}
 		/*
