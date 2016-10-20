@@ -872,7 +872,10 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
     		LOGGER.error(html.getAbsolutePath() + " not exists, return now...");
     		return;
 		}
-    	// 解析文件.
+    	/* 
+    	 * 解析文件. 
+    	 * 对于概念页面，解析头部的概念名称及相关信息插入ST_NOTION_INFO.
+    	 */
     	if("NOTION".equals(type)){
     		List<NotionHot> notionHotList = parseNotionHotFromHtml(html);
     		if(notionHotList != null && !notionHotList.isEmpty()){
