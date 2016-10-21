@@ -31,6 +31,8 @@ public interface NotionInfoDao {
 	
 	NotionInfo queryNotionInfoByName(String notionName, String type,  String source);
 	
+	List<NotionInfo> queryNotionInfoByType(String type, String source);
+	
 	void updateCorpsNumByNotionName(NotionInfo notionInfo);
 	
 }

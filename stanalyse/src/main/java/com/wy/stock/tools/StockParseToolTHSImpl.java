@@ -193,7 +193,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 			LOGGER.error(html.getAbsolutePath() + " not exists, return null now...");
 			return;
 		}
-		final String TYPE = "A1";
+		final String TYPE = StockConstant.THS_NOTION_TYPE1;
 		// 不存在corpsNum
 		int corpsNum = -1;
 		Timestamp timestamp = new Timestamp(Calendar.getInstance()
@@ -207,6 +207,8 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 			LOGGER.error("outerIter is null, reutrn null now...");
 			return;
 		}
+		
+		List<NotionInfo> notionInfoList = new ArrayList<NotionInfo>();
 		while(outerIter.hasNext()){
 		   	Element innerElement = outerIter.next();
 			Iterator<Element> innerIter = innerElement.select("> div > a").iterator();
@@ -216,16 +218,14 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 			}
 			while(innerIter.hasNext()){
 				Element element = innerIter.next();
-				String notionName = element.select(" > a").text();
-				String notionUrl = element.select(">a").attr("href");
+				String notionName = element.select(" a").text();
+				String notionUrl = element.select("a").attr("href");
 				if(StringUtils.isEmpty(notionUrl)){
 					LOGGER.error("notionUrl is empty, continue");
 					continue;
 				}
 				String notionCode = notionUrl.split("/")[6].replace("gn_", "");
 				
-				// 先删除ST_NOTION_INFO中已经存在的，然后插入.
-				notionInfoService.deleteNotionInfoByType(TYPE, StockConstant.THS_FLAG);
     			NotionInfo notionInfoNew = new NotionInfo();
     			notionInfoNew.setType(TYPE);
     			notionInfoNew.setNotionUrl(notionUrl);
@@ -234,9 +234,13 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
     			notionInfoNew.setTimestamp(timestamp);
     			notionInfoNew.setSource(StockConstant.THS_FLAG);
     			notionInfoNew.setCorpsNum(corpsNum);
-    			notionInfoService.insertNotionInfo(notionInfoNew);
+    			notionInfoList.add(notionInfoNew);
 			}
 		}
+		// 先删除ST_NOTION_INFO中已经存在的，然后插入.
+		notionInfoService.deleteNotionInfoByType(TYPE, StockConstant.THS_FLAG);
+		notionInfoService.insertNotionInfoBatch(notionInfoList);
+		
 		/*
 		Iterator<Element> trIter = notionDoc.select("body > div.wrap > div.page-main > div.clearfix > div > table > tbody > tr").iterator();
 		if(trIter == null){
@@ -1022,7 +1026,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 			        		result.add(notionHot);
 			        		
 			        		// 检查ST_NOTION_INFO中是否存在，不存在插入，存在更新.
-			        		NotionInfo notionInfo = notionInfoService.queryNotionInfoByName(notionName, StockConstant.THS_FLAG);
+			        		NotionInfo notionInfo = notionInfoService.queryNotionInfoByName(notionName, StockConstant.THS_NOTION_TYPE0, StockConstant.THS_FLAG);
 			        		if(notionInfo != null){
 			            		NotionInfo notionInfoNew = new NotionInfo();
 			            		notionInfoNew.setNotionUrl(notionUrl);
@@ -1357,7 +1361,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				if(StringUtils.isEmpty(notionName)){
 					notionName = strArr[1];
 					// 查询 ST_NOTION_INFO 中是是否存在该条记录.
-					NotionInfo existed = notionInfoService.queryNotionInfoByName(notionName, StockConstant.THS_FLAG);
+					NotionInfo existed = notionInfoService.queryNotionInfoByName(notionName, StockConstant.THS_NOTION_TYPE0, StockConstant.THS_FLAG);
 					if(existed == null){
 						// 新增
 						NotionInfo newInfo = new NotionInfo();

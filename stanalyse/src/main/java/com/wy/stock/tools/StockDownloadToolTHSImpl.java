@@ -12,9 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.IndustryHot;
-import com.wy.stock.domain.NotionHot;
+import com.wy.stock.domain.NotionInfo;
 import com.wy.stock.service.IndustryHotService;
 import com.wy.stock.service.NotionHotService;
+import com.wy.stock.service.NotionInfoService;
 import com.wy.stock.utils.HttpUtils;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
@@ -32,6 +33,8 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 	private NotionHotService notionHotService;
 	
 	private IndustryHotService industryHotService;
+	
+	private NotionInfoService notionInfoService;
 	
 	/**
 	 * 获取概念、行业热点页面的html文件, 用于解析获取所有概念、行业信息 记入 ST_NOTION_INFO ST_INDUSTRY_INFO,
@@ -56,7 +59,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
         	String url = "http://q.10jqka.com.cn/stock/gn/";
         	LOGGER.info(StockConstant.NOTION_HOT_HTML_FILE + " downloading");
         	try {
-        		HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+        		HttpUtils.httpDownload(url, "GBK", 10 * 1000, file);
     		} catch (FileNotFoundException e) {
     			if(file.exists()){
     				file.delete();
@@ -193,95 +196,53 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		}
 		
 		// http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/3/ajax/1/code/300220  返回的是html
-		
-		
-		
-		
-		String commonUrl = "http://q.10jqka.com.cn/interface/stock/detail/zdf/desc/";
 		if("NOTION".equals(type)){
-			// 先查询ST_NOTION_HOT中热点板块, 关联 ST_NOTION_INFO, 根据url来下载.
-			List<NotionHot> notionHotList = notionHotService.queryNotionHotInfoByDateStr(tradeDate, StockConstant.THS_FLAG);
-			if(notionHotList == null || notionHotList.isEmpty()){
-				LOGGER.error("notionHotList is null or empty, return now...");
+			// 查询ST_NOTION_INFO
+			List<NotionInfo> notionInfoList = notionInfoService.queryNotionInfoByType(StockConstant.THS_NOTION_TYPE1,  StockConstant.THS_FLAG);
+			if(notionInfoList == null || notionInfoList.isEmpty()){
+				LOGGER.error("notionInfoList is null or empty, return now...");
 				return;
 			}
 			
-			for(NotionHot notionHot : notionHotList){
-				int rank = notionHot.getRank();
-				String notionHotStockUrl = notionHot.getNotionUrl();
-				String notionName = notionHot.getNotionName();
-				int corpsNum = notionHot.getCorpsNum();
-				// notionUrl 最后的部分，即板块名称的拼音缩写
-				String notionAlphabet = notionHotStockUrl.split("/")[5];
-				/*
-				 *  每页数据是50条记录，根据板块中股票个数，下载排名靠后的股票.   例如：123个股票，下载第2,3页;   76个股票，下载1,2页.
-				 */
-				int a = corpsNum / StockConstant.NOTION_HOT_PAGE_SIZE;  // 取整
-				float b = corpsNum / Float.valueOf(StockConstant.NOTION_HOT_PAGE_SIZE);  // 浮点数.
-				String url1 = "";
-				String url2 = "";
-				File file1 = null;
-				File file2 = null;
-				// 板块排名靠前的第一页必须取.
-				if(rank <= StockConstant.NOTION_HOT_PAGE_SIZE){
-					url1 = commonUrl + "1" + "/3/" + notionAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + "1" + ".json");
-					try {
-						if(!StringUtils.isEmpty(url1) && !file1.exists()){
-							HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
-						}
-			    	} catch (FileNotFoundException e) {
-		    			if(file1.exists()){
-		    				file1.delete();
-		    			}
-		    			LOGGER.error(e);
-		    		} catch (IOException e) {
-		    			if(file1.exists()){
-		    				file1.delete();
-		    			}
-		    			LOGGER.error(e);
-		    		}
-				}
-
-				if(corpsNum <= StockConstant.NOTION_HOT_PAGE_SIZE){   // 板块包含的股票个数 <= pageSize, 只取第一页.
-					url1 = commonUrl + "1" + "/3/" + notionAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + "1" + ".json");
-				}else if(a == b){    // 刚好能被pageSize整除
-					url1 = commonUrl + a + "/3/" + notionAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_"  + a + ".json");
-					url2 = commonUrl + (a - 1) + "/3/" + notionAlphabet;
-					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + (a - 1) + ".json");
-				}else if( a < b){    // 不能被pageSize整除情况.
-					url1 = commonUrl + (a + 1) + "/3/" + notionAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_"  + (a + 1) + ".json");
-					url2 = commonUrl + a + "/3/" + notionAlphabet;
-					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_"  + a + ".json");
-				}
-				try {
-					if(!StringUtils.isEmpty(url1) && !file1.exists()){
-						HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
+			downloadAllNotionUrlHtml(notionInfoList);
+			
+			File file = null;
+			try {
+				for(NotionInfo info : notionInfoList){
+					String notionUrl = info.getNotionUrl();
+					String notionName = info.getNotionName();
+					String notionCode = info.getNotionCode();
+					
+					/*
+					 * 先下载notionUrl对应的页面
+					 */
+					file = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + "0" + ".html");
+					if(!StringUtils.isEmpty(notionUrl) && !file.exists()){
+						HttpUtils.httpDownload(notionUrl, "GB2312", 10 * 1000, file);
 					}
-	        		if(!StringUtils.isEmpty(url2) && !file2.exists()){
-	        			HttpUtils.httpDownload(url2, "GB2312", 10 * 1000, file2);
-	        		}
-	    		} catch (FileNotFoundException e) {
-	    			if(file1.exists()){
-	    				file1.delete();
-	    			}
-	    			if(file2.exists()){
-	    				file2.delete();
-	    			}
-	    			LOGGER.error(e);
-	    		} catch (IOException e) {
-	    			if(file1.exists()){
-	    				file1.delete();
-	    			}
-	    			if(file2.exists()){
-	    				file2.delete();
-	    			}
-	    			LOGGER.error(e);
-	    		}
-			}
+					
+					/*
+					 * 下载概念列表页面，获取前50条记录，每页10条.
+					 */
+					for(int page = 1; page <= 5; page++){
+						String url = "http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/" + page + "/ajax/1/code/" + notionCode;
+						file = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + page + ".html");
+							if(!StringUtils.isEmpty(url) && !file.exists()){
+								HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+							}
+					}
+				}
+			}catch (FileNotFoundException e) {
+    			if(file.exists()){
+    				file.delete();
+    			}
+    			LOGGER.error(e);
+    		} catch (IOException e) {
+    			if(file.exists()){
+    				file.delete();
+    			}
+    			LOGGER.error(e);
+    		}
 		}else if("INDUSTRY".equals(type)){
 			// 先查询ST_INDUSTRY_HOT中热点板块, 关联 ST_INDUSTRY_INFO, 根据url来下载.
 			List<IndustryHot> industryHotList = industryHotService.queryIndustryHotInfoByDate(tradeDate, StockConstant.THS_FLAG);
@@ -290,6 +251,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				return;
 			}
 			
+			String commonUrl = "http://q.10jqka.com.cn/interface/stock/detail/zdf/desc/";
 			for(IndustryHot industryHot : industryHotList){
 				int rank = industryHot.getRank();
 				String industryHotStockUrl = industryHot.getIndustryUrl();
@@ -363,6 +325,34 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 			}
 		}
 	}
+	
+	private void downloadAllNotionUrlHtml(List<NotionInfo> notionInfoList){
+		/*
+		 * 下载所有的notionUrl对应的页面，解析并存入ST_NOTION_HOT
+		 */
+		File file = null;
+		try {
+			for(NotionInfo info : notionInfoList){
+				String notionUrl = info.getNotionUrl();
+				String notionName = info.getNotionName();
+				
+				file = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + "0" + ".html");
+				if(!StringUtils.isEmpty(notionUrl) && !file.exists()){
+					HttpUtils.httpDownload(notionUrl, "GB2312", 10 * 1000, file);
+				}
+			}
+		}catch (FileNotFoundException e) {
+			if(file.exists()){
+				file.delete();
+			}
+			LOGGER.error(e);
+		} catch (IOException e) {
+			if(file.exists()){
+				file.delete();
+			}
+			LOGGER.error(e);
+		}
+	}
 
 	public NotionHotService getNotionHotService() {
 		return notionHotService;
@@ -380,4 +370,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		this.industryHotService = industryHotService;
 	}
 
+	public NotionInfoService getNotionInfoService() {
+		return notionInfoService;
+	}
+
+	public void setNotionInfoService(NotionInfoService notionInfoService) {
+		this.notionInfoService = notionInfoService;
+	}
+	
 }

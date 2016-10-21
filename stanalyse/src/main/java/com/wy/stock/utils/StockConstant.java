@@ -118,4 +118,10 @@ public interface StockConstant {
 	 */
 	int INDUSTRY_HOT_PAGE_SIZE = 50;
 	
+	/**
+	 * ST_NOTION_INFO 中 type  A0:同花顺开始的概念页面.   A1:同花顺改版后的概念页面
+	 */
+	String THS_NOTION_TYPE0 = "A0";
+	String THS_NOTION_TYPE1 = "A1";
+	
 }

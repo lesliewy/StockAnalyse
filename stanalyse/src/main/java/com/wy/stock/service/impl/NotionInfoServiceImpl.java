@@ -82,6 +82,10 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 		return notionInfoDao.queryNotionInfoByName(notionName,  type, source);
 	}
 	
+	public List<NotionInfo> queryNotionInfoByType(String type, String source) {
+		return notionInfoDao.queryNotionInfoByType(type, source);
+	}
+	
 	public Map<String, String> queryNotionInfoMap(String source) {
 		List<NotionInfo> allNotionInfo = notionInfoDao.queryAllNotionInfo(source);
 		if(allNotionInfo == null){
@@ -138,4 +142,5 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 	public void setNotionInfoDao(NotionInfoDao notionInfoDao) {
 		this.notionInfoDao = notionInfoDao;
 	}
+
 }

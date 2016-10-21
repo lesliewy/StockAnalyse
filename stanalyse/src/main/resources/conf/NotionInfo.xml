@@ -83,4 +83,11 @@
          AND SOURCE = #source#
     </select>
     
+    <select id="queryNotionInfoByType" parameterClass="NotionInfo" resultMap="NotionInfoResult">
+        select *
+        from ST_NOTION_INFO
+       where TYPE = #type#
+         AND SOURCE = #source#
+    </select>
+    
 </sqlMap>

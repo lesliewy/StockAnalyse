@@ -111,33 +111,32 @@ public class PersistBoardHotTHSJob {
 		 * 对于概念页面，没有列表，取消该操作.
 		 */
 		/*
-		int totalPagesNotion = stockParseToolTHS.getNotionIndustryHotTotalPages(notionHotHtml, "NOTION");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesNotion, "NOTION");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesNotion, "NOTION");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesNotion, "NOTION");
-		*/
 		int totalPagesIndustry = stockParseToolTHS.getNotionIndustryHotTotalPages(industryHotHtml, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		*/
 		
 		/*
 		 * 解析概念、行业板块热点html文件并登记
 		 * 对于概念页面，将概念相关信息存入ST_NOTION_INFO.
 		 */
 		stockParseToolTHS.persistNotionIndustryHot(notionHotHtml, "NOTION");
+		/*
 		stockParseToolTHS.persistNotionIndustryHot(industryHotHtml, "INDUSTRY");
+		*/
 		
 		/*
 		 * 解析概念、行业板块排名靠后的json文件中的信息.
 		 * 对于概念页面，由于没有列表，取消该操作.
 		 */
-		// stockParseToolTHS.persistNotionIndustryHot(savedDir, totalPagesNotion, "NOTION");
+		/*
 		stockParseToolTHS.persistNotionIndustryHot(savedDir, totalPagesIndustry, "INDUSTRY");
+		*/
 
 		/*
 		 * 获取概念、行业热点排名靠前的以及靠后的板块内的股票的文件. json文件.
-		 * 对于概念页面, 从ST_NOTION_INFO中获取notionUrl, 下载该URL对应的html.
+		 * 对于概念页面, 需要下载notionUrl对应的页面，以及概念列表页面.  从ST_NOTION_INFO中获取相关信息来构造概念列表页面的url.
 		 */
 		String dateStr = String.valueOf(cal.get(Calendar.YEAR)).substring(2, 4) +
 		StringUtils.leftPad(String.valueOf(cal.get(Calendar.MONTH) + 1), 2, "0") +
@@ -145,19 +144,23 @@ public class PersistBoardHotTHSJob {
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "NOTION");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "NOTION");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "NOTION");
+		/*
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
+		*/
 		
 		/*
 		 * 解析概念板块内的股票信息.
 		 */
-		
+		stockParseToolTHS.persistNotionIndustryHotStocksFromhtml(dateStr, "NOTION");
 		
 		/*
 		 * 解析行业板块热点排名靠前以及靠后的板块内的股票，json格式.
 		 */
+		/*
 		stockParseToolTHS.persistNotionIndustryHotStocksFromJson(dateStr, "INDUSTRY");
+		*/
 		
 		/*
 		 * 记录重要指数. ST_INDEX.
