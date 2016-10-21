@@ -29,6 +29,8 @@ public interface StockParseToolTHS {
 	
 	List<NotionHotStocks> parseNotionHotStocksFromHtml(File html);
 	
+	List<NotionHot> parseNotionHotStocksFromStocksHtml(File html);
+	
 	List<IndustryHotStocks> parseIndustryHotStocksFromHtml(File html);
 	
 	void persistNotionIndustryHotStocksFromhtml(String date, String type);

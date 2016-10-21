@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -541,6 +542,101 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	}
 	
 	/**
+	 * 解析页面: http://q.10jqka.com.cn/gn/detail/code/gn_300168/
+	 * 获取notionHot信息.
+	 */
+	public List<NotionHot> parseNotionHotStocksFromStocksHtml(File htmlDir) {
+		if(!htmlDir.exists()){
+			LOGGER.error(htmlDir.getAbsolutePath() + " not exists, return null now...");
+			return null;
+		}
+		LOGGER.info("processing Dir: " + htmlDir.getAbsolutePath());
+		/*
+		 * 页面中不存在tradeDate, 直接获取当天日期
+		 */
+		String tradeDateStr = new SimpleDateFormat("YYYY-MM-dd 00:00:00").format(Calendar.getInstance().getTime());
+        Timestamp tradeDate = Timestamp.valueOf(tradeDateStr);
+        Timestamp timestamp = new Timestamp(Calendar.getInstance()
+				.getTimeInMillis());
+		
+        /*
+         * 处理所有notionUrl对应的页面, 即尾部是 _0.html的文件.
+         */
+		com.wy.stock.utils.FileNameSelector selector = new com.wy.stock.utils.FileNameSelector("notionHot" + "_", "_0.html");
+		File[] htmls = htmlDir.listFiles(selector);
+		if(htmls != null && htmls.length > 0){
+			for(File html : htmls){
+				String fileName = html.getAbsolutePath();
+				Document notionHotDoc = getNotionIndustryDoc(html);
+				String notionName = html.getName().split("_")[1];
+				String changePercentStr = notionHotDoc.select("body > div.container.w1200 > div:nth-child(3) > div.body > div > div.board-main.w900 > div.heading > div.board-infos > dl:nth-child(6) > dd").text();
+				if(!NumberUtils.isNumber(changePercentStr)){
+					LOGGER.error(fileName + " changePerchent  is not valid, skipped.");
+					continue;
+				}
+				Float changePercent = Float.valueOf(changePercentStr);
+				
+			}
+		
+
+        
+        
+        
+        
+        
+		Iterator<Element> trIter = notionHotDoc.select("body > div.wrap > div.page-main > div.clearfix > div > table > tbody > tr").iterator();
+		if(trIter == null){
+			LOGGER.error("trIter is null, reutrn null now...");
+			return null;
+		}
+		
+		List<NotionHotStocks> list = new ArrayList<NotionHotStocks>();
+		// 记入 ST_NOTION_STOCK, 先排除ST_NOTION_STOCK 中已经有的.
+		List<NotionStock> notionStockList = new ArrayList<NotionStock>();
+		List<String> notionStockExisted = notionStockService.queryCodeByNotionCode(notionCode, StockConstant.THS_FLAG);
+		while(trIter.hasNext()){
+			Element trElement = trIter.next();
+			// 序号
+			int rank = Integer.valueOf(trElement.select("> td:nth-child(1)").text());
+			// 股票代码 body > div.wrap > div.page-main > div.clearfix > div > table > tbody > tr:nth-child(1) > td.tc.highlight > a
+			String code = trElement.select("> td:nth-child(2) > a").text();
+			// 股票名称 body > div.wrap > div.page-main > div.clearfix > div > table > tbody > tr:nth-child(1) > td.tc.highlight > a
+			String stockName = trElement.select("> td:nth-child(3) > a").text();
+			// 最新价 body > div.wrap > div.page-main > div.clearfix > div > table > tbody > tr:nth-child(1) > td:nth-child(4)
+			Float newPrice = Float.valueOf(trElement.select("> td:nth-child(4)").text());
+			// 涨跌幅
+			Float changePercent = Float.valueOf(trElement.select("> td:nth-child(6)").text().replace("%", ""));
+			
+			NotionHotStocks notionHotStocks = new NotionHotStocks();
+			notionHotStocks.setTradeDate(tradeDate);
+			notionHotStocks.setRank(rank);
+			notionHotStocks.setNotionName(notionName);
+			notionHotStocks.setCode(code);
+			notionHotStocks.setStockName(stockName);
+			notionHotStocks.setNewPrice(newPrice);
+			notionHotStocks.setChangePercent(changePercent);
+			notionHotStocks.setTimestamp(timestamp);
+    		list.add(notionHotStocks);
+    		
+    		if(notionStockExisted != null && !notionStockExisted.contains(code)){
+        		NotionStock notionStock = new NotionStock();
+        		notionStock.setNotionCode(notionCode);
+        		notionStock.setNotionName(notionName);
+        		notionStock.setCode(code);
+        		notionStock.setStockName(stockName);
+        		notionStock.setTimestamp(timestamp);
+        		notionStock.setSource(StockConstant.THS_FLAG);
+        		notionStockList.add(notionStock);
+    		}
+		}
+		
+		if(notionStockList != null && !notionStockList.isEmpty()){
+			notionStockService.insertNotionStockBatch(notionStockList);
+		}
+    	return list;
+	}
+	
+	/**
 	 * 解析行业热点板块下的股票信息
 	 * @param html
 	 * @return
@@ -664,6 +760,22 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 					}
 				}
 			}
+		}
+	}
+	
+	public void persistNotionIndustryHotFromStocksHtml(File htmlDir){
+		if(htmlDir == null){
+			LOGGER.error("htmlDir is null, return now...");
+			return;
+		}
+		if(!htmlDir.exists()){
+			LOGGER.error(htmlDir.getAbsolutePath() + " not exists, return now....");
+			return;
+		}
+		
+		List<NotionHot> notionHotList = parseNotionHotStocksFromStocksHtml(htmlDir);
+		if(notionHotList != null && !notionHotList.isEmpty()){
+			notionHotService.insertNotionHotBatch(notionHotList);
 		}
 	}
 	

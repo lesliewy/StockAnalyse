@@ -204,7 +204,16 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				return;
 			}
 			
+			/*
+			 * 下载所有的notionUrl页面
+			 */
 			downloadAllNotionUrlHtml(notionInfoList);
+			
+			/*
+			 * 解析notionUrl页面, 将数据插入ST_NOTION_HOT
+			 */
+			persistNotionHotFromHtml();
+			
 			
 			File file = null;
 			try {
