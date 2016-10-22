@@ -23,15 +23,6 @@ public class TestStockParseToolTHS {
 	}
 	
 	@Test
-	public void testParseNotionHotFromHtml(){
-		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
-				.getBean("stockParseToolTHS");
-		
-		File html = new File("/home/leslie/MyProject/StockAnalyse/html/boardHot/2015/10/27/notionHot.html");
-		stockParseTHS.parseNotionHotFromHtml(html);
-	}
-	
-	@Test
 	public void testPersistNotionIndustryInfo(){
 		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
 				.getBean("stockParseToolTHS");

@@ -33,6 +33,8 @@ public interface StockParseToolTHS {
 	
 	List<IndustryHotStocks> parseIndustryHotStocksFromHtml(File html);
 	
+	void persistNotionIndustryHotFromStocksHtml(File htmlDir, String tradeDate);
+	
 	void persistNotionIndustryHotStocksFromhtml(String date, String type);
 	
 	void persistNotionIndustryHotStocksFromJson(String date, String type);

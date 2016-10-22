@@ -48,6 +48,8 @@ public class NotionHot {
 	
 	private int corpsNum;
 	
+	private String notionCode;
+	
 	public Timestamp getTradeDate() {
 		return tradeDate;
 	}
@@ -190,6 +192,14 @@ public class NotionHot {
 
 	public void setHighTradeDateStr(String highTradeDateStr) {
 		this.highTradeDateStr = highTradeDateStr;
+	}
+
+	public String getNotionCode() {
+		return notionCode;
+	}
+
+	public void setNotionCode(String notionCode) {
+		this.notionCode = notionCode;
 	}
 
 }

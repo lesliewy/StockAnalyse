@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.CandleLine;
+import com.wy.stock.domain.NotionHot;
 import com.wy.stock.domain.NotionHotStocks;
 import com.wy.stock.domain.StockHistory;
 
@@ -47,6 +48,8 @@ public class StockUtils {
 	public static ValueComparatorFloat descMapComparatorFloat = new ValueComparatorFloat(false);
 	
 	public static NotionHotStocksComparatorFloat descNotionHotStocksComparatorFloat = new NotionHotStocksComparatorFloat(false);
+	
+	public static NotionHotComparatorFloat descNotionHotComparatorFloat = new NotionHotComparatorFloat(false);
 	
 	private static class ValueComparatorInteger implements Comparator<Map.Entry<String, Integer>> {
 		// 默认升序;
@@ -75,6 +78,28 @@ public class StockUtils {
 				return mp1.getValue() - mp2.getValue() > 0 ? 1 : -1;
 			}
 			return mp1.getValue() - mp2.getValue() > 0 ? -1 : 1;
+		}
+	}
+	
+	private static class NotionHotComparatorFloat implements Comparator<NotionHot> {
+		// 默认升序;
+		private boolean asc = true;
+		NotionHotComparatorFloat(boolean isAsc){
+			asc = isAsc;
+		}
+		public int compare(NotionHot notionHot1,
+				NotionHot notionHot2) {
+			if(asc){
+				return notionHot1.getChangePercent() - notionHot2.getChangePercent() > 0 ? 1 : -1;
+			}
+			float diff = notionHot1.getChangePercent() - notionHot2.getChangePercent();
+			if(diff > 0){
+				return -1;
+			}else if (diff == 0){
+				return notionHot1.getNotionName().compareTo(notionHot2.getNotionName());
+			}else {
+				return 1;
+			}
 		}
 	}
 	

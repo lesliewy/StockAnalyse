@@ -19,6 +19,8 @@ import com.wy.stock.utils.StockConstant;
 public class NotionInfoServiceImpl implements NotionInfoService {
 
 	private NotionInfoDao notionInfoDao;
+	
+	private static Map<String, String>  notionNameCode = new HashMap<String, String>();
 
 	public void insertNotionInfo(NotionInfo notionInfo) {
 		notionInfoDao.insertNotionInfo(notionInfo);
@@ -121,6 +123,21 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 			result.put(info.getNotionCode(), info.getNotionName());
 		}
 		return result;
+	}
+	
+	public Map<String, String> queryNotionNameCodeMap(String type, String source){
+		if(notionNameCode != null && !notionNameCode.isEmpty()){
+			return notionNameCode;
+		}
+		List<NotionInfo> list = notionInfoDao.queryNotionInfoByType(type, source);
+		if(list == null){
+			return null;
+		}
+		for(NotionInfo info : list){
+			notionNameCode.put(info.getNotionName(), info.getNotionCode());
+		}
+		return notionNameCode;
+	
 	}
 	
 	public Map<String, Integer> queryNotionCorpsNumMap(String source) {

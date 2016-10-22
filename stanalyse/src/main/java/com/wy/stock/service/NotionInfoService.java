@@ -46,5 +46,7 @@ public interface NotionInfoService {
 	
 	Map<String, String> queryNotionCodeNameMap(String source);
 	
+	Map<String, String> queryNotionNameCodeMap(String type, String source);
+	
 	Map<String, Integer> queryNotionCorpsNumMap(String source);
 }

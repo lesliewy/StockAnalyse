@@ -104,6 +104,7 @@
         <property name="notionHotService" ref="notionHotService" />
         <property name="industryHotService" ref="industryHotService" />
         <property name="notionInfoService" ref="notionInfoService" />
+        <property name="stockParseToolTHS" ref="stockParseToolTHS" />
     </bean>
     <bean id="stockParseTool" class="com.wy.stock.tools.StockParseToolImpl">
         <property name="stockInfoService" ref="stockInfoService" />
@@ -410,7 +411,6 @@
         <property name="cronExpression" value="0 0/5 * * * ?" />
     </bean>
     
-    <!-- 
     <bean lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
         <property name="triggers">
             <list>
@@ -420,6 +420,5 @@
             </list>
         </property>
     </bean>
-     -->
     <!-- JOB 配置 END -->
 </beans>
