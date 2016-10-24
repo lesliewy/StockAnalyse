@@ -62,7 +62,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
         	String url = "http://q.10jqka.com.cn/stock/gn/";
         	LOGGER.info(StockConstant.NOTION_HOT_HTML_FILE + " downloading");
         	try {
-        		HttpUtils.httpDownload(url, "GBK", 10 * 1000, file);
+        		HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
     		} catch (FileNotFoundException e) {
     			if(file.exists()){
     				file.delete();
@@ -361,7 +361,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				
 				file = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + "0" + ".html");
 				if(!StringUtils.isEmpty(notionUrl) && !file.exists()){
-					HttpUtils.httpDownload(notionUrl, "GB2312", 10 * 1000, file);
+					HttpUtils.httpDownload(notionUrl, "GBK", 10 * 1000, file);
 				}
 			}
 		}catch (FileNotFoundException e) {

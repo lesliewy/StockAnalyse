@@ -750,6 +750,18 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 					if(jsonFile.getAbsolutePath().split("_").length != 3){
 						continue;
 					}
+					/*
+					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，直接跳过.
+					 */
+					try {
+						if(StockUtils.getTotalLines(jsonFile.getAbsolutePath()) > 1){
+							LOGGER.error(jsonFile.getAbsolutePath() + " may be a invalid file, skipped.");
+							continue;
+						}
+					} catch (IOException e) {
+						LOGGER.error(e);;
+					}
+					
 					// 从文件名中获取industryName
 					String industryName = jsonFile.getAbsolutePath().split("_")[1];
 					// 从文件名中解析出当前页，用于计算序号.

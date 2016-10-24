@@ -3,17 +3,23 @@
  */
 package com.wy.test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import com.wy.stock.utils.HttpUtils;
 import com.wy.stock.utils.StockUtils;
 
 /**
@@ -114,6 +120,26 @@ public class Test1 {
 		 String notionUrl = "http://q.10jqka.com.cn/gn/detail/code/gn_300200/";
 		 String notionCode = notionUrl.split("/")[6].replace("gn_", "");
 		 System.out.println("notionCode: " + notionCode);
+	 }
+	 
+	 @Test
+	 public void test11(){
+		 DecimalFormat df = new DecimalFormat("###0.00");  
+		 System.out.println(df.format(11234.123));
+		 System.out.println(df.format(1.123));
+		 System.out.println(df.format(10.123));
+		 System.out.println(df.format(0.123));
+		 System.out.println(df.format(0.12));
+	 }
+	 
+	 @Test
+	 public void test12(){
+		 try {
+			 File file1 = new File("/home/leslie/a" + ".json");
+					HttpUtils.httpDownload("http://q.10jqka.com.cn/interface/stock/detail/zdf/desc/2/1/hxzy", "GB2312", 10 * 1000, file1);
+ 		} catch (FileNotFoundException e) {
+ 		} catch (IOException e) {
+ 		}
 	 }
 	
 }

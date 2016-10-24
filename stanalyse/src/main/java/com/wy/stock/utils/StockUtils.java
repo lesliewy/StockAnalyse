@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -345,6 +346,20 @@ public class StockUtils {
 			}
 		}
 	}
+	
+	 public static int getTotalLines(String fileName) throws IOException {
+        FileReader in = new FileReader(fileName);
+        LineNumberReader reader = new LineNumberReader(in);
+        String strLine = reader.readLine();
+        int totalLines = 0;
+        while (strLine != null) {
+            totalLines++;
+            strLine = reader.readLine();
+        }
+        reader.close();
+        in.close();
+        return totalLines;
+    }
 	
 	public static List<String> getTradeDateLimit(){
 		List<String> list = new ArrayList<String>();

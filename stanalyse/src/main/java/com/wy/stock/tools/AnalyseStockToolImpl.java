@@ -706,7 +706,7 @@ public class AnalyseStockToolImpl implements AnalyseStockTool{
         Collections.sort(sortList, StockUtils.descMapComparatorFloat);
         int index = 0;
 		// 保留2位小数
-		DecimalFormat df = new DecimalFormat("####.00");  
+		DecimalFormat df = new DecimalFormat("###0.00");  
         for(Map.Entry<String,Float> entry : sortList){
         	String notionName = entry.getKey();
         	sb.append(CSV_SPLIT)
