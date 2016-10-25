@@ -39,8 +39,8 @@ public class NotionHotServiceImpl implements NotionHotService {
 		return notionHotDao.queryNotionHotByDateStr(tradeDateStr, source);
 	}
 	
-	public List<NotionHot> queryNotionHotInfoByDateStr(String tradeDateStr, String source) {
-		return notionHotDao.queryNotionHotInfoByDateStr(tradeDateStr, source);
+	public List<NotionHot> queryNotionHotInfoByDateStr(String tradeDateStr, String type, String source) {
+		return notionHotDao.queryNotionHotInfoByDateStr(tradeDateStr, type, source);
 	}
 	
 	public List<NotionHot> queryNotionHotForCsv(int year) {

@@ -6,6 +6,7 @@ package com.wy.stock.tools;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +49,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 	 * @param type
 	 */
 	public void downloadBoardHotHtmlFiles(File savedDir, String type){
-    	String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
+       String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
     	if(!savedDir.exists()){
     		savedDir.mkdirs();
     	}
@@ -114,6 +115,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				file = new File(dirPath + "notionHot_" + page + ".json");
 				
 				try {
+					/*
+					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
+					 */
+					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
+						file.delete();
+					}
 					// 已经存在的不再重新下载.
 					if(!StringUtils.isEmpty(url) && file != null && !file.exists()){
 						HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
@@ -136,6 +143,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				file = new File(dirPath + "industryHot_" + totalPages + ".json");
 				
 				try {
+					/*
+					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
+					 */
+					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
+						file.delete();
+					}
 					// 已经存在的不再重新下载.
 					if(!StringUtils.isEmpty(url) && file != null && !file.exists()){
 						HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
@@ -199,13 +212,13 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		}
 		
 		if("NOTION".equals(type)){
-			// http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/3/ajax/1/code/300220  返回的是html
+            // http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/3/ajax/1/code/300220  返回的是html
 			
 			/*
 			 * 下载所有的notionUrl页面
 			 */
 			downloadAllNotionUrlHtml();
-			
+            
 			/*
 			 * 解析notionUrl页面, 将数据插入ST_NOTION_HOT
 			 */
@@ -241,6 +254,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					url1 = commonUrl + "1" + "/1/" + industryAlphabet;
 					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".json");
 					try {
+						/*
+						 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
+						 */
+						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) > 1){
+							file1.delete();
+						}
 						if(!StringUtils.isEmpty(url1) && !file1.exists()){
 							HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
 						}
@@ -271,6 +290,15 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".json");
 				}
 				try {
+					/*
+					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
+					 */
+					if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) > 1){
+						file1.delete();
+					}
+					if(file2 != null && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) > 1){
+						file2.delete();
+					}
 					if(!StringUtils.isEmpty(url1) && !file1.exists()){
 						HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
 					}
@@ -300,7 +328,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 	
 	private void downloadNotionHotListHtmls(String tradeDate){
 		// 先查询ST_INDUSTRY_HOT中热点板块, 关联 ST_INDUSTRY_INFO, 根据url来下载.
-		List<NotionHot> notionHotList = notionHotService.queryNotionHotInfoByDateStr(tradeDate, StockConstant.THS_FLAG);
+		List<NotionHot> notionHotList = notionHotService.queryNotionHotInfoByDateStr(tradeDate, StockConstant.THS_NOTION_TYPE1, StockConstant.THS_FLAG);
 		if(notionHotList == null || notionHotList.isEmpty()){
 			LOGGER.error("notionHotList is null or empty, return now...");
 			return;
@@ -315,6 +343,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				if(rank > 50 && rank < 130){
 					continue;
 				}
+				
+				/*
+				 * 某些情况，下载的5个列表页面是无效的，不包含数据，所以要排除这种情况。 
+				 * 这里判断同一个notionName的5个文件大小都一样的话，就认为是无效的，删除掉.
+				 */
+				deleteInvalidFiles(tradeDate, notionName);
 				
 				/*
 				 * 下载概念列表页面，获取前50条记录，每页10条.
@@ -340,6 +374,55 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		}
 	}
 	
+	private void deleteInvalidFiles(String tradeDate, String notionName){
+		com.wy.stock.utils.FileNameSelector selector = null;
+		String dirPath = StockConstant.BOARD_HOT_FILE_PATH + tradeDate.substring(0, 4) + File.separatorChar + 
+				tradeDate.substring(5, 7) + File.separatorChar + tradeDate.substring(8, 10) + File.separatorChar;
+		File parent = new File(dirPath);
+		if(! parent.exists()){
+			LOGGER.error(dirPath + " not exists.");
+			return;
+		}
+		
+		selector = new com.wy.stock.utils.FileNameSelector(StockConstant.NOTION_HOT_IDENTIFIER + "_" + notionName + "_", ".html");
+		File[] notionFiles = parent.listFiles(selector);
+		if(notionFiles != null){
+			int length = notionFiles.length;
+			if(length > 4){
+				/*
+				 * 0.html结尾的不是列表文件, 不考虑; 遍历一次将其排除.
+				 */
+				ArrayList<File> files = new ArrayList<File>();
+				for(File notionFile : notionFiles){
+					String name = notionFile.getName();
+					if(! name.endsWith("0.html")){
+						files.add(notionFile);
+					}
+				}
+				int index = 0;
+				long preSize = files.get(0).length();
+				long curSize = 0;
+				for(File file : files){
+					curSize = file.length();
+					if(curSize != preSize){
+						break;
+					}
+					preSize = file.length();
+					index++;
+				}
+				/*
+				 * 删除文件
+				 */
+				if(index == files.size()){
+					for(File notionFile : files){
+						notionFile.delete();
+					}
+					LOGGER.info("delete files, prefix: " + selector.getPrefix() + "; post: " + selector.getPost());
+				}
+			}
+		}
+	}
+	
 	private void downloadAllNotionUrlHtml(){
 		/*
 		 *  查询ST_NOTION_INFO
@@ -355,8 +438,8 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		 */
 		File file = null;
 		try {
-			for(NotionInfo info : notionInfoList){
-				String notionUrl = info.getNotionUrl();
+		   for(NotionInfo info : notionInfoList){
+			   	String notionUrl = info.getNotionUrl();
 				String notionName = info.getNotionName();
 				
 				file = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + "0" + ".html");

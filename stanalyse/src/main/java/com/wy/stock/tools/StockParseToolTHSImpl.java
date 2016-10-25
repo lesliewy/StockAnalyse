@@ -473,8 +473,12 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				String changePercentAll = notionHotDoc.select("body > div.container.w1200 > div:nth-child(3) > div.body > div > div.board-main.w900 > div.heading > div.board-infos > dl:nth-child(6) > dd").text();
 				String changePercentStr = changePercentAll.replace("%", "");
 				if(!NumberUtils.isNumber(changePercentStr)){
-					LOGGER.error(fileName + " changePerchent  is not valid, skipped.");
-					continue;
+					changePercentAll = notionHotDoc.select("body > div.container.w1200 > div:nth-child(3) > div.body > div > div.heading > div > dl:nth-child(1) > dd").text();
+					changePercentStr = changePercentAll.replace("%", "");
+					if(!NumberUtils.isNumber(changePercentStr)){
+						LOGGER.error(fileName + " changePerchent  is not valid, skipped.");
+						continue;
+					}
 				}
 				Float changePercent = Float.valueOf(changePercentStr);
 				NotionHot notionHot = new NotionHot();

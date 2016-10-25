@@ -23,5 +23,21 @@ public class FileNameSelector implements FilenameFilter{
 	public boolean accept(File dir, String name) {
 		return name.startsWith(prefix) && name.endsWith(post);
 	}
-	 
+
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
+	public String getPost() {
+		return post;
+	}
+
+	public void setPost(String post) {
+		this.post = post;
+	}
+	
 }

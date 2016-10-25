@@ -86,6 +86,7 @@
         from ST_NOTION_HOT a, ST_NOTION_INFO b
        where a.NOTION_NAME = b.NOTION_NAME 
              AND a.TRADE_DATE like CONCAT(#tradeDateStr# , '%')
+             AND b.TYPE = #type#
              AND a.SOURCE = #source#
              AND a.SOURCE = b.SOURCE
              ORDER BY a.RANK

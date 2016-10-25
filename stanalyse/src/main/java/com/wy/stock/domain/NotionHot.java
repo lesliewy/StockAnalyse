@@ -50,6 +50,8 @@ public class NotionHot {
 	
 	private String notionCode;
 	
+	private String type;
+	
 	public Timestamp getTradeDate() {
 		return tradeDate;
 	}
@@ -200,6 +202,14 @@ public class NotionHot {
 
 	public void setNotionCode(String notionCode) {
 		this.notionCode = notionCode;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

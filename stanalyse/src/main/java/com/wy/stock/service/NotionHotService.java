@@ -24,7 +24,7 @@ public interface NotionHotService {
 	
 	List<NotionHot> queryNotionHotByDateStr(String tradeDateStr, String source);
 	
-	List<NotionHot> queryNotionHotInfoByDateStr(String tradeDateStr, String source);
+	List<NotionHot> queryNotionHotInfoByDateStr(String tradeDateStr, String type, String source);
 	
 	List<NotionHot> queryNotionHotForCsv(int year);
 	
