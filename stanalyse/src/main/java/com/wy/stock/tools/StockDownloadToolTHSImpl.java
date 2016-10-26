@@ -119,6 +119,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
 					 */
 					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
+						LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
 						file.delete();
 					}
 					// 已经存在的不再重新下载.
@@ -147,6 +148,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
 					 */
 					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
+						LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
 						file.delete();
 					}
 					// 已经存在的不再重新下载.
@@ -258,6 +260,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 						 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
 						 */
 						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) > 1){
+							LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
 							file1.delete();
 						}
 						if(!StringUtils.isEmpty(url1) && !file1.exists()){
@@ -294,9 +297,11 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
 					 */
 					if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) > 1){
+						LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
 						file1.delete();
 					}
 					if(file2 != null && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) > 1){
+						LOGGER.info(file2.getAbsolutePath() + " may be not valid, delete...");
 						file2.delete();
 					}
 					if(!StringUtils.isEmpty(url1) && !file1.exists()){
