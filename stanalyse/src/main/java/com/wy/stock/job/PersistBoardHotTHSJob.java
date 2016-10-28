@@ -4,6 +4,8 @@
 package com.wy.stock.job;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ import com.wy.stock.service.StockJobService;
 import com.wy.stock.tools.AnalyseStockTool;
 import com.wy.stock.tools.StockDownloadToolTHS;
 import com.wy.stock.tools.StockParseToolTHS;
+import com.wy.stock.utils.HttpUtils;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
 
@@ -124,6 +127,20 @@ public class PersistBoardHotTHSJob {
 		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
 		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		/*
+		 * 某些情况下，下载的json文件仍然可能是乱码.
+		 */
+		if(!isValidJson(savedDir, totalPagesIndustry)){
+			LOGGER.info("json file not valid after 3 times, delete JOB T, wait next time...");
+			// 更新JOB状态.
+			remark = "json file not valid";
+			status = StockConstant.JOB_STATE_DELETE;
+			job.setStatus(status);
+			job.setRemark(remark);
+			job.setTimestamp(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+			stockJobService.updateRunningJob(job);
+			return;
+		}
 		
 		/*
 		 * 解析概念、行业板块热点html文件并登记
@@ -335,6 +352,30 @@ public class PersistBoardHotTHSJob {
 		}
 		filePath = "/home/leslie/MyProject/StockAnalyse/gen/notionHotStocksPhraseAdd.csv";
 		StockUtils.writeToFile(filePath, sb, "GB2312");
+	}
+	
+	private boolean isValidJson(File savedDir, int totalPages){
+		String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
+		File file = null;
+		for(int page = 2; page <= totalPages; page++){
+			file = new File(dirPath + "industryHot_" + totalPages + ".json");
+			try {
+				/*
+				 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
+				 */
+				if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
+					LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
+					file.delete();
+					return false;
+				}
+			} catch (IOException e) {
+				if(file.exists()){
+					file.delete();
+				}
+				LOGGER.error(e);
+			}
+		}
+		return true;
 	}
 
 	public StockJobService getStockJobService() {
