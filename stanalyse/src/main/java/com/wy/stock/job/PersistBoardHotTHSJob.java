@@ -4,7 +4,6 @@
 package com.wy.stock.job;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -19,7 +18,6 @@ import com.wy.stock.service.StockJobService;
 import com.wy.stock.tools.AnalyseStockTool;
 import com.wy.stock.tools.StockDownloadToolTHS;
 import com.wy.stock.tools.StockParseToolTHS;
-import com.wy.stock.utils.HttpUtils;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
 
@@ -111,6 +109,15 @@ public class PersistBoardHotTHSJob {
 		if(!notionHotHtml.exists() || !industryHotHtml.exists()){
 			LOGGER.info(notionHotHtml.getAbsolutePath() + " or " + industryHotHtml.getAbsolutePath() + " not exists, return now...");
 			remark = "notionHot.html or industryHot.html not exists.";
+			status = StockConstant.JOB_STATE_DELETE;
+			job.setStatus(status);
+			job.setRemark(remark);
+			job.setTimestamp(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+			stockJobService.updateRunningJob(job);
+			return;
+		}else if(notionHotHtml.length() < 30000 || industryHotHtml.length() < 30000){   // 这里根据文件大小判断下载的html是否是乱码.
+			LOGGER.info(notionHotHtml.getAbsolutePath() + " or " + industryHotHtml.getAbsolutePath() + " is invalid, return now...");
+			remark = "notionHot.html or industryHot.html is invalid.";
 			status = StockConstant.JOB_STATE_DELETE;
 			job.setStatus(status);
 			job.setRemark(remark);
