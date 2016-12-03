@@ -116,7 +116,9 @@ public class PersistBoardHotTHSJob {
 			stockJobService.updateRunningJob(job);
 			return;
 		}else if(notionHotHtml.length() < 30000 || industryHotHtml.length() < 30000){   // 这里根据文件大小判断下载的html是否是乱码.
-			LOGGER.info(notionHotHtml.getAbsolutePath() + " or " + industryHotHtml.getAbsolutePath() + " is invalid, return now...");
+			LOGGER.info(notionHotHtml.getAbsolutePath() + " or " + industryHotHtml.getAbsolutePath() + " is invalid, wait next time, return now...");
+			notionHotHtml.delete();
+			industryHotHtml.delete();
 			remark = "notionHot.html or industryHot.html is invalid.";
 			status = StockConstant.JOB_STATE_DELETE;
 			job.setStatus(status);
