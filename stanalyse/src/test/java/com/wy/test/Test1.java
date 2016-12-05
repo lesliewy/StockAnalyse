@@ -185,5 +185,15 @@ public class Test1 {
 		System.out.println(file5.length());
 	}
 	
+	@Test
+	public void test14(){
+		String mongoFieldName = "aaa.b.c.d";
+		String[] arr = mongoFieldName.split("\\.");
+		System.out.println(arr.length);
+		for(String str : arr){
+			System.out.println(str);
+		}
+	}
+	
 }
 
