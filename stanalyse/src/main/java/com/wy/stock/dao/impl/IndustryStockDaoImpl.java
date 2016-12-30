@@ -70,6 +70,15 @@ public class IndustryStockDaoImpl extends SqlMapClientDaoSupport implements Indu
 	}
 	
 	@SuppressWarnings("unchecked")
+	public List<IndustryStock> queryIndustryStockByIndustryName(IndustryStock industryStock) {
+		if(StringUtils.isBlank(industryStock.getIndustryName()) || StringUtils.isBlank(industryStock.getSource())){
+			LOGGER.info("industryName or source is null, return now...");
+			return null;
+		}
+		return getSqlMapClientTemplate().queryForList("queryIndustryStockByIndustryName", industryStock);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public List<IndustryStock> queryIndustryStockByCode(String code) {
 		if(StringUtils.isBlank(code)){
 			LOGGER.info("code is null, return now...");

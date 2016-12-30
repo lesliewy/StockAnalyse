@@ -50,10 +50,10 @@ public class TestStockParseToolTHS {
 	
 	@Test
 	public void testPersistNotionIndustryHotStocksFromhtml(){
-		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
-				.getBean("stockParseToolTHS");
+//		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
+//				.getBean("stockParseToolTHS");
 //		stockParseTHS.persistNotionIndustryHotStocksFromhtml("151028", "NOTION");
-		stockParseTHS.persistNotionIndustryHotStocksFromhtml("151028", "INDUSTRY");
+//		stockParseTHS.persistNotionIndustryHotStocksFromhtml("151028", "INDUSTRY");
 	}
 	
 	@Test

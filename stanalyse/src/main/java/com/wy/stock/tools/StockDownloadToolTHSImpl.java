@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,8 +44,8 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 	/**
 	 * 获取概念、行业热点页面的html文件, 用于解析获取所有概念、行业信息 记入 ST_NOTION_INFO ST_INDUSTRY_INFO,
 	 *  同样也用于解析板块热点的第一页数据, 记入 ST_NOTION_HOT, ST_INDUSTRY_HOT.
-	 * 概念: http://q.10jqka.com.cn/stock/gn/
-	 * 同行顺行业: http://q.10jqka.com.cn/stock/thshy/
+	 * 概念: http://q.10jqka.com.cn/gn/
+	 * 同行顺行业: http://q.10jqka.com.cn/thshy/   该文件用于解析获取总页数.
 	 * @param savedDir
 	 * @param type
 	 */
@@ -60,7 +61,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
         		LOGGER.info(file.getAbsoluteFile() + " exists, return now...");
         		return;
         	}
-        	String url = "http://q.10jqka.com.cn/stock/gn/";
+        	String url = "http://q.10jqka.com.cn/gn/";
         	LOGGER.info(StockConstant.NOTION_HOT_HTML_FILE + " downloading");
         	try {
         		HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
@@ -76,12 +77,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
     			LOGGER.error(e);
     		}
     	}else if("INDUSTRY".equalsIgnoreCase(type)){
-        	File file =  new File(dirPath + StockConstant.INDUSTRY_HOT_HTML_FILE);
+        	File file =  new File(dirPath + StockConstant.INDUSTRY_HOT_IDENTIFIER + ".html");
         	if(file.exists() && file.length() > 100){
         		LOGGER.info(file.getAbsoluteFile() + " exists, return now...");
         		return;
         	}
-        	String url = "http://q.10jqka.com.cn/stock/thshy/";
+        	String url = "http://q.10jqka.com.cn/thshy/";
         	LOGGER.info(StockConstant.INDUSTRY_HOT_HTML_FILE + " downloading");
         	try {
         		HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
@@ -168,23 +169,96 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				}
 			}
 		}
+	}	
+
+	/**
+	 * 获取概念、行业热点页面的排名靠后的文件，html格式.
+	 * 概念: 首页html: http://q.10jqka.com.cn/stock/gn/   后续: http://q.10jqka.com.cn/interface/stock/gn/zdf/desc/3/quote/quote
+	 * 同行顺行业: 首页html: http://q.10jqka.com.cn/stock/thshy/  后续: http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/page/2/ajax/1/
+	 * @author leslie  
+	 * @param savedDir
+	 * @param totalPages
+	 * @param type  
+	 * @since 1.0.0
+	 */
+	public void downloadBoardHotHtmlFiles(File savedDir, int totalPages, String type) {
+		String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
+		String url = "";
+		File file = null;
+		if("NOTION".equalsIgnoreCase(type)){
+			// 获取全部页面.
+			for(int page = 2; page <= totalPages; page++){
+				url = "http://q.10jqka.com.cn/interface/stock/gn/zdf/desc/" + page + "/quote/quote";
+				file = new File(dirPath + "notionHot_" + page + ".json");
+				
+				try {
+					/*
+					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
+					 */
+					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
+						LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
+						file.delete();
+					}
+					// 已经存在的不再重新下载.
+					if(!StringUtils.isEmpty(url) && file != null && !file.exists()){
+						HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+					}
+				} catch (FileNotFoundException e) {
+					if(file.exists()){
+						file.delete();
+					}
+					LOGGER.error(e);
+				} catch (IOException e) {
+					if(file.exists()){
+						file.delete();
+					}
+					LOGGER.error(e);
+				}
+			}
+		}else if("INDUSTRY".equalsIgnoreCase(type)){
+			for(int page = 1; page <= totalPages; page++){
+				// http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/page/2/ajax/1/
+				url = "http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/page/" + page + "/ajax/1/";
+				file = new File(dirPath + "industryHot_" + page + ".html");
+				
+				try {
+					// 已经存在的不再重新下载.
+					if(!StringUtils.isEmpty(url) && file != null && !file.exists()){
+						HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+					}
+				} catch (FileNotFoundException e) {
+					if(file.exists()){
+						file.delete();
+					}
+					LOGGER.error(e);
+				} catch (IOException e) {
+					if(file.exists()){
+						file.delete();
+					}
+					LOGGER.error(e);
+				}
+			}
+		}
 	}
 	
 	/**
 	 * 下载指数的html文件: http://q.10jqka.com.cn/stock/zs/, 用于解析记入 ST_INDEX.
 	 */
 	public void downloadIndexFiles() {
-		File file =  new File(StockUtils.getDailyStockSaveDir("B") + StockConstant.INDEX_HTML_FILE);
-    	if(file.exists() && file.length() > 100){
-    		LOGGER.info(file.getAbsoluteFile() + " exists, return now...");
-    		return;
-    	}
-    	if(!file.getParentFile().exists()){
-    		file.getParentFile().mkdirs();
-    	}
-    	String indexUrl = "http://q.10jqka.com.cn/stock/zs/";
+    	String commonUrl = "http://q.10jqka.com.cn/zs/detail/code/";
+    	Map<String, String> indexCodeMap = StockUtils.getIndexCodeMap("job-T");
+    	File file = null;
     	try {
-    		HttpUtils.httpDownload(indexUrl, "GB2312", 10 * 1000, file);
+    		for(String code : indexCodeMap.keySet()){
+    			file =  new File(StockUtils.getDailyStockSaveDir("B") + "index_" + code + ".html");
+    	    	if(file.exists() && file.length() > 100){
+    	    		continue;
+    	    	}
+    	    	if(!file.getParentFile().exists()){
+    	    		file.getParentFile().mkdirs();
+    	    	}
+    			HttpUtils.httpDownload(commonUrl + code, "GB2312", 10 * 1000, file);
+    		}
 		} catch (FileNotFoundException e) {
 			if(file.exists()){
 				file.delete();
@@ -237,12 +311,12 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				LOGGER.error("industryHotList is null or empty, return now...");
 				return;
 			}
-			
-			String commonUrl = "http://q.10jqka.com.cn/interface/stock/detail/zdf/desc/";
+			                 // http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/2/ajax/1/code/881156
+			String commonUrl = "http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/";
 			for(IndustryHot industryHot : industryHotList){
 				int rank = industryHot.getRank();
-				String industryHotStockUrl = industryHot.getIndustryUrl();
 				String industryName = industryHot.getIndustryName();
+				String industryCode = industryHot.getIndustryCode();
 				int pageSize = StockConstant.INDUSTRY_HOT_PAGE_SIZE;
 				int corpsNum = industryHot.getCorpsNum();
 				int a = corpsNum / pageSize;  // 取整
@@ -251,18 +325,11 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				String url2 = "";
 				File file1 = null;
 				File file2 = null;
-				String industryAlphabet = industryHotStockUrl.split("/")[5];
+				// 第一页必须取
 				if(rank <= StockConstant.INDUSTRY_HOT_PAGE_SIZE){
-					url1 = commonUrl + "1" + "/1/" + industryAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".json");
+					url1 = commonUrl + "1" + "/ajax/1/code/" + industryCode;
+					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".html");
 					try {
-						/*
-						 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
-						 */
-						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) > 1){
-							LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
-							file1.delete();
-						}
 						if(!StringUtils.isEmpty(url1) && !file1.exists()){
 							HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
 						}
@@ -279,31 +346,20 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		    		}
 				}
 				if(corpsNum <= pageSize){   // 板块包含的股票个数 <= pageSize, 只取第一页.
-					url1 = commonUrl + "1" + "/1/" + industryAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".json");
+					url1 = commonUrl + "1" + "/ajax/1/code/" + industryCode;
+					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".html");
 				}else if(a == b){    // 刚好能被pageSize整除
-					url1 = commonUrl + a + "/1/" + industryAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".json");
-					url2 = commonUrl + (a - 1) + "/1/" + industryAlphabet;
-					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + (a - 1) + ".json");
+					url1 = commonUrl + a + "/ajax/1/code/" + industryCode;
+					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".html");
+					url2 = commonUrl + (a - 1) + "/ajax/1/code/" + industryCode;
+					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + (a - 1) + ".html");
 				}else if( a < b){    // 不能被pageSize整除情况.
-					url1 = commonUrl + (a + 1) + "/1/" + industryAlphabet;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + (a + 1) + ".json");
-					url2 = commonUrl + a + "/1/" + industryAlphabet;
-					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".json");
+					url1 = commonUrl + (a + 1) + "/ajax/1/code/" + industryCode;
+					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + (a + 1) + ".html");
+					url2 = commonUrl + a + "/ajax/1/code/" + industryCode;
+					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".html");
 				}
 				try {
-					/*
-					 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
-					 */
-					if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) > 1){
-						LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
-						file1.delete();
-					}
-					if(file2 != null && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) > 1){
-						LOGGER.info(file2.getAbsolutePath() + " may be not valid, delete...");
-						file2.delete();
-					}
 					if(!StringUtils.isEmpty(url1) && !file1.exists()){
 						HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
 					}

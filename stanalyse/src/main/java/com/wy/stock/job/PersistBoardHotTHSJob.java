@@ -4,7 +4,6 @@
 package com.wy.stock.job;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -133,37 +132,17 @@ public class PersistBoardHotTHSJob {
 		 * 对于概念页面，没有列表，取消该操作.
 		 */
 		int totalPagesIndustry = stockParseToolTHS.getNotionIndustryHotTotalPages(industryHotHtml, "INDUSTRY");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
-		/*
-		 * 某些情况下，下载的json文件仍然可能是乱码.
-		 */
-		if(!isValidJson(savedDir, totalPagesIndustry)){
-			LOGGER.info("json file not valid after 3 times, delete JOB T, wait next time...");
-			// 更新JOB状态.
-			remark = "json file not valid";
-			status = StockConstant.JOB_STATE_DELETE;
-			job.setStatus(status);
-			job.setRemark(remark);
-			job.setTimestamp(new Timestamp(Calendar.getInstance().getTimeInMillis()));
-			stockJobService.updateRunningJob(job);
-			return;
-		}
+		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, totalPagesIndustry, "INDUSTRY");
 		
 		/*
 		 * 解析概念、行业板块热点html文件并登记
 		 * 对于概念页面，将概念相关信息存入ST_NOTION_INFO.
 		 */
-		stockParseToolTHS.persistNotionIndustryHot(notionHotHtml, "NOTION");
-		stockParseToolTHS.persistNotionIndustryHot(industryHotHtml, "INDUSTRY");
+		stockParseToolTHS.persistNotionIndustryHot(savedDir, "NOTION");
+		stockParseToolTHS.persistNotionIndustryHot(savedDir, "INDUSTRY");
 		
-		/*
-		 * 解析概念、行业板块排名靠后的json文件中的信息.
-		 * 对于概念页面，由于没有列表，取消该操作.
-		 */
-		stockParseToolTHS.persistNotionIndustryHot(savedDir, totalPagesIndustry, "INDUSTRY");
-
 		/*
 		 * 获取概念、行业热点排名靠前的以及靠后的板块内的股票的文件. json文件.
 		 * 对于概念页面, 需要下载notionUrl对应的页面，以及概念列表页面.  从ST_NOTION_INFO中获取相关信息来构造概念列表页面的url.
@@ -179,14 +158,10 @@ public class PersistBoardHotTHSJob {
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
 		
 		/*
-		 * 解析概念板块内的股票信息.
+		 * 解析概念板块、行业板块内的股票信息.
 		 */
-		stockParseToolTHS.persistNotionIndustryHotStocksFromhtml(dateStr, "NOTION");
-		
-		/*
-		 * 解析行业板块热点排名靠前以及靠后的板块内的股票，json格式.
-		 */
-		stockParseToolTHS.persistNotionIndustryHotStocksFromJson(dateStr, "INDUSTRY");
+		stockParseToolTHS.persistNotionIndustryHotStocksFromHtml(dateStr, "NOTION");
+		stockParseToolTHS.persistNotionIndustryHotStocksFromHtml(dateStr, "INDUSTRY");
 		
 		/*
 		 * 记录重要指数. ST_INDEX.
@@ -194,7 +169,7 @@ public class PersistBoardHotTHSJob {
 		stockDownloadToolTHS.downloadIndexFiles();
 		stockDownloadToolTHS.downloadIndexFiles();
 		stockDownloadToolTHS.downloadIndexFiles();
-		stockParseToolTHS.persistIndexFromHtml(new File(StockUtils.getDailyStockSaveDir("B") + "index.html"));
+		stockParseToolTHS.persistIndexFromHtmls(savedDir);
 		
 		// 更新JOB状态.
 		remark = "success";
@@ -363,30 +338,6 @@ public class PersistBoardHotTHSJob {
 		StockUtils.writeToFile(filePath, sb, "GB2312");
 	}
 	
-	private boolean isValidJson(File savedDir, int totalPages){
-		String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
-		File file = null;
-		for(int page = 2; page <= totalPages; page++){
-			file = new File(dirPath + "industryHot_" + totalPages + ".json");
-			try {
-				/*
-				 * 不明白某些时候获取的某些文件是乱码。这里认为行数大于1的文件都是乱码，删除掉.
-				 */
-				if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) > 1){
-					LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
-					file.delete();
-					return false;
-				}
-			} catch (IOException e) {
-				if(file.exists()){
-					file.delete();
-				}
-				LOGGER.error(e);
-			}
-		}
-		return true;
-	}
-
 	public StockJobService getStockJobService() {
 		return stockJobService;
 	}

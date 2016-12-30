@@ -23,6 +23,8 @@ public interface IndustryStockDao {
 	
 	List<IndustryStock> queryIndustryStockByIndustryCode(IndustryStock industryStock);
 	
+	List<IndustryStock> queryIndustryStockByIndustryName(IndustryStock industryStock);
+	
 	List<IndustryStock> queryIndustryStockByCode(String code);
 	
 	List<IndustryStock> queryAllIndustryStock(String source);

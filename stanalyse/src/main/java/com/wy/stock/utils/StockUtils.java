@@ -263,26 +263,37 @@ public class StockUtils {
 	    return sb.toString();  
 	}
 	
-	public static Map<String, String> getIndexCodeMap(){
+	public static Map<String, String> getIndexCodeMap(String type){
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("创业板指", "399006");
-		result.put("深证A指", "399107");
-		result.put("深证综指", "399106");
-		result.put("深证成指", "399001");
-		result.put("中小板综", "399101");
-		result.put("成份A指", "399002");
-		result.put("新指数", "399100");
-		result.put("上证380", "1B0009");
-		result.put("B股指数", "1A0003");
-		result.put("综合指数", "1B0006");
-		result.put("上证指数", "1A0001");
-		result.put("新综指", "999009");
-		result.put("A股指数", "1A0002");
-		result.put("沪深300", "1B0300");
-		result.put("上证180", "1B0007");
-		result.put("上证50", "1B0016");
-		result.put("深证B指", "399108");
-		result.put("成份B指", "399003");
+		if("all".equalsIgnoreCase(type)){
+			result.put("创业板指", "399006");
+			result.put("深证A指", "399107");
+			result.put("深证综指", "399106");
+			result.put("深证成指", "399001");
+			result.put("中小板综", "399101");
+			result.put("成份A指", "399002");
+			result.put("新指数", "399100");
+			result.put("上证380", "1B0009");
+			result.put("B股指数", "1A0003");
+			result.put("综合指数", "1B0006");
+			result.put("上证指数", "1A0001");
+			result.put("新综指", "999009");
+			result.put("A股指数", "1A0002");
+			result.put("沪深300", "1B0300");
+			result.put("上证180", "1B0007");
+			result.put("上证50", "1B0016");
+			result.put("深证B指", "399108");
+			result.put("成份B指", "399003");
+		}else if("job-T".equalsIgnoreCase(type)){
+			result.put("399006", "创业板指");
+			result.put("399106", "深证综指");
+			result.put("399001", "深证成指");
+			result.put("1B0009", "上证380");
+			result.put("1A0001", "上证指数");
+			result.put("1B0300", "沪深300");
+			result.put("1B0007", "上证180");
+			result.put("1B0016", "上证50");
+		}
 		return result;
 	}
 	
