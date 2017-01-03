@@ -126,7 +126,6 @@ public class PersistBoardHotTHSJob {
 			stockJobService.updateRunningJob(job);
 			return;
 		}
-		
 		/*
 		 * 获取概念、行业板块热点排名靠后的文件，放入指定目录下。 需要从排名靠前的html文件中先解析出总页数，然后根据页数构造排名靠后的url.
 		 * 对于概念页面，没有列表，取消该操作.

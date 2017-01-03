@@ -311,7 +311,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				LOGGER.error("industryHotList is null or empty, return now...");
 				return;
 			}
-			                 // http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/2/ajax/1/code/881156
+			// http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/2/ajax/1/code/881156
 			String commonUrl = "http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/";
 			for(IndustryHot industryHot : industryHotList){
 				int rank = industryHot.getRank();
@@ -330,6 +330,14 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					url1 = commonUrl + "1" + "/ajax/1/code/" + industryCode;
 					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".html");
 					try {
+						/*
+						 * 这里认为行数小于100的文件都是乱码，删除掉.
+						 */
+						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 100){
+							LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
+							file1.delete();
+						}
+						
 						if(!StringUtils.isEmpty(url1) && !file1.exists()){
 							HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
 						}
@@ -360,8 +368,22 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".html");
 				}
 				try {
+					/*
+					 * 这里认为行数小于100的文件都是乱码，删除掉.
+					 */
+					if(!StringUtils.isEmpty(url1) && file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 100){
+						LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
+						file1.delete();
+					}
 					if(!StringUtils.isEmpty(url1) && !file1.exists()){
 						HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
+					}
+					/*
+					 * 这里认为行数小于100的文件都是乱码，删除掉.
+					 */
+					if(!StringUtils.isEmpty(url2) && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) < 100){
+						LOGGER.info(file2.getAbsolutePath() + " may be not valid, delete...");
+						file2.delete();
 					}
 	        		if(!StringUtils.isEmpty(url2) && !file2.exists()){
 	        			HttpUtils.httpDownload(url2, "GB2312", 10 * 1000, file2);
