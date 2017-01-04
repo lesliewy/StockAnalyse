@@ -188,16 +188,16 @@ public class PersistBoardHotTHSJob {
 	}
 
 	private void genFiles(){
-		int year = 2016;
+		int year = 2017;
 		analyseStockTool.genIndustryHotCsv(year);
 	
-		year = 2016;
+		year = 2017;
 		analyseStockTool.genNotionHotCsv(year);
 	
-		year = 2016;
+		year = 2017;
 		analyseStockTool.genIndustryHotStockCsv(year);
 		
-		year = 2016;
+		year = 2017;
 		analyseStockTool.genNotionHotStockCsv(year);
 	
 		List<String> list = StockUtils.getTradeDateLimit();
