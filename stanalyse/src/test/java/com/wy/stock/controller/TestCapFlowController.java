@@ -19,7 +19,7 @@ public class TestCapFlowController {
 	private static ApplicationContext applicationContext = null; // 提供静态ApplicationContext
 	static {
 		applicationContext = new ClassPathXmlApplicationContext(
-				"conf/applicationContext.xml"); // 实例化
+				"applicationContext-dev.xml"); // 实例化
 	}
 	
 	@Test

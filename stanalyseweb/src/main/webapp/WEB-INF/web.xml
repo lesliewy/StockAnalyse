@@ -20,7 +20,8 @@
 	</listener>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:conf/applicationContext.xml</param-value>
+		<!-- applicationContext 是dev prod 版本的文件. 没有放在conf目录下. -->
+		<param-value>classpath:applicationContext.xml</param-value>
 	</context-param>
 	
 	<!-- configure the setting of springmvcDispatcherServlet and configure the mapping 
