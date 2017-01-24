@@ -65,9 +65,10 @@ public class NotionHotDaoImpl extends SqlMapClientDaoSupport implements NotionHo
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<NotionHot> queryNotionHotInfoByDateStr(String tradeDateStr, String source) {
+	public List<NotionHot> queryNotionHotInfoByDateStr(String tradeDateStr, String type, String source) {
 		NotionHot query = new NotionHot();
 		query.setTradeDateStr(tradeDateStr);
+		query.setType(type);
 		query.setSource(source);
 		return getSqlMapClientTemplate().queryForList("queryNotionHotInfoByDateStr", query);
 	}

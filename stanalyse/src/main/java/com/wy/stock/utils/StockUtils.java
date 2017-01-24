@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.CandleLine;
+import com.wy.stock.domain.NotionHot;
 import com.wy.stock.domain.NotionHotStocks;
 import com.wy.stock.domain.StockHistory;
 
@@ -47,6 +49,8 @@ public class StockUtils {
 	public static ValueComparatorFloat descMapComparatorFloat = new ValueComparatorFloat(false);
 	
 	public static NotionHotStocksComparatorFloat descNotionHotStocksComparatorFloat = new NotionHotStocksComparatorFloat(false);
+	
+	public static NotionHotComparatorFloat descNotionHotComparatorFloat = new NotionHotComparatorFloat(false);
 	
 	private static class ValueComparatorInteger implements Comparator<Map.Entry<String, Integer>> {
 		// 默认升序;
@@ -75,6 +79,28 @@ public class StockUtils {
 				return mp1.getValue() - mp2.getValue() > 0 ? 1 : -1;
 			}
 			return mp1.getValue() - mp2.getValue() > 0 ? -1 : 1;
+		}
+	}
+	
+	private static class NotionHotComparatorFloat implements Comparator<NotionHot> {
+		// 默认升序;
+		private boolean asc = true;
+		NotionHotComparatorFloat(boolean isAsc){
+			asc = isAsc;
+		}
+		public int compare(NotionHot notionHot1,
+				NotionHot notionHot2) {
+			if(asc){
+				return notionHot1.getChangePercent() - notionHot2.getChangePercent() > 0 ? 1 : -1;
+			}
+			float diff = notionHot1.getChangePercent() - notionHot2.getChangePercent();
+			if(diff > 0){
+				return -1;
+			}else if (diff == 0){
+				return notionHot1.getNotionName().compareTo(notionHot2.getNotionName());
+			}else {
+				return 1;
+			}
 		}
 	}
 	
@@ -237,26 +263,37 @@ public class StockUtils {
 	    return sb.toString();  
 	}
 	
-	public static Map<String, String> getIndexCodeMap(){
+	public static Map<String, String> getIndexCodeMap(String type){
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("创业板指", "399006");
-		result.put("深证A指", "399107");
-		result.put("深证综指", "399106");
-		result.put("深证成指", "399001");
-		result.put("中小板综", "399101");
-		result.put("成份A指", "399002");
-		result.put("新指数", "399100");
-		result.put("上证380", "1B0009");
-		result.put("B股指数", "1A0003");
-		result.put("综合指数", "1B0006");
-		result.put("上证指数", "1A0001");
-		result.put("新综指", "999009");
-		result.put("A股指数", "1A0002");
-		result.put("沪深300", "1B0300");
-		result.put("上证180", "1B0007");
-		result.put("上证50", "1B0016");
-		result.put("深证B指", "399108");
-		result.put("成份B指", "399003");
+		if("all".equalsIgnoreCase(type)){
+			result.put("创业板指", "399006");
+			result.put("深证A指", "399107");
+			result.put("深证综指", "399106");
+			result.put("深证成指", "399001");
+			result.put("中小板综", "399101");
+			result.put("成份A指", "399002");
+			result.put("新指数", "399100");
+			result.put("上证380", "1B0009");
+			result.put("B股指数", "1A0003");
+			result.put("综合指数", "1B0006");
+			result.put("上证指数", "1A0001");
+			result.put("新综指", "999009");
+			result.put("A股指数", "1A0002");
+			result.put("沪深300", "1B0300");
+			result.put("上证180", "1B0007");
+			result.put("上证50", "1B0016");
+			result.put("深证B指", "399108");
+			result.put("成份B指", "399003");
+		}else if("job-T".equalsIgnoreCase(type)){
+			result.put("399006", "创业板指");
+			result.put("399106", "深证综指");
+			result.put("399001", "深证成指");
+			result.put("1B0009", "上证380");
+			result.put("1A0001", "上证指数");
+			result.put("1B0300", "沪深300");
+			result.put("1B0007", "上证180");
+			result.put("1B0016", "上证50");
+		}
 		return result;
 	}
 	
@@ -320,6 +357,20 @@ public class StockUtils {
 			}
 		}
 	}
+	
+	 public static int getTotalLines(String fileName) throws IOException {
+        FileReader in = new FileReader(fileName);
+        LineNumberReader reader = new LineNumberReader(in);
+        String strLine = reader.readLine();
+        int totalLines = 0;
+        while (strLine != null) {
+            totalLines++;
+            strLine = reader.readLine();
+        }
+        reader.close();
+        in.close();
+        return totalLines;
+    }
 	
 	public static List<String> getTradeDateLimit(){
 		List<String> list = new ArrayList<String>();

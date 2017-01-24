@@ -43,6 +43,13 @@ public class IndustryStockServiceImpl implements IndustryStockService {
 		return industryStockDao.queryIndustryStockByIndustryCode(query);
 	}
 	
+	public List<IndustryStock> queryIndustryStockByIndustryName(String industryName, String source) {
+		IndustryStock query = new IndustryStock();
+		query.setIndustryName(industryName);
+		query.setSource(source);
+		return industryStockDao.queryIndustryStockByIndustryName(query);
+	}
+	
 	public List<String> queryCodeByIndustryCode(String industryCode, String source) {
 		List<IndustryStock> list = queryIndustryStockByIndustryCode(industryCode, source);
 		List<String> result = new ArrayList<String>();
@@ -54,6 +61,17 @@ public class IndustryStockServiceImpl implements IndustryStockService {
 		return result;
 	}
 
+	public List<String> queryCodeByIndustryName(String industryName, String source) {
+		List<IndustryStock> list = queryIndustryStockByIndustryName(industryName, source);
+		List<String> result = new ArrayList<String>();
+		if(list != null && !list.isEmpty()){
+			for(IndustryStock industryStock : list){
+				result.add(industryStock.getCode());
+			}
+		}
+		return result;
+	}
+	
 	public List<IndustryStock> queryIndustryStockByCode(String code) {
 		return industryStockDao.queryIndustryStockByCode(code);
 	}

@@ -44,6 +44,8 @@ public class IndustryHot {
 	
 	private int corpsNum;
 	
+	private String industryCode;
+	
 	private String lowTradeDateStr;
 	
 	private String highTradeDateStr;
@@ -174,6 +176,14 @@ public class IndustryHot {
 
 	public void setCorpsNum(int corpsNum) {
 		this.corpsNum = corpsNum;
+	}
+
+	public String getIndustryCode() {
+		return industryCode;
+	}
+
+	public void setIndustryCode(String industryCode) {
+		this.industryCode = industryCode;
 	}
 
 	public String getLowTradeDateStr() {

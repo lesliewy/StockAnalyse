@@ -103,6 +103,8 @@
     <bean id="stockDownloadToolTHS" class="com.wy.stock.tools.StockDownloadToolTHSImpl">
         <property name="notionHotService" ref="notionHotService" />
         <property name="industryHotService" ref="industryHotService" />
+        <property name="notionInfoService" ref="notionInfoService" />
+        <property name="stockParseToolTHS" ref="stockParseToolTHS" />
     </bean>
     <bean id="stockParseTool" class="com.wy.stock.tools.StockParseToolImpl">
         <property name="stockInfoService" ref="stockInfoService" />

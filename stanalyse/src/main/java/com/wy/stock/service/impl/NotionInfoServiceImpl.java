@@ -19,6 +19,8 @@ import com.wy.stock.utils.StockConstant;
 public class NotionInfoServiceImpl implements NotionInfoService {
 
 	private NotionInfoDao notionInfoDao;
+	
+	private static Map<String, String>  notionNameCode = new HashMap<String, String>();
 
 	public void insertNotionInfo(NotionInfo notionInfo) {
 		notionInfoDao.insertNotionInfo(notionInfo);
@@ -34,6 +36,10 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 	
 	public void deleteNotionInfoBySource(String source) {
 		notionInfoDao.deleteNotionInfoBySource(source);
+	}
+	
+	public void deleteNotionInfoByType(String type, String source) {
+		notionInfoDao.deleteNotionInfoByType(type, source);
 	}
 	
 	public void updateByNotionName(NotionInfo notionInfo) {
@@ -74,8 +80,12 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 		return map;
 	}
 	
-	public NotionInfo queryNotionInfoByName(String notionName, String source) {
-		return notionInfoDao.queryNotionInfoByName(notionName, source);
+	public NotionInfo queryNotionInfoByName(String notionName, String type, String source) {
+		return notionInfoDao.queryNotionInfoByName(notionName,  type, source);
+	}
+	
+	public List<NotionInfo> queryNotionInfoByType(String type, String source) {
+		return notionInfoDao.queryNotionInfoByType(type, source);
 	}
 	
 	public Map<String, String> queryNotionInfoMap(String source) {
@@ -113,6 +123,21 @@ public class NotionInfoServiceImpl implements NotionInfoService {
 			result.put(info.getNotionCode(), info.getNotionName());
 		}
 		return result;
+	}
+	
+	public Map<String, String> queryNotionNameCodeMap(String type, String source){
+		if(notionNameCode != null && !notionNameCode.isEmpty()){
+			return notionNameCode;
+		}
+		List<NotionInfo> list = notionInfoDao.queryNotionInfoByType(type, source);
+		if(list == null){
+			return null;
+		}
+		for(NotionInfo info : list){
+			notionNameCode.put(info.getNotionName(), info.getNotionCode());
+		}
+		return notionNameCode;
+	
 	}
 	
 	public Map<String, Integer> queryNotionCorpsNumMap(String source) {

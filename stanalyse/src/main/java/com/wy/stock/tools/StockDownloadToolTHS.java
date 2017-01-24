@@ -15,6 +15,8 @@ public interface StockDownloadToolTHS {
 	
 	void downloadBoardHotJsonFiles(File savedDir, int totalPages, String type);
 	
+	void downloadBoardHotHtmlFiles(File savedDir, int totalPages, String type);
+	
 	void downloadBoardHotStocksFiles(String date, String type);
 	
 	void downloadIndexFiles();

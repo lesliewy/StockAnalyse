@@ -23,11 +23,15 @@ public interface NotionInfoDao {
 	
 	void deleteNotionInfoBySource(String source);
 	
+	void deleteNotionInfoByType(String type, String source);
+	
 	void updateByNotionName(NotionInfo notionInfo);
 	
 	void updateNotionCodeByNotionName(NotionInfo notionInfo);
 	
-	NotionInfo queryNotionInfoByName(String notionName, String source);
+	NotionInfo queryNotionInfoByName(String notionName, String type,  String source);
+	
+	List<NotionInfo> queryNotionInfoByType(String type, String source);
 	
 	void updateCorpsNumByNotionName(NotionInfo notionInfo);
 	

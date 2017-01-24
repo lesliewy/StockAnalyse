@@ -63,6 +63,17 @@ public class NotionInfoDaoImpl extends SqlMapClientDaoSupport implements NotionI
 		}
 		getSqlMapClientTemplate().delete("deleteNotionInfoBySource", source);
 	}
+	
+   public void deleteNotionInfoByType(String type, String source) {
+		if(StringUtils.isBlank(source) || StringUtils.isBlank(type)){
+			LOGGER.info("source or type is null, return now...");
+			return;
+		}
+		NotionInfo notionInfo = new NotionInfo();
+		notionInfo.setType(type);
+		notionInfo.setSource(source);
+		getSqlMapClientTemplate().delete("deleteNotionInfoByType", notionInfo);
+	}
 
 	public void updateByNotionName(NotionInfo notionInfo) {
 		if(notionInfo == null){
@@ -88,11 +99,20 @@ public class NotionInfoDaoImpl extends SqlMapClientDaoSupport implements NotionI
 		getSqlMapClientTemplate().update("updateNotionCodeByNotionName", notionInfo);
 	}
 
-	public NotionInfo queryNotionInfoByName(String notionName, String source) {
+	public NotionInfo queryNotionInfoByName(String notionName, String type, String source) {
 		NotionInfo query = new NotionInfo();
 		query.setNotionName(notionName);
+		query.setType(type);
 		query.setSource(source);
 		return (NotionInfo) getSqlMapClientTemplate().queryForObject("queryNotionInfoByName", query);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<NotionInfo> queryNotionInfoByType(String type, String source) {
+		NotionInfo query = new NotionInfo();
+		query.setType(type);
+		query.setSource(source);
+		return  getSqlMapClientTemplate().queryForList("queryNotionInfoByType", query);
 	}
 
 	public void updateCorpsNumByNotionName(NotionInfo notionInfo) {

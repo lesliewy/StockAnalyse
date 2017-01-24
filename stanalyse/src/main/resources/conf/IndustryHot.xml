@@ -28,6 +28,7 @@
 		<result property="avgPrice" column="AVG_PRICE" />
 		<result property="industryUrl" column="INDUSTRY_URL" />
 		<result property="corpsNum" column="CORPS_NUM" />
+		<result property="industryCode" column="INDUSTRY_CODE" />
 	</resultMap>
 	
     <resultMap id="IndustryHotResult2" class="IndustryHot">
@@ -73,7 +74,7 @@
     </select>
     
     <select id="queryIndustryHotInfoByDateStr" parameterClass="IndustryHot" resultMap="IndustryHotResult">
-        select a.*, b.INDUSTRY_URL, b.CORPS_NUM
+        select a.*, b.INDUSTRY_URL, b.CORPS_NUM, b.INDUSTRY_CODE
         from ST_INDUSTRY_HOT a, ST_INDUSTRY_INFO b
        where a.INDUSTRY_NAME = b.INDUSTRY_NAME 
              AND a.TRADE_DATE like CONCAT(#tradeDateStr# , '%')

@@ -46,24 +46,32 @@ public class PersistBoardHotTHSJob {
 		long begin = System.currentTimeMillis();
 		
 		Calendar cal = Calendar.getInstance();
-		// 周六、日不执行.注意法定节假日等不开市时也会执行,暂时没有添加.
+		/*
+		 *  周六、日不执行.注意法定节假日等不开市时也会执行,暂时没有添加.
+		 */
 		if(StockUtils.isWeekend(cal)){
 			LOGGER.info("Saturday or Sunday, return now...");
 			return;
 		}
 		
-		// 清理超长R状态的job, 修改状态为D.
+		/*
+		 *  清理超长R状态的job, 修改状态为D.
+		 */
 		stockJobService.cleanLongTimeJob(StockConstant.DEL_R_UPPER_LIMIT, jobType);
 		String jobDate = new SimpleDateFormat("YYMMddHHmm").format(Calendar.getInstance().getTime());
 		
-		// 查询当前是否有正在运行的job
+		/*
+		 *  查询当前是否有正在运行的job
+		 */
 		List<StockJob> runningJobs = stockJobService.queryStockJobByDateStatus(jobDate.substring(0, 6), jobType, StockConstant.JOB_STATE_RUNNING);
 		if(runningJobs != null && !runningJobs.isEmpty()){
 			LOGGER.info("JOB " + jobType + " - running job exists: " + runningJobs + ". return now...");
 			return;
 		}
 		
-		// 每天只执行一次
+		/*
+		 *  每天只执行一次
+		 */
 		List<StockJob> existedJobs = stockJobService.queryStockJobByDateStatus(jobDate.substring(0, 6), jobType, StockConstant.JOB_STATE_SUCCESS);
 		if(existedJobs != null && !existedJobs.isEmpty()){
 			LOGGER.info("JOB " + jobType + " - existes: " + existedJobs + ". return now...");
@@ -72,7 +80,9 @@ public class PersistBoardHotTHSJob {
 		
 		String remark = "running";
 		String status = StockConstant.JOB_STATE_RUNNING;
-		// 登记当前的job
+		/*
+		 *  登记当前的job
+		 */
 		StockJob job = new StockJob();
 		job.setJobDate(jobDate);
 		job.setJobType(jobType);
@@ -84,7 +94,7 @@ public class PersistBoardHotTHSJob {
 		stockJobService.insertStockJob(job);
 		
 		/*
-		 *  获取概念、行业板块热点排名靠前的文件， 放入指定的目录下.
+		 *  获取概念、行业板块文件， 放入指定的目录下.
 		 */
 		File savedDir = new File(StockUtils.getDailyStockSaveDir("B"));
 		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, "NOTION");
@@ -104,35 +114,37 @@ public class PersistBoardHotTHSJob {
 			job.setTimestamp(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 			stockJobService.updateRunningJob(job);
 			return;
+		}else if(notionHotHtml.length() < 30000 || industryHotHtml.length() < 30000){   // 这里根据文件大小判断下载的html是否是乱码.
+			LOGGER.info(notionHotHtml.getAbsolutePath() + " or " + industryHotHtml.getAbsolutePath() + " is invalid, wait next time, return now...");
+			notionHotHtml.delete();
+			industryHotHtml.delete();
+			remark = "notionHot.html or industryHot.html is invalid.";
+			status = StockConstant.JOB_STATE_DELETE;
+			job.setStatus(status);
+			job.setRemark(remark);
+			job.setTimestamp(new Timestamp(Calendar.getInstance().getTimeInMillis()));
+			stockJobService.updateRunningJob(job);
+			return;
 		}
-		
 		/*
 		 * 获取概念、行业板块热点排名靠后的文件，放入指定目录下。 需要从排名靠前的html文件中先解析出总页数，然后根据页数构造排名靠后的url.
+		 * 对于概念页面，没有列表，取消该操作.
 		 */
-		int totalPagesNotion = stockParseToolTHS.getNotionIndustryHotTotalPages(notionHotHtml, "NOTION");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesNotion, "NOTION");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesNotion, "NOTION");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesNotion, "NOTION");
-		
 		int totalPagesIndustry = stockParseToolTHS.getNotionIndustryHotTotalPages(industryHotHtml, "INDUSTRY");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
-		stockDownloadToolTHS.downloadBoardHotJsonFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, totalPagesIndustry, "INDUSTRY");
+		stockDownloadToolTHS.downloadBoardHotHtmlFiles(savedDir, totalPagesIndustry, "INDUSTRY");
 		
 		/*
 		 * 解析概念、行业板块热点html文件并登记
+		 * 对于概念页面，将概念相关信息存入ST_NOTION_INFO.
 		 */
-		stockParseToolTHS.persistNotionIndustryHot(notionHotHtml, "NOTION");
-		stockParseToolTHS.persistNotionIndustryHot(industryHotHtml, "INDUSTRY");
+		stockParseToolTHS.persistNotionIndustryHot(savedDir, "NOTION");
+		stockParseToolTHS.persistNotionIndustryHot(savedDir, "INDUSTRY");
 		
 		/*
-		 * 解析概念、行业板块排名靠后的json文件中的信息.
-		 */
-		stockParseToolTHS.persistNotionIndustryHot(savedDir, totalPagesNotion, "NOTION");
-		stockParseToolTHS.persistNotionIndustryHot(savedDir, totalPagesIndustry, "INDUSTRY");
-
-		/*
 		 * 获取概念、行业热点排名靠前的以及靠后的板块内的股票的文件. json文件.
+		 * 对于概念页面, 需要下载notionUrl对应的页面，以及概念列表页面.  从ST_NOTION_INFO中获取相关信息来构造概念列表页面的url.
 		 */
 		String dateStr = String.valueOf(cal.get(Calendar.YEAR)).substring(2, 4) +
 		StringUtils.leftPad(String.valueOf(cal.get(Calendar.MONTH) + 1), 2, "0") +
@@ -145,10 +157,10 @@ public class PersistBoardHotTHSJob {
 		stockDownloadToolTHS.downloadBoardHotStocksFiles(dateStr, "INDUSTRY");
 		
 		/*
-		 * 解析概念板块热点排名靠前以及靠后的板块内的股票，json格式.
+		 * 解析概念板块、行业板块内的股票信息.
 		 */
-		stockParseToolTHS.persistNotionIndustryHotStocksFromJson(dateStr, "NOTION");
-		stockParseToolTHS.persistNotionIndustryHotStocksFromJson(dateStr, "INDUSTRY");
+		stockParseToolTHS.persistNotionIndustryHotStocksFromHtml(dateStr, "NOTION");
+		stockParseToolTHS.persistNotionIndustryHotStocksFromHtml(dateStr, "INDUSTRY");
 		
 		/*
 		 * 记录重要指数. ST_INDEX.
@@ -156,7 +168,7 @@ public class PersistBoardHotTHSJob {
 		stockDownloadToolTHS.downloadIndexFiles();
 		stockDownloadToolTHS.downloadIndexFiles();
 		stockDownloadToolTHS.downloadIndexFiles();
-		stockParseToolTHS.persistIndexFromHtml(new File(StockUtils.getDailyStockSaveDir("B") + "index.html"));
+		stockParseToolTHS.persistIndexFromHtmls(savedDir);
 		
 		// 更新JOB状态.
 		remark = "success";
@@ -168,22 +180,24 @@ public class PersistBoardHotTHSJob {
 		
 		LOGGER.info("JOB " + jobType + " finished. elapsed time: " + (System.currentTimeMillis() - begin)/(1000 * 60) + " min.");
 		
-		// 产生文件.
+		/*
+		 *  产生文件.
+		 */
 		genFiles();
 		LOGGER.info("JOB " + jobType + " genFiles finished. total time: " + (System.currentTimeMillis() - begin)/(1000 * 60) + " min.");
 	}
 
 	private void genFiles(){
-		int year = 2016;
+		int year = 2017;
 		analyseStockTool.genIndustryHotCsv(year);
 	
-		year = 2016;
+		year = 2017;
 		analyseStockTool.genNotionHotCsv(year);
 	
-		year = 2016;
+		year = 2017;
 		analyseStockTool.genIndustryHotStockCsv(year);
 		
-		year = 2016;
+		year = 2017;
 		analyseStockTool.genNotionHotStockCsv(year);
 	
 		List<String> list = StockUtils.getTradeDateLimit();
@@ -322,7 +336,7 @@ public class PersistBoardHotTHSJob {
 		filePath = "/home/leslie/MyProject/StockAnalyse/gen/notionHotStocksPhraseAdd.csv";
 		StockUtils.writeToFile(filePath, sb, "GB2312");
 	}
-
+	
 	public StockJobService getStockJobService() {
 		return stockJobService;
 	}

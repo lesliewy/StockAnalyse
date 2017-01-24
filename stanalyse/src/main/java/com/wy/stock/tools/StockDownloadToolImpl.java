@@ -164,7 +164,7 @@ public class StockDownloadToolImpl implements StockDownloadTool {
 		String tradeDate = "20" + date.substring(0, 2) + "-" + date.substring(2, 4) + "-" + date.substring(4, 6);
 		if("NOTION".equals(type)){
 			// 先查询ST_NOTION_HOT中热点板块, 关联 ST_NOTION_INFO
-			List<NotionHot> notionHotList = notionHotService.queryNotionHotInfoByDateStr(tradeDate, StockConstant.DFCF_FLAG);
+			List<NotionHot> notionHotList = notionHotService.queryNotionHotInfoByDateStr(tradeDate, StockConstant.THS_NOTION_TYPE1, StockConstant.DFCF_FLAG);
 			if(notionHotList == null || notionHotList.isEmpty()){
 				LOGGER.error("notionHotList is null or empty, return now...");
 				return;

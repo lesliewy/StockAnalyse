@@ -49,7 +49,7 @@
     </select>
     
     <update id="updateByIndustryName" parameterClass="IndustryInfo">
-        UPDATE ST_INDUSTRY_INFO SET INDUSTRY_URL = #industryUrl#, TIMESTAMP = #timestamp#, CORPS_NUM = #corpsNum#
+        UPDATE ST_INDUSTRY_INFO SET INDUSTRY_URL = #industryUrl#, TIMESTAMP = #timestamp#, CORPS_NUM = #corpsNum#, INDUSTRY_CODE=#industryCode#
          WHERE INDUSTRY_NAME = #industryName#
                AND SOURCE = #source#
     </update>

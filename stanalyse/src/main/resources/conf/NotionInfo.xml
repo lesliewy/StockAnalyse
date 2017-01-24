@@ -13,6 +13,7 @@
 		a query, and the class properties. A result map isn't necessary if the columns 
 		(or aliases) match to the properties exactly. -->
 	<resultMap id="NotionInfoResult" class="NotionInfo">
+	    <result property="type" column="TYPE" />
 		<result property="notionUrl" column="NOTION_URL" />
 		<result property="notionName" column="NOTION_NAME" />
 		<result property="timestamp" column="TIMESTAMP" />
@@ -23,6 +24,7 @@
 
 	<insert id="insertNotionInfo" parameterClass="NotionInfo">
 		insert into ST_NOTION_INFO (
+		TYPE,
 		NOTION_URL,
 		NOTION_NAME,
 		TIMESTAMP,
@@ -30,7 +32,7 @@
 		NOTION_CODE,
 		CORPS_NUM)
 		values (
-		#notionUrl#, #notionName#, #timestamp#, #source#, #notionCode#, #corpsNum#
+		#type#, #notionUrl#, #notionName#, #timestamp#, #source#, #notionCode#, #corpsNum#
 		)
 	</insert>
 	
@@ -42,6 +44,10 @@
         delete from ST_NOTION_INFO where SOURCE = #source#
     </delete>
     
+    <delete id="deleteNotionInfoByType" parameterClass="NotionInfo">
+        delete from ST_NOTION_INFO where TYPE = #type# AND SOURCE = #source#
+    </delete>
+    
     <select id="queryAllNotionInfo" parameterClass="java.lang.String" resultMap="NotionInfoResult">
         select *
         from ST_NOTION_INFO
@@ -51,18 +57,21 @@
     <update id="updateByNotionName" parameterClass="NotionInfo">
         UPDATE ST_NOTION_INFO SET NOTION_URL = #notionUrl#, TIMESTAMP = #timestamp#, CORPS_NUM = #corpsNum#
          WHERE NOTION_NAME = #notionName#
+               AND TYPE = #type#
                AND SOURCE = #source#
     </update>
     
     <update id="updateCorpsNumByNotionName" parameterClass="NotionInfo">
         UPDATE ST_NOTION_INFO SET TIMESTAMP = #timestamp#, CORPS_NUM = #corpsNum#
          WHERE NOTION_NAME = #notionName#
+               AND TYPE = #type#
                AND SOURCE = #source#
     </update>
     
     <update id="updateNotionCodeByNotionName" parameterClass="NotionInfo">
         UPDATE ST_NOTION_INFO SET NOTION_CODE = #notionCode#
          WHERE NOTION_NAME = #notionName#
+               TYPE = #type#
                AND SOURCE = #source#
     </update>
     
@@ -70,6 +79,14 @@
         select *
         from ST_NOTION_INFO
        where NOTION_NAME = #notionName#
+         AND TYPE = #type#
+         AND SOURCE = #source#
+    </select>
+    
+    <select id="queryNotionInfoByType" parameterClass="NotionInfo" resultMap="NotionInfoResult">
+        select *
+        from ST_NOTION_INFO
+       where TYPE = #type#
          AND SOURCE = #source#
     </select>
     

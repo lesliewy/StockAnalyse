@@ -3,6 +3,8 @@
  */
 package com.wy.stock.service.impl;
 
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 
 import com.wy.stock.dao.StockJobDao;
@@ -33,6 +35,8 @@ public class StockJobServiceImpl implements StockJobService {
 		StockJob job = new StockJob();
 		job.setDelRUpperLimit(delRTime);
 		job.setJobFlag(jobFlag);
+		job.setRemark("kill long time job");
+		job.setTimestamp(new Timestamp(Calendar.getInstance().getTimeInMillis()));
 		stockJobDao.updateR2D(job);
 	}
 

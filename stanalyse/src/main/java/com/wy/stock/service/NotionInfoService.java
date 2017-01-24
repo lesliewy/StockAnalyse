@@ -22,6 +22,8 @@ public interface NotionInfoService {
 	
 	void deleteNotionInfoBySource(String source);
 	
+	void deleteNotionInfoByType(String type, String source);
+	
 	void updateByNotionName(NotionInfo notionInfo);
 	
 	void updateNotionCodeByNotionName(NotionInfo notionInfo);
@@ -34,13 +36,17 @@ public interface NotionInfoService {
 	
 	Map<String, String> queryNotionUrlNameMap(String source);
 	
-	NotionInfo queryNotionInfoByName(String notionName, String source);
+	NotionInfo queryNotionInfoByName(String notionName, String type, String source);
+	
+	List<NotionInfo> queryNotionInfoByType(String type, String source);
 	
 	Map<String, String> queryNotionInfoMap(String source);
 	
 	Map<String, Integer> queryNotionNameNumMap(String source);
 	
 	Map<String, String> queryNotionCodeNameMap(String source);
+	
+	Map<String, String> queryNotionNameCodeMap(String type, String source);
 	
 	Map<String, Integer> queryNotionCorpsNumMap(String source);
 }

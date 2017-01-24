@@ -13,6 +13,8 @@ import java.sql.Timestamp;
  */
 public class NotionInfo {
 	
+	private String type;
+	
 	private String notionName;
 	
 	private String notionUrl;
@@ -24,6 +26,14 @@ public class NotionInfo {
 	private String notionCode;
 	
 	private Integer corpsNum;
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public String getNotionName() {
 		return notionName;

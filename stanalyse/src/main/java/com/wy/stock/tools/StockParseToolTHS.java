@@ -23,25 +23,31 @@ public interface StockParseToolTHS {
 	
 	List<NotionInfo> parseNotionInfoFromDoc(Document industryInfoDoc);
 	
-	List<NotionHot> parseNotionHotFromHtml(File html);
+	void  persistNotionHotFromHtml(File html);
 	
 	List<IndustryHot> parseIndustryHotFromHtml(File jsonfile);
 	
 	List<NotionHotStocks> parseNotionHotStocksFromHtml(File html);
 	
+	List<NotionHot> parseNotionHotStocksFromStocksHtml(File html);
+	
 	List<IndustryHotStocks> parseIndustryHotStocksFromHtml(File html);
 	
-	void persistNotionIndustryHotStocksFromhtml(String date, String type);
+	void persistNotionIndustryHotFromStocksHtml(File htmlDir, String tradeDate);
+	
+	void persistNotionIndustryHotStocksFromHtml(String date, String type);
 	
 	void persistNotionIndustryHotStocksFromJson(String date, String type);
 	
 	void persistNotionIndustryInfo(File html, String type);
 	
-	void persistNotionIndustryHot(File html, String type);
+	void persistNotionIndustryHot(File savedDir, String type);
 	
 	void persistNotionIndustryHot(File saveDir, int totalPages, String type);
 	
 	void persistIndexFromHtml(File html);
+	
+	void persistIndexFromHtmls(File savedDir);
 	
 	int getNotionIndustryHotTotalPages(File html, String type);
 	

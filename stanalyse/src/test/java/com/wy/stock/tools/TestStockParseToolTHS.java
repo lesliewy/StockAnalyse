@@ -19,16 +19,7 @@ public class TestStockParseToolTHS {
 	private static ApplicationContext applicationContext = null; // 提供静态ApplicationContext
 	static {
 		applicationContext = new ClassPathXmlApplicationContext(
-				"conf/applicationContext.xml"); // 实例化
-	}
-	
-	@Test
-	public void testParseNotionHotFromHtml(){
-		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
-				.getBean("stockParseToolTHS");
-		
-		File html = new File("/home/leslie/MyProject/StockAnalyse/html/boardHot/2015/10/27/notionHot.html");
-		stockParseTHS.parseNotionHotFromHtml(html);
+				"applicationContext-dev.xml"); // 实例化
 	}
 	
 	@Test
@@ -59,10 +50,10 @@ public class TestStockParseToolTHS {
 	
 	@Test
 	public void testPersistNotionIndustryHotStocksFromhtml(){
-		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
-				.getBean("stockParseToolTHS");
+//		StockParseToolTHS stockParseTHS = (StockParseToolTHS) applicationContext
+//				.getBean("stockParseToolTHS");
 //		stockParseTHS.persistNotionIndustryHotStocksFromhtml("151028", "NOTION");
-		stockParseTHS.persistNotionIndustryHotStocksFromhtml("151028", "INDUSTRY");
+//		stockParseTHS.persistNotionIndustryHotStocksFromhtml("151028", "INDUSTRY");
 	}
 	
 	@Test

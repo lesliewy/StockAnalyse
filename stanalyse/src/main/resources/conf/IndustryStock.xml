@@ -55,6 +55,13 @@
              AND SOURCE = #source#
     </select>
     
+    <select id="queryIndustryStockByIndustryName" parameterClass="IndustryStock" resultMap="IndustryStockResult">
+        select *
+        from ST_INDUSTRY_STOCK
+       where INDUSTRY_NAME = #industryName#
+             AND SOURCE = #source#
+    </select>
+    
     <select id="queryAllIndustryStock" parameterClass="java.lang.String" resultMap="IndustryStockResult">
         select *
         from ST_INDUSTRY_STOCK
