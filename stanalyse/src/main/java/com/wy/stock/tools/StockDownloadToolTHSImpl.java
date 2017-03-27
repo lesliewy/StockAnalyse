@@ -331,9 +331,9 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".html");
 					try {
 						/*
-						 * 这里认为行数小于100的文件都是乱码，删除掉.
+						 * 这里认为行数小于30的文件都是乱码，删除掉.
 						 */
-						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 100){
+						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 30){
 							LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
 							file1.delete();
 						}
@@ -369,9 +369,9 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				}
 				try {
 					/*
-					 * 这里认为行数小于100的文件都是乱码，删除掉.
+					 * 这里认为行数小于30的文件都是乱码，删除掉.
 					 */
-					if(!StringUtils.isEmpty(url1) && file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 100){
+					if(!StringUtils.isEmpty(url1) && file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 30){
 						LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
 						file1.delete();
 					}
@@ -379,9 +379,9 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 						HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
 					}
 					/*
-					 * 这里认为行数小于100的文件都是乱码，删除掉.
+					 * 这里认为行数小于30的文件都是乱码，删除掉.
 					 */
-					if(!StringUtils.isEmpty(url2) && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) < 100){
+					if(!StringUtils.isEmpty(url2) && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) < 30){
 						LOGGER.info(file2.getAbsolutePath() + " may be not valid, delete...");
 						file2.delete();
 					}
