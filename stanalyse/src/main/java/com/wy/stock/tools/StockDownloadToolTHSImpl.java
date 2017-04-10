@@ -289,12 +289,11 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 		
 		if("NOTION".equals(type)){
             // http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/3/ajax/1/code/300220  返回的是html
-			
 			/*
 			 * 下载所有的notionUrl页面
 			 */
 			downloadAllNotionUrlHtml();
-            
+         
 			/*
 			 * 解析notionUrl页面, 将数据插入ST_NOTION_HOT
 			 */
@@ -314,94 +313,40 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 			// http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/2/ajax/1/code/881156
 			String commonUrl = "http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/";
 			for(IndustryHot industryHot : industryHotList){
-				int rank = industryHot.getRank();
 				String industryName = industryHot.getIndustryName();
 				String industryCode = industryHot.getIndustryCode();
-				int pageSize = StockConstant.INDUSTRY_HOT_PAGE_SIZE;
-				int corpsNum = industryHot.getCorpsNum();
-				int a = corpsNum / pageSize;  // 取整
-				float b = corpsNum / Float.valueOf(pageSize);  // 浮点数.
-				String url1 = "";
-				String url2 = "";
-				File file1 = null;
-				File file2 = null;
-				// 第一页必须取
-				if(rank <= StockConstant.INDUSTRY_HOT_PAGE_SIZE){
-					url1 = commonUrl + "1" + "/ajax/1/code/" + industryCode;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".html");
-					try {
-						/*
-						 * 这里认为行数小于30的文件都是乱码，删除掉.
-						 */
-						if(file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 30){
-							LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
-							file1.delete();
-						}
-						
-						if(!StringUtils.isEmpty(url1) && !file1.exists()){
-							HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
-						}
-		    		} catch (FileNotFoundException e) {
-		    			if(file1.exists()){
-		    				file1.delete();
-		    			}
-		    			LOGGER.error(e);
-		    		} catch (IOException e) {
-		    			if(file1.exists()){
-		    				file1.delete();
-		    			}
-		    			LOGGER.error(e);
-		    		}
-				}
-				if(corpsNum <= pageSize){   // 板块包含的股票个数 <= pageSize, 只取第一页.
-					url1 = commonUrl + "1" + "/ajax/1/code/" + industryCode;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + "1" + ".html");
-				}else if(a == b){    // 刚好能被pageSize整除
-					url1 = commonUrl + a + "/ajax/1/code/" + industryCode;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".html");
-					url2 = commonUrl + (a - 1) + "/ajax/1/code/" + industryCode;
-					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + (a - 1) + ".html");
-				}else if( a < b){    // 不能被pageSize整除情况.
-					url1 = commonUrl + (a + 1) + "/ajax/1/code/" + industryCode;
-					file1 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + (a + 1) + ".html");
-					url2 = commonUrl + a + "/ajax/1/code/" + industryCode;
-					file2 = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_"  + a + ".html");
-				}
+				
+			   // 下载所有的数据.
+				File file = null;
+				String url = null;
 				try {
-					/*
-					 * 这里认为行数小于30的文件都是乱码，删除掉.
-					 */
-					if(!StringUtils.isEmpty(url1) && file1.exists() && StockUtils.getTotalLines(file1.getAbsolutePath()) < 30){
-						LOGGER.info(file1.getAbsolutePath() + " may be not valid, delete...");
-						file1.delete();
-					}
-					if(!StringUtils.isEmpty(url1) && !file1.exists()){
-						HttpUtils.httpDownload(url1, "GB2312", 10 * 1000, file1);
-					}
-					/*
-					 * 这里认为行数小于30的文件都是乱码，删除掉.
-					 */
-					if(!StringUtils.isEmpty(url2) && file2.exists() && StockUtils.getTotalLines(file2.getAbsolutePath()) < 30){
-						LOGGER.info(file2.getAbsolutePath() + " may be not valid, delete...");
-						file2.delete();
-					}
-	        		if(!StringUtils.isEmpty(url2) && !file2.exists()){
-	        			HttpUtils.httpDownload(url2, "GB2312", 10 * 1000, file2);
-	        		}
-	    		} catch (FileNotFoundException e) {
-	    			if(file1.exists()){
-	    				file1.delete();
-	    			}
-	    			if(file2.exists()){
-	    				file2.delete();
+   				for(int page = 1; page <= 100; page++){
+   					url = commonUrl + page + "/ajax/1/code/" + industryCode;
+   					file = new File(StockUtils.getDailyStockSaveDir("B") + "industryHot_" + industryName + "_" + page + ".html");
+					
+						if(!StringUtils.isEmpty(url) && !file.exists()){
+							HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+						}
+						// 这里认为行数小于30的文件都是乱码，删除掉.
+						if(!StringUtils.isEmpty(url) && file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) < 30){
+							LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
+							file.delete();
+						}
+						// 这里认为行数小于40的文件是没有数据的空文件, 说明已经获取完了.
+						if(!StringUtils.isEmpty(url) && file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) < 40){
+							LOGGER.info(file.getAbsolutePath() + " may be finished, delete...");
+							file.delete();
+							break;
+						}
+		    		}
+				}catch (FileNotFoundException e) {
+	    			if(file.exists()){
+	    				file.delete();
 	    			}
 	    			LOGGER.error(e);
 	    		} catch (IOException e) {
-	    			if(file1.exists()){
-	    				file1.delete();
-	    			}
-	    			if(file2.exists()){
-	    				file2.delete();
+	    			if(file.exists()){
+	    				file.delete();
 	    			}
 	    			LOGGER.error(e);
 	    		}
@@ -423,7 +368,7 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				String notionName = notionHot.getNotionName();
 				String notionCode = notionHot.getNotionCode();
 				int rank = notionHot.getRank();
-				if(rank > 50 && rank < 130){
+				if(rank > 50 && rank < 120){
 					continue;
 				}
 				
@@ -434,14 +379,25 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 				deleteInvalidFiles(tradeDate, notionName);
 				
 				/*
-				 * 下载概念列表页面，获取前50条记录，每页10条.
+				 * 获取所有数据.
 				 */
-				for(int page = 1; page <= 5; page++){
+				for(int page = 1; page <= 100; page++){
 					String url = "http://q.10jqka.com.cn/gn/detail/field/199112/order/desc/page/" + page + "/ajax/1/code/" + notionCode;
 					file = new File(StockUtils.getDailyStockSaveDir("B") + "notionHot_" + notionName + "_" + page + ".html");
-						if(!StringUtils.isEmpty(url) && !file.exists()){
-							HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
-						}
+					if(!StringUtils.isEmpty(url) && !file.exists()){
+						HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+					}
+					 // 这里认为行数小于30的文件都是乱码，删除掉.
+					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) < 30){
+						LOGGER.info(file.getAbsolutePath() + " may be not valid, delete...");
+						file.delete();
+					}
+					// 这里认为行数小于40的文件是没有数据的空文件, 说明已经获取完了.
+					if(file.exists() && StockUtils.getTotalLines(file.getAbsolutePath()) < 40){
+						LOGGER.info(file.getAbsolutePath() + " may be finished, delete...");
+						file.delete();
+						break;
+					}
 				}
 			}
 		}catch (FileNotFoundException e) {
