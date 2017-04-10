@@ -9,10 +9,10 @@ import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.CandleLine;
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.service.GapService;
 import com.wy.stock.service.StockHistoryService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.utils.StockUtils;
 
 /**
@@ -26,18 +26,18 @@ public class GapServiceImpl implements GapService{
 	
 	private StockHistoryService stockHistoryService;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	public void gapAnalyse() {
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		Float gapDiff = 3.0f;
 		StringBuilder sb = new StringBuilder("\nGaps \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			sb.append(gapAnalyseSingle(stock.getCode(), stock.getExchange(), stock.getType(), gapDiff));
 		}
 		LOGGER.info(sb.toString());
@@ -135,12 +135,12 @@ public class GapServiceImpl implements GapService{
 		this.stockHistoryService = stockHistoryService;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 }

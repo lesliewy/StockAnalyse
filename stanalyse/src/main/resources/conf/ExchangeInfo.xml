@@ -4,15 +4,15 @@
     PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
     "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
-<sqlMap namespace="StockInfo">
+<sqlMap namespace="ExchangeInfo">
 
 	<!-- Use type aliases to avoid typing the full classname every time. -->
-	<typeAlias alias="StockInfo" type="com.wy.stock.domain.StockInfo" />
+	<typeAlias alias="ExchangeInfo" type="com.wy.stock.domain.ExchangeInfo" />
 
 	<!-- Result maps describe the mapping between the columns returned from 
 		a query, and the class properties. A result map isn't necessary if the columns 
 		(or aliases) match to the properties exactly. -->
-	<resultMap id="StockInfoResult" class="StockInfo">
+	<resultMap id="ExchangeInfoResult" class="ExchangeInfo">
 		<result property="name" column="NAME" />
 		<result property="code" column="CODE" />
 		<result property="type" column="TYPE" />
@@ -20,7 +20,7 @@
 		<result property="timestamp" column="TIMESTAMP" />
 	</resultMap>
 
-	<insert id="insertStockInfo" parameterClass="StockInfo">
+	<insert id="insertExchangeInfo" parameterClass="ExchangeInfo">
 		insert into ST_INFO (
 		NAME,
 		CODE,
@@ -32,7 +32,7 @@
 		)
 	</insert>
 	
-    <delete id="deleteByExchangeType" parameterClass="StockInfo">
+    <delete id="deleteByExchangeType" parameterClass="ExchangeInfo">
         delete from ST_INFO where EXCHANGE = #exchange# AND TYPE = #type#
     </delete>
     
@@ -40,22 +40,22 @@
         delete from ST_INFO where EXCHANGE = #exchange#
     </delete>
     
-    <delete id="deleteByKey" parameterClass="StockInfo">
+    <delete id="deleteByKey" parameterClass="ExchangeInfo">
         delete from ST_INFO where EXCHANGE = #exchange# AND CODE = #code# AND TYPE = #type#
     </delete>
     
-    <select id="queryAllStockInfo" resultMap="StockInfoResult">
+    <select id="queryAllExchangeInfo" resultMap="ExchangeInfoResult">
         select *
         from ST_INFO
     </select>
     
-    <select id="queryStockInfoByExchange" resultMap="StockInfoResult">
+    <select id="queryExchangeInfoByExchange" resultMap="ExchangeInfoResult">
         select *
         from ST_INFO
        where EXCHANGE = #exchange#
     </select>
     
-    <select id="queryStockInfoByType" resultMap="StockInfoResult">
+    <select id="queryExchangeInfoByType" resultMap="ExchangeInfoResult">
         select *
         from ST_INFO
        where TYPE = #type#

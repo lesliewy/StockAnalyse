@@ -17,7 +17,7 @@ import com.wy.stock.domain.NotionHot;
 import com.wy.stock.domain.NotionHotStocks;
 import com.wy.stock.domain.NotionInfo;
 import com.wy.stock.domain.StockCapFlow;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 
 /**
  * @author leslie
@@ -27,7 +27,7 @@ public interface StockParseTool {
 
 	void getStockInfo();
 	
-	void parseHistCsv(File file, StockInfo stockInfo, Map<String, String> maxDateMap) throws IOException;
+	void parseHistCsv(File file, ExchangeInfo stockInfo, Map<String, String> maxDateMap) throws IOException;
 	
 	void parseAllHistCsv(File dir);
 	

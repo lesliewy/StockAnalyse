@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.wy.stock.dao.StockHistoryDao;
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.service.StockHistoryService;
 
 /**
@@ -35,7 +35,7 @@ public class StockHistoryServiceImpl implements StockHistoryService {
 		stockHistoryDao.deleteHistoryByKey(stockHistory);
 	}
 	
-	public List<StockInfo> queryAllHistStock() {
+	public List<ExchangeInfo> queryAllHistStock() {
 		return stockHistoryDao.queryAllHistStock();
 	}
 

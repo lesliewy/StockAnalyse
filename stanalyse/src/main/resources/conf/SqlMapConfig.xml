@@ -21,7 +21,7 @@
 
 	<!-- List the SQL Map XML files. They can be loaded from the classpath, 
 		as they are here (com.domain.data...) -->
-    <sqlMap resource="conf/StockInfo.xml" />
+    <sqlMap resource="conf/ExchangeInfo.xml" />
     <sqlMap resource="conf/StockHistory.xml" />
     <sqlMap resource="conf/StockJob.xml" />
     <sqlMap resource="conf/StockMovingAvg.xml" />

@@ -15,12 +15,12 @@ import com.wy.stock.domain.IndustryHot;
 import com.wy.stock.domain.IndustryInfo;
 import com.wy.stock.domain.NotionHot;
 import com.wy.stock.domain.NotionInfo;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.service.IndustryHotService;
 import com.wy.stock.service.IndustryInfoService;
 import com.wy.stock.service.NotionHotService;
 import com.wy.stock.service.NotionInfoService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.utils.HttpUtils;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
@@ -35,7 +35,7 @@ public class StockDownloadToolImpl implements StockDownloadTool {
 	private static Logger LOGGER = Logger.getLogger(StockDownloadToolImpl.class
 			.getName());
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	private NotionInfoService notionInfoService;
 	
@@ -53,7 +53,7 @@ public class StockDownloadToolImpl implements StockDownloadTool {
      */
     public void downloadCsvFiles(File savedDir){
     	// 查询所有的股票信息.
-    	List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+    	List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
     	if(allStocks == null || allStocks.isEmpty()){
     		LOGGER.info("allStocks is empty, return now...");
     		return;
@@ -64,7 +64,7 @@ public class StockDownloadToolImpl implements StockDownloadTool {
     	}
     	String stockStr = "";
     	int num = 0;
-    	for(StockInfo stock : allStocks){
+    	for(ExchangeInfo stock : allStocks){
     		if("上证".equals(stock.getExchange())){
     			stockStr = stock.getCode() + ".ss";
     		}else if("深证".equals(stock.getExchange())){
@@ -471,12 +471,12 @@ public class StockDownloadToolImpl implements StockDownloadTool {
 		return file;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 	public NotionHotService getNotionHotService() {

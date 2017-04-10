@@ -33,7 +33,7 @@ import com.wy.stock.service.NotionHotService;
 import com.wy.stock.service.NotionHotStocksService;
 import com.wy.stock.service.NotionInfoService;
 import com.wy.stock.service.StockCapFlowService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
 
@@ -49,7 +49,7 @@ public class AnalyseStockToolImpl implements AnalyseStockTool{
 
 	private StockCapFlowService stockCapFlowService;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	private IndustryStockService industryStockService;
 	
@@ -224,7 +224,7 @@ public class AnalyseStockToolImpl implements AnalyseStockTool{
 		/*
 		 *  code - name Map
 		 */
-		codeNameMap = stockInfoService.queryStockCodeNameMap();
+		codeNameMap = exchangeInfoService.queryStockCodeNameMap();
 		if(codeNameMap == null){
 			LOGGER.info("codeNameMap is null, return now...");
 			return false;
@@ -806,7 +806,7 @@ public class AnalyseStockToolImpl implements AnalyseStockTool{
 		Map<String, String> stockIndustriesMap = industryHotStocksService.queryStocksIndustriesBetweenMap(lowTradeDateStr, highTradeDateStr);
 		
 		// 股票代码
-		Map<String, String> codeMap = stockInfoService.queryStockNameCodeMap();
+		Map<String, String> codeMap = exchangeInfoService.queryStockNameCodeMap();
 		
 		// 股票区间总的涨跌幅, 这里仍然使用notion
 		Map<String, Float> stockChangePctMap = notionHotStocksService.queryStocksChangePctBetweenMap(lowTradeDateStr, highTradeDateStr);
@@ -864,7 +864,7 @@ public class AnalyseStockToolImpl implements AnalyseStockTool{
 		Map<String, String> stockNotionsMap = notionHotStocksService.queryStocksNotionsBetweenMap(lowTradeDateStr, highTradeDateStr);
 		
 		// 股票代码
-		Map<String, String> codeMap = stockInfoService.queryStockNameCodeMap();
+		Map<String, String> codeMap = exchangeInfoService.queryStockNameCodeMap();
 		
 		// 股票区间总的涨跌幅
 		Map<String, Float> stockChangePctMap = notionHotStocksService.queryStocksChangePctBetweenMap(lowTradeDateStr, highTradeDateStr);
@@ -916,12 +916,12 @@ public class AnalyseStockToolImpl implements AnalyseStockTool{
 		this.stockCapFlowService = stockCapFlowService;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 	public IndustryStockService getIndustryStockService() {

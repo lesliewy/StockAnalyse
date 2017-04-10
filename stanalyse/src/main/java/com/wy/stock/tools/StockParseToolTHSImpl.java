@@ -52,7 +52,7 @@ import com.wy.stock.service.NotionHotStocksService;
 import com.wy.stock.service.NotionInfoService;
 import com.wy.stock.service.NotionStockService;
 import com.wy.stock.service.StockFiveChangeService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
 
@@ -86,7 +86,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	
 	private StockFiveChangeService stockFiveChangeService;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
     
 	/**
@@ -668,7 +668,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		String dirPath = StockConstant.BOARD_HOT_FILE_PATH + "20" + date.substring(0, 2) + File.separatorChar + 
 				 date.substring(2, 4) + File.separatorChar + date.substring(4, 6) + File.separatorChar;
 		String currDateStr = "20" + date.substring(0, 2) + "-" + date.substring(2, 4) + "-" + date.substring(4, 6);
-		Map<String, String> codeNameMap = stockInfoService.queryStockCodeNameMap();
+		Map<String, String> codeNameMap = exchangeInfoService.queryStockCodeNameMap();
         Timestamp timestamp = new Timestamp(Calendar.getInstance()
 				.getTimeInMillis());
 		if("NOTION".equals(type)){
@@ -966,7 +966,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	}
 	
 	public void persistNotionIndustryHot(File saveDir,  int totalPages, String type) {
-		Map<String, String> codeNameMap = stockInfoService.queryStockCodeNameMap();
+		Map<String, String> codeNameMap = exchangeInfoService.queryStockCodeNameMap();
 		Timestamp timestamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
 		if("NOTION".equalsIgnoreCase(type)){
 			com.wy.stock.utils.FileNameSelector selector = new com.wy.stock.utils.FileNameSelector("notionHot" + "_", ".json");
@@ -1752,7 +1752,7 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		Timestamp tradeDate = Timestamp.valueOf(tradeDateStr + " 00:00:00");
 		Timestamp timestamp = new Timestamp(Calendar.getInstance()
 				.getTimeInMillis());
-		Map<String, String> codeNameMap = stockInfoService.queryStockCodeNameMap();
+		Map<String, String> codeNameMap = exchangeInfoService.queryStockCodeNameMap();
 		List<NotionHotStocks> list = new ArrayList<NotionHotStocks>();
 		BufferedReader reader = null;
 		try {
@@ -2152,12 +2152,12 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		this.stockFiveChangeService = stockFiveChangeService;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 }

@@ -13,11 +13,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.StockCapFlow;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.domain.StockJob;
 import com.wy.stock.service.ConfigService;
 import com.wy.stock.service.StockCapFlowService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.service.StockJobService;
 import com.wy.stock.tools.StockDownloadTool;
 import com.wy.stock.tools.StockParseTool;
@@ -43,7 +43,7 @@ public class PersistStockCapFlowJob {
 	
 	private StockCapFlowService stockCapFlowService;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	private String jobType = StockConstant.JOB_TYPE_CAP_FLOW;
 	
@@ -124,8 +124,8 @@ public class PersistStockCapFlowJob {
 			stockCapFlowService.insertStockCapFlowBatch(capFlowList);
 		}else if("B".equalsIgnoreCase(persistCapFlowMode)){
 			// 查询所有的沪深A股, 遍历每个股票.
-			List<StockInfo> allA = stockInfoService.queryStockInfoByType("A");
-			for(StockInfo stock : allA){
+			List<ExchangeInfo> allA = exchangeInfoService.queryExchangeInfoByType("A");
+			for(ExchangeInfo stock : allA){
 				String code = stock.getCode();
 				// 下载html文件.
 				File html = stockDownloadTool.downloadStockCapFlowHist(savedDir, code);
@@ -196,12 +196,12 @@ public class PersistStockCapFlowJob {
 		this.stockCapFlowService = stockCapFlowService;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 	
 }

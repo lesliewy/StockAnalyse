@@ -6,7 +6,7 @@ package com.wy.stock.dao;
 import java.util.List;
 
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 
 /**
  * @author leslie
@@ -22,7 +22,7 @@ public interface StockHistoryDao {
 	
 	void deleteHistoryByKey(StockHistory stockHistory);
 	
-	List<StockInfo> queryAllHistStock();
+	List<ExchangeInfo> queryAllHistStock();
 	
 	List<StockHistory> queryHistListByKey(StockHistory query);
 	

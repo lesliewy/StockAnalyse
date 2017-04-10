@@ -12,10 +12,10 @@ import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.CandleLine;
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.service.CandlestickService;
 import com.wy.stock.service.StockHistoryService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.utils.StockUtils;
 
 /**
@@ -28,7 +28,7 @@ public class CandlestickServiceImpl implements CandlestickService {
 	
 	private StockHistoryService stockHistoryService;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 
 	/**
 	 * 启明星: 见底转向.
@@ -36,13 +36,13 @@ public class CandlestickServiceImpl implements CandlestickService {
 	public StringBuilder morningStarAnalyse(Timestamp lowestTime) {
 		StringBuilder sb = new StringBuilder("\n启明星 \n");
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return sb;
 		}
 
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			sb.append(morningStarSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTime));
 		}
 		LOGGER.info(sb.toString());
@@ -55,12 +55,12 @@ public class CandlestickServiceImpl implements CandlestickService {
 	public StringBuilder duskStarAnalyse(Timestamp lowestTime) {
 		StringBuilder sb = new StringBuilder("\n黄昏星 \n");
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return sb;
 		}
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			sb.append(duskStarSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTime));
 		}
 		LOGGER.info(sb.toString());
@@ -73,12 +73,12 @@ public class CandlestickServiceImpl implements CandlestickService {
 	public StringBuilder crossStarAnalyse(Timestamp lowestTime){
 		StringBuilder sb = new StringBuilder("\n十字星 \n");
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return sb;
 		}
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(crossStarSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTime));
 			}
@@ -93,13 +93,13 @@ public class CandlestickServiceImpl implements CandlestickService {
 	public StringBuilder shootingStarAnalyse(){
 		StringBuilder sb = new StringBuilder("\n射击星 \n");
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return sb;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(shootingStarSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -114,12 +114,12 @@ public class CandlestickServiceImpl implements CandlestickService {
 	public StringBuilder pregnantLineAnalyse(Timestamp lowestTime){
 		StringBuilder sb = new StringBuilder("\n孕线 \n");
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return sb;
 		}
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(pregnantLineSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTime));
 			}
@@ -134,13 +134,13 @@ public class CandlestickServiceImpl implements CandlestickService {
 	public StringBuilder blackCloudCoverAnalyse(){
 		StringBuilder sb = new StringBuilder("\n乌云盖顶 \n");
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return sb;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(blackCloudCoverSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -154,14 +154,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void breakTopBottomAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n穿头破脚 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(breakTopBottomSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -174,14 +174,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void hammerAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n锤头 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(hammerSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -194,14 +194,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void hangLineAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n吊颈 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(hangLineSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -214,14 +214,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void dawnAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n曙光初现 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(dawnSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -234,14 +234,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void redThreeAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n红三兵 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(redThreeSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -254,14 +254,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void twoCrowsAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n两只乌鸦 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(twoCrowsSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -274,14 +274,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void threeCrowsAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n三只乌鸦 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(threeCrowsSingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -294,14 +294,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void ascTrilogyAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n上升三部曲 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(ascTrilogySingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -314,14 +314,14 @@ public class CandlestickServiceImpl implements CandlestickService {
 	 */
 	public void descTrilogyAnalyse(){
 		// 查询所有的公司.
-		List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+		List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
 		if(allStocks == null){
 			LOGGER.info("allStocks is null, return now...");
 			return;
 		}
 		String lowestTimeStr = "2013-01-01 00:00:00";
 		StringBuilder sb = new StringBuilder("\n下跌三部曲 \n");
-		for(StockInfo stock : allStocks){
+		for(ExchangeInfo stock : allStocks){
 			if("上证".equals(stock.getExchange()) && "A".equals(stock.getType())){
 				sb.append(descTrilogySingle(stock.getCode(), stock.getExchange(), stock.getType(), lowestTimeStr));
 			}
@@ -1231,12 +1231,12 @@ public class CandlestickServiceImpl implements CandlestickService {
 		this.stockHistoryService = stockHistoryService;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 }

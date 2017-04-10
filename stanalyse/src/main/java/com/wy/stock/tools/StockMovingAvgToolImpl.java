@@ -12,10 +12,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.domain.StockMovingAvg;
 import com.wy.stock.service.StockHistoryService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.service.StockMovingAvgService;
 
 /**
@@ -31,7 +31,7 @@ public class StockMovingAvgToolImpl implements StockMovingAvgTool {
 	
 	private StockMovingAvgService maService;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	/**
 	 * 查找均线多头排列或者空头排列。
@@ -136,7 +136,7 @@ public class StockMovingAvgToolImpl implements StockMovingAvgTool {
 	
 	public void calcAllMovingAvg(){
     	// 查询所有的股票信息.
-    	List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+    	List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
     	if(allStocks == null || allStocks.isEmpty()){
     		LOGGER.info("allStocks is empty, return now...");
     		return;
@@ -146,7 +146,7 @@ public class StockMovingAvgToolImpl implements StockMovingAvgTool {
     	List<StockMovingAvg> allMovingAvgs = maService.queryAllDistinct();
     	List<String> allMovingAvgFlags = translate2String(allMovingAvgs);
     	int num = 0;
-    	for(StockInfo stock : allStocks){
+    	for(ExchangeInfo stock : allStocks){
     		String code = stock.getCode();
     		String exchange = stock.getExchange();
     		String type = stock.getType();
@@ -243,12 +243,12 @@ public class StockMovingAvgToolImpl implements StockMovingAvgTool {
 		this.maService = maService;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 	
 }

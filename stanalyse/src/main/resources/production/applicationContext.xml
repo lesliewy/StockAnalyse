@@ -33,7 +33,7 @@
     -->
 
 	<!-- DAO begin -->
-	<bean id="stockInfoDao" class="com.wy.stock.dao.impl.StockInfoDaoImpl">
+	<bean id="exchangeInfoDao" class="com.wy.stock.dao.impl.ExchangeInfoDaoImpl">
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
     <bean id="stockHistoryDao" class="com.wy.stock.dao.impl.StockHistoryDaoImpl">
@@ -87,14 +87,14 @@
 	<!-- DAO end -->
 
 	<!-- Service begin -->
-    <bean id="stockInfoService" class="com.wy.stock.service.impl.StockInfoServiceImpl">
-        <property name="stockInfoDao" ref="stockInfoDao" />
+    <bean id="exchangeInfoService" class="com.wy.stock.service.impl.ExchangeInfoServiceImpl">
+        <property name="exchangeInfoDao" ref="exchangeInfoDao" />
     </bean>
     <bean id="stockHistoryService" class="com.wy.stock.service.impl.StockHistoryServiceImpl">
         <property name="stockHistoryDao" ref="stockHistoryDao" />
     </bean>
     <bean id="stockDownloadTool" class="com.wy.stock.tools.StockDownloadToolImpl">
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
         <property name="notionInfoService" ref="notionInfoService" />
         <property name="industryInfoService" ref="industryInfoService" />
         <property name="notionHotService" ref="notionHotService" />
@@ -107,7 +107,7 @@
         <property name="stockParseToolTHS" ref="stockParseToolTHS" />
     </bean>
     <bean id="stockParseTool" class="com.wy.stock.tools.StockParseToolImpl">
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
         <property name="stockHistoryService" ref="stockHistoryService" />
         <property name="notionInfoService" ref="notionInfoService" />
         <property name="industryInfoService" ref="industryInfoService" />
@@ -129,15 +129,15 @@
         <property name="notionStockService" ref="notionStockService" />
         <property name="industryStockService" ref="industryStockService" />
         <property name="stockFiveChangeService" ref="stockFiveChangeService" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
     </bean>
     <bean id="candlestickService" class="com.wy.stock.service.impl.CandlestickServiceImpl">
         <property name="stockHistoryService" ref="stockHistoryService" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
     </bean>
     <bean id="gapService" class="com.wy.stock.service.impl.GapServiceImpl">
         <property name="stockHistoryService" ref="stockHistoryService" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
     </bean>
     <bean id="stockJobService" class="com.wy.stock.service.impl.StockJobServiceImpl">
         <property name="stockJobDao" ref="stockJobDao" />
@@ -148,7 +148,7 @@
     <bean id="stockMovingAvgTool" class="com.wy.stock.tools.StockMovingAvgToolImpl">
         <property name="maService" ref="maService" />
         <property name="stockHistoryService" ref="stockHistoryService" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
     </bean>
     <bean id="notionHotService" class="com.wy.stock.service.impl.NotionHotServiceImpl">
         <property name="notionHotDao" ref="notionHotDao" />
@@ -200,7 +200,7 @@
     <bean id="analyseStockTool" class="com.wy.stock.tools.AnalyseStockToolImpl">
         <property name="stockCapFlowService" ref="stockCapFlowService" />
         <property name="industryStockService" ref="industryStockService" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
         <property name="notionHotService" ref="notionHotService" />
         <property name="industryHotService" ref="industryHotService" />
         <property name="industryHotStocksService" ref="industryHotStocksService" />
@@ -247,13 +247,13 @@
         <property name="stockDownloadTool" ref="stockDownloadTool" />
         <property name="stockParseTool" ref="stockParseTool" />
         <property name="stockCapFlowService" ref="stockCapFlowService" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
     </bean>
     
     <bean id="downloadStockCapFlowDetailJob" class="com.wy.stock.job.DownloadStockCapFlowDetailJob">
         <property name="stockJobService" ref="stockJobService" />
         <property name="stockDownloadTool" ref="stockDownloadTool" />
-        <property name="stockInfoService" ref="stockInfoService" />
+        <property name="exchangeInfoService" ref="exchangeInfoService" />
     </bean>
     
     <bean id="persistNotionIndustryInfoJob" class="com.wy.stock.job.PersistNotionIndustryInfoJob">

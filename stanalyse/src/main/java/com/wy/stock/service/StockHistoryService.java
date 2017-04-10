@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 
 /**
  * @author leslie
@@ -23,7 +23,7 @@ public interface StockHistoryService {
 	
 	void deleteHistoryByKey(StockHistory stockHistory);
 	
-	List<StockInfo> queryAllHistStock();
+	List<ExchangeInfo> queryAllHistStock();
 	
 	List<StockHistory> queryHistListByKey(String code, String exchange, String type);
 	

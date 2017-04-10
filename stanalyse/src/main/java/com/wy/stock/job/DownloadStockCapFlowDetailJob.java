@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.domain.StockJob;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.service.StockJobService;
 import com.wy.stock.service.thread.DownloadStockCapFlowDetailThread;
 import com.wy.stock.tools.StockDownloadTool;
@@ -36,7 +36,7 @@ public class DownloadStockCapFlowDetailJob {
 	
 	private StockDownloadTool stockDownloadTool;
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	private String jobType = StockConstant.JOB_TYPE_CAP_FLOW_DETAIL;
 	
@@ -88,8 +88,8 @@ public class DownloadStockCapFlowDetailJob {
 		// 将个股资金的明细数据和所有个股的当天资金json文件放在同一个目录下。
 		File savedDir =  new File(StockUtils.getDailyStockSaveDir("C"));
 		// 查询所有的沪深A股, 遍历每个股票.
-		List<StockInfo> allA = stockInfoService.queryStockInfoByType("A");
-		for(StockInfo stock : allA){
+		List<ExchangeInfo> allA = exchangeInfoService.queryExchangeInfoByType("A");
+		for(ExchangeInfo stock : allA){
 			String code = stock.getCode();
 			/*
 			 * 非线程方式.
@@ -152,12 +152,12 @@ public class DownloadStockCapFlowDetailJob {
 		this.stockDownloadTool = stockDownloadTool;
 	}
 
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 }

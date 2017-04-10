@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  * @author leslie
  *
  */
-public class StockInfo {
+public class ExchangeInfo {
 	
 	private String name;
 	
@@ -65,7 +65,7 @@ public class StockInfo {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj.getClass().isInstance(this)){
-			StockInfo o = (StockInfo)obj;
+			ExchangeInfo o = (ExchangeInfo)obj;
 			if(o.getCode().equals(this.getCode())
 					&& o.getExchange().equals(this.getExchange())
 					&& o.getType().equals(this.getType())){

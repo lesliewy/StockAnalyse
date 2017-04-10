@@ -13,7 +13,7 @@ import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 import com.ibatis.sqlmap.client.SqlMapExecutor;
 import com.wy.stock.dao.StockHistoryDao;
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 
 /**
  * @author leslie
@@ -93,7 +93,7 @@ public class StockHistoryDaoImpl extends SqlMapClientDaoSupport implements Stock
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StockInfo> queryAllHistStock() {
+	public List<ExchangeInfo> queryAllHistStock() {
 		return getSqlMapClientTemplate().queryForList("queryAllHistStock");
 	}
 

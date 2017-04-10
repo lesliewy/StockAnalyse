@@ -41,7 +41,7 @@ import com.wy.stock.domain.NotionStock;
 import com.wy.stock.domain.StockCapFlow;
 import com.wy.stock.domain.StockFiveChange;
 import com.wy.stock.domain.StockHistory;
-import com.wy.stock.domain.StockInfo;
+import com.wy.stock.domain.ExchangeInfo;
 import com.wy.stock.service.IndexService;
 import com.wy.stock.service.IndustryHotStocksService;
 import com.wy.stock.service.IndustryInfoService;
@@ -51,7 +51,7 @@ import com.wy.stock.service.NotionInfoService;
 import com.wy.stock.service.NotionStockService;
 import com.wy.stock.service.StockFiveChangeService;
 import com.wy.stock.service.StockHistoryService;
-import com.wy.stock.service.StockInfoService;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.utils.HttpUtils;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
@@ -66,7 +66,7 @@ public class StockParseToolImpl implements StockParseTool {
 	private static Logger LOGGER = Logger.getLogger(StockParseToolImpl.class
 			.getName());
 	
-	private StockInfoService stockInfoService;
+	private ExchangeInfoService exchangeInfoService;
 	
 	private StockHistoryService stockHistoryService;
 	
@@ -123,10 +123,10 @@ public class StockParseToolImpl implements StockParseTool {
 			if(pages == 1){
 				pages = getStockInfoPages(result.substring(result.indexOf("=") + 1));
 			}
-			List<StockInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
+			List<ExchangeInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
 			if(stocks != null && !stocks.isEmpty()){
 				// insertStockInfoBatch 内部会先删除再插入
-				stockInfoService.insertStockInfoBatch(stocks);
+				exchangeInfoService.insertExchangeInfoBatch(stocks);
 			}
 		}
 		
@@ -154,10 +154,10 @@ public class StockParseToolImpl implements StockParseTool {
 			if(pages == 1){
 				pages = getStockInfoPages(result.substring(result.indexOf("=") + 1));
 			}
-			List<StockInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
+			List<ExchangeInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
 			if(stocks != null && !stocks.isEmpty()){
 				// insertStockInfoBatch 内部会先删除再插入
-				stockInfoService.insertStockInfoBatch(stocks);
+				exchangeInfoService.insertExchangeInfoBatch(stocks);
 			}
 		}
 
@@ -185,10 +185,10 @@ public class StockParseToolImpl implements StockParseTool {
 			if(pages == 1){
 				pages = getStockInfoPages(result.substring(result.indexOf("=") + 1));
 			}
-			List<StockInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
+			List<ExchangeInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
 			if(stocks != null && !stocks.isEmpty()){
 				// insertStockInfoBatch 内部会先删除再插入
-				stockInfoService.insertStockInfoBatch(stocks);
+				exchangeInfoService.insertExchangeInfoBatch(stocks);
 			}
 		}
 		// 深证B股: 每页20条, 一共3页.
@@ -215,10 +215,10 @@ public class StockParseToolImpl implements StockParseTool {
 			if(pages == 1){
 				pages = getStockInfoPages(result.substring(result.indexOf("=") + 1));
 			}
-			List<StockInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
+			List<ExchangeInfo> stocks = getStockInfo(result.substring(result.indexOf("=") + 1), exchange, type);
 			if(stocks != null && !stocks.isEmpty()){
 				// insertStockInfoBatch 内部会先删除再插入
-				stockInfoService.insertStockInfoBatch(stocks);
+				exchangeInfoService.insertExchangeInfoBatch(stocks);
 			}
 		}
 	}
@@ -254,9 +254,9 @@ public class StockParseToolImpl implements StockParseTool {
 	 * @throws JSONException
 	 */
     @SuppressWarnings("unchecked")
-	private List<StockInfo> getStockInfo(String jsonString, String exchange, String type) throws JSONException {
+	private List<ExchangeInfo> getStockInfo(String jsonString, String exchange, String type) throws JSONException {
         JSONObject jsonObject = new JSONObject(jsonString);
-        List<StockInfo> result = new ArrayList<StockInfo>();
+        List<ExchangeInfo> result = new ArrayList<ExchangeInfo>();
         Iterator<String> iterator1 = jsonObject.keys();
     	
         Timestamp timestamp = new Timestamp(Calendar.getInstance()
@@ -276,7 +276,7 @@ public class StockParseToolImpl implements StockParseTool {
             	}
             	String[] oneStockArray = oneStock.split(",");
             	
-            	StockInfo stockInfo = new StockInfo();
+            	ExchangeInfo stockInfo = new ExchangeInfo();
             	stockInfo.setName(oneStockArray[2]);
             	stockInfo.setCode(oneStockArray[1]);
             	stockInfo.setExchange(exchange);
@@ -314,7 +314,7 @@ public class StockParseToolImpl implements StockParseTool {
     		return;
     	}
     	// 查询所有的股票
-    	List<StockInfo> allStocks = stockInfoService.queryAllStockInfo();
+    	List<ExchangeInfo> allStocks = exchangeInfoService.queryAllExchangeInfo();
     	if(allStocks == null || allStocks.isEmpty()){
     		return;
     	}
@@ -328,7 +328,7 @@ public class StockParseToolImpl implements StockParseTool {
     	String dirPath = dir.getAbsolutePath() + File.separatorChar;
     	// 遍历
     	int num = 0;
-    	for(StockInfo stock : allStocks){
+    	for(ExchangeInfo stock : allStocks){
     		LOGGER.info(num++ + " process " + stock.getExchange() + " " + stock.getCode() + " " + stock.getType());
     		String stockStr = "";
     		if("上证".equals(stock.getExchange())){
@@ -363,7 +363,7 @@ public class StockParseToolImpl implements StockParseTool {
     /**
      * 解析指定的csv文件.
      */
-    public void parseHistCsv(File file, StockInfo stock, Map<String, String> maxDateMap) throws IOException{
+    public void parseHistCsv(File file, ExchangeInfo stock, Map<String, String> maxDateMap) throws IOException{
     	if(file == null || !file.exists() || !file.getName().endsWith("csv")){
     		LOGGER.info(file.getAbsolutePath() + " not exists or not a csv, return now...");
     		return;
@@ -1454,12 +1454,12 @@ public class StockParseToolImpl implements StockParseTool {
 		
 	}
 	
-	public StockInfoService getStockInfoService() {
-		return stockInfoService;
+	public ExchangeInfoService getExchangeInfoService() {
+		return exchangeInfoService;
 	}
 
-	public void setStockInfoService(StockInfoService stockInfoService) {
-		this.stockInfoService = stockInfoService;
+	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
+		this.exchangeInfoService = exchangeInfoService;
 	}
 
 	public StockHistoryService getStockHistoryService() {
