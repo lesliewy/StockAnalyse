@@ -42,6 +42,8 @@ import com.wy.stock.domain.NotionHotStocks;
 import com.wy.stock.domain.NotionInfo;
 import com.wy.stock.domain.NotionStock;
 import com.wy.stock.domain.StockFiveChange;
+import com.wy.stock.domain.StocksInfo;
+import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.service.IndexService;
 import com.wy.stock.service.IndustryHotService;
 import com.wy.stock.service.IndustryHotStocksService;
@@ -52,7 +54,7 @@ import com.wy.stock.service.NotionHotStocksService;
 import com.wy.stock.service.NotionInfoService;
 import com.wy.stock.service.NotionStockService;
 import com.wy.stock.service.StockFiveChangeService;
-import com.wy.stock.service.ExchangeInfoService;
+import com.wy.stock.service.StocksInfoService;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
 
@@ -88,7 +90,10 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	
 	private ExchangeInfoService exchangeInfoService;
 	
-    
+	private StocksInfoService stocksInfoService;
+	
+	private static Set<String> existedStocksInfoCode = new HashSet<String>();
+	
 	/**
 	 * 解析html获取概念信息对象, NotionInfo
 	 */
@@ -351,13 +356,15 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
         List<NotionHotStocks> list = new ArrayList<NotionHotStocks>();
 		// 记入 ST_NOTION_STOCK, 先排除ST_NOTION_STOCK 中已经有的.
 		List<NotionStock> notionStockList = new ArrayList<NotionStock>();
+		// 记入ST_STOCKS_INFO.
+		List<StocksInfo> stocksInfoList = new ArrayList<StocksInfo>();
 		Map<String, String> notionNameCode = notionInfoService.queryNotionNameCodeMap(StockConstant.THS_NOTION_TYPE1, StockConstant.THS_FLAG);
 		String notionCode = notionNameCode.get(notionName);
 		List<String> notionStockExisted = new ArrayList<String>();
 		if(!StringUtils.isBlank(notionCode)){
 			notionStockExisted  = notionStockService.queryCodeByNotionCode(notionCode, StockConstant.THS_FLAG);
 		}
-        
+      
 		Document notionHotStocksDoc = getNotionIndustryDoc(html);
 		// body > table > tbody > tr:nth-child(1) > td:nth-child(1)
 		// body > table > tbody > tr:nth-child(2) > td:nth-child(5)
@@ -390,6 +397,48 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				continue;
 			}
 			Float changePercent = Float.valueOf(changePercentStr);
+			// 换手率 body > table > tbody > tr:nth-child(1) > td:nth-child(8)
+			String turnoverRateStr= trElement.select("> td:nth-child(8)").text().replace("%", "");
+			Float turnoverRate = null;
+			if(StringUtils.isNotBlank(turnoverRateStr) && NumberUtils.isNumber(turnoverRateStr)){
+				turnoverRate = Float.valueOf(turnoverRateStr);
+			}
+			// 量比 body > table > tbody > tr:nth-child(1) > td:nth-child(9)
+			String volumnRateStr = trElement.select("> td:nth-child(9)").text();
+			Float volumnRate = null;
+			if(StringUtils.isNotBlank(volumnRateStr) && NumberUtils.isNumber(volumnRateStr)){
+				volumnRate = Float.valueOf(volumnRateStr);
+			}
+			// 振幅 body > table > tbody > tr:nth-child(1) > td:nth-child(10)
+			String amplitudeStr = trElement.select("> td:nth-child(10)").text();
+			Float amplitude = null;
+			if(StringUtils.isNotBlank(amplitudeStr) && NumberUtils.isNumber(amplitudeStr)){
+				amplitude = Float.valueOf(amplitudeStr);
+			}
+			// 成交额 body > table > tbody > tr:nth-child(1) > td:nth-child(11)
+			String volumnAmountStr = trElement.select("> td:nth-child(11)").text().replace("亿", "");
+			Float volumnAmount = null;
+			if(StringUtils.isNotBlank(volumnAmountStr) && NumberUtils.isNumber(volumnAmountStr)){
+				volumnAmount = Float.valueOf(volumnAmountStr);
+			}
+			// 流通股 body > table > tbody > tr:nth-child(1) > td:nth-child(12)
+			String tradableNumStr = trElement.select("> td:nth-child(12)").text().replace("亿", "");
+			Float tradableNum = null;
+			if(StringUtils.isNotBlank(tradableNumStr) && NumberUtils.isNumber(tradableNumStr)){
+				tradableNum = Float.valueOf(tradableNumStr);
+			}
+			// 流通市值 body > table > tbody > tr:nth-child(1) > td:nth-child(13)
+			String tradableAmountStr = trElement.select("> td:nth-child(13)").text().replace("亿", "");
+			Float tradableAmount = null;
+			if(StringUtils.isNotBlank(tradableAmountStr) && NumberUtils.isNumber(tradableAmountStr)){
+				tradableAmount = Float.valueOf(tradableAmountStr);
+			}
+			// 市盈率 body > table > tbody > tr:nth-child(1) > td:nth-child(14)
+			String peRatioStr = trElement.select("> td:nth-child(14)").text();
+			Float peRatio = null;
+			if(StringUtils.isNotBlank(peRatioStr) && NumberUtils.isNumber(peRatioStr)){
+				peRatio = Float.valueOf(peRatioStr);
+			}
 			
 			NotionHotStocks notionHotStocks = new NotionHotStocks();
 			notionHotStocks.setTradeDate(tradeDate);
@@ -401,6 +450,33 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 			notionHotStocks.setChangePercent(changePercent);
 			notionHotStocks.setTimestamp(timestamp);
     		list.add(notionHotStocks);
+    		
+    		StocksInfo stocksInfo = new StocksInfo();
+    		stocksInfo.setTradeDate(tradeDate);
+    		stocksInfo.setCode(code);
+    		if(turnoverRate != null){
+    			stocksInfo.setTurnoverRate(turnoverRate);
+    		}
+    		if(volumnRate != null){
+    			stocksInfo.setVolumnRate(volumnRate);
+    		}
+    		if(amplitude != null){
+    			stocksInfo.setAmplitude(amplitude);
+    		}
+    		if(volumnAmount != null){
+    			stocksInfo.setVolumnAmount(volumnAmount);
+    		}
+    		if(tradableNum != null){
+    			stocksInfo.setTradableNum(tradableNum);
+    		}
+    		if(tradableAmount != null){
+    			stocksInfo.setTradableAmount(tradableAmount);
+    		}
+    		if(peRatio != null){
+    			stocksInfo.setPeRatio(peRatio);
+    		}
+    		stocksInfo.setTimestamp(timestamp);
+    		stocksInfoList.add(stocksInfo);
     		
     		if(notionStockExisted != null && !notionStockExisted.contains(code)){
         		NotionStock notionStock = new NotionStock();
@@ -416,6 +492,10 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		
 		if(notionStockList != null && !notionStockList.isEmpty()){
 			notionStockService.insertNotionStockBatch(notionStockList);
+		}
+		
+		if(stocksInfoList != null && !stocksInfoList.isEmpty()){
+			stocksInfoService.insertStocksInfoBatch(stocksInfoList);
 		}
     	return list;
 	}
@@ -545,6 +625,8 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		List<IndustryHotStocks> list = new ArrayList<IndustryHotStocks>();
 		// 记入 ST_INDUSTRY_STOCK, 先排除ST_INDUSTRY_STOCK 中已经有的.
 		List<IndustryStock> industryStockList = new ArrayList<IndustryStock>();
+		// 记入ST_STOCKS_INFO.
+		List<StocksInfo> stocksInfoList = new ArrayList<StocksInfo>();
 		String industryName = html.getName().split("_")[1];
 		String industryCode = industryHotDoc.select("#requestQuery").attr("value").split("/")[1];
 		List<String> industryStockExisted = industryStockService.queryCodeByIndustryName(industryName, StockConstant.THS_FLAG);
@@ -568,6 +650,48 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				continue;
 			}
 			Float changePercent = Float.valueOf(changePercentStr);
+			// 换手率 body > table > tbody > tr:nth-child(1) > td:nth-child(8)
+			String turnoverRateStr= trElement.select("> td:nth-child(8)").text().replace("%", "");
+			Float turnoverRate = null;
+			if(StringUtils.isNotBlank(turnoverRateStr) && NumberUtils.isNumber(turnoverRateStr)){
+				turnoverRate = Float.valueOf(turnoverRateStr);
+			}
+			// 量比 body > table > tbody > tr:nth-child(1) > td:nth-child(9)
+			String volumnRateStr = trElement.select("> td:nth-child(9)").text();
+			Float volumnRate = null;
+			if(StringUtils.isNotBlank(volumnRateStr) && NumberUtils.isNumber(volumnRateStr)){
+				volumnRate = Float.valueOf(volumnRateStr);
+			}
+			// 振幅 body > table > tbody > tr:nth-child(1) > td:nth-child(10)
+			String amplitudeStr = trElement.select("> td:nth-child(10)").text();
+			Float amplitude = null;
+			if(StringUtils.isNotBlank(amplitudeStr) && NumberUtils.isNumber(amplitudeStr)){
+				amplitude = Float.valueOf(amplitudeStr);
+			}
+			// 成交额 body > table > tbody > tr:nth-child(1) > td:nth-child(11)
+			String volumnAmountStr = trElement.select("> td:nth-child(11)").text().replace("亿", "");
+			Float volumnAmount = null;
+			if(StringUtils.isNotBlank(volumnAmountStr) && NumberUtils.isNumber(volumnAmountStr)){
+				volumnAmount = Float.valueOf(volumnAmountStr);
+			}
+			// 流通股 body > table > tbody > tr:nth-child(1) > td:nth-child(12)
+			String tradableNumStr = trElement.select("> td:nth-child(12)").text().replace("亿", "");
+			Float tradableNum = null;
+			if(StringUtils.isNotBlank(tradableNumStr) && NumberUtils.isNumber(tradableNumStr)){
+				tradableNum = Float.valueOf(tradableNumStr);
+			}
+			// 流通市值 body > table > tbody > tr:nth-child(1) > td:nth-child(13)
+			String tradableAmountStr = trElement.select("> td:nth-child(13)").text().replace("亿", "");
+			Float tradableAmount = null;
+			if(StringUtils.isNotBlank(tradableAmountStr) && NumberUtils.isNumber(tradableAmountStr)){
+				tradableAmount = Float.valueOf(tradableAmountStr);
+			}
+			// 市盈率 body > table > tbody > tr:nth-child(1) > td:nth-child(14)
+			String peRatioStr = trElement.select("> td:nth-child(14)").text();
+			Float peRatio = null;
+			if(StringUtils.isNotBlank(peRatioStr) && NumberUtils.isNumber(peRatioStr)){
+				peRatio = Float.valueOf(peRatioStr);
+			}
 			
 			IndustryHotStocks industryHotStocks = new IndustryHotStocks();
 			industryHotStocks.setTradeDate(tradeDate);
@@ -590,12 +714,44 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
         		industryStock.setSource(StockConstant.THS_FLAG);
         		industryStockList.add(industryStock);
     		}
+    		
+    		if(existedStocksInfoCode != null && !existedStocksInfoCode.contains(code)){
+       		StocksInfo stocksInfo = new StocksInfo();
+       		stocksInfo.setTradeDate(tradeDate);
+       		stocksInfo.setCode(code);
+       		if(turnoverRate != null){
+       			stocksInfo.setTurnoverRate(turnoverRate);
+       		}
+       		if(volumnRate != null){
+       			stocksInfo.setVolumnRate(volumnRate);
+       		}
+       		if(amplitude != null){
+       			stocksInfo.setAmplitude(amplitude);
+       		}
+       		if(volumnAmount != null){
+       			stocksInfo.setVolumnAmount(volumnAmount);
+       		}
+       		if(tradableNum != null){
+       			stocksInfo.setTradableNum(tradableNum);
+       		}
+       		if(tradableAmount != null){
+       			stocksInfo.setTradableAmount(tradableAmount);
+       		}
+       		if(peRatio != null){
+       			stocksInfo.setPeRatio(peRatio);
+       		}
+       		stocksInfo.setTimestamp(timestamp);
+       		stocksInfoList.add(stocksInfo);
+    		}
 		}
 		
 		if(industryStockList != null && !industryStockList.isEmpty()){
 			industryStockService.insertIndustryStockBatch(industryStockList);
 		}
 		
+		if(stocksInfoList != null && !stocksInfoList.isEmpty()){
+			stocksInfoService.insertStocksInfoBatch(stocksInfoList);
+		}
     	return list;
 	}
 	
@@ -607,7 +763,11 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	public void persistNotionIndustryHotStocksFromHtml(String date, String type){
 		String dirPath = StockConstant.BOARD_HOT_FILE_PATH + "20" + date.substring(0, 2) + File.separatorChar + 
 				 date.substring(2, 4) + File.separatorChar + date.substring(4, 6) + File.separatorChar;
+		String tradeDate = "20" + date.substring(0, 2) + "-" + date.substring(2, 4) + "-" + date.substring(4, 6);
 		if("NOTION".equals(type)){
+			// 先删除掉ST_STOCKS_INFO 中当天的数据.
+			stocksInfoService.deleteStocksInfoByDate(tradeDate);
+			
 			File parent = new File(dirPath);
 			com.wy.stock.utils.FileNameSelector selector = new com.wy.stock.utils.FileNameSelector("notionHot" + "_", ".html");
 			File[] notionFiles = parent.listFiles(selector);
@@ -624,6 +784,9 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				}
 			}
 		}else if("INDUSTRY".equals(type)){
+			// 先查询ST_STOCKS_INFO已经有的. 注意这种做法不能将
+			existedStocksInfoCode = stocksInfoService.queryStocksInfoCodeByDate(tradeDate);
+			
 			File parent = new File(dirPath);
 			com.wy.stock.utils.FileNameSelector selector = new com.wy.stock.utils.FileNameSelector(StockConstant.INDUSTRY_HOT_IDENTIFIER + "_", ".html");
 			File[] industryFiles = parent.listFiles(selector);
@@ -2158,6 +2321,14 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 
 	public void setExchangeInfoService(ExchangeInfoService exchangeInfoService) {
 		this.exchangeInfoService = exchangeInfoService;
+	}
+
+	public StocksInfoService getStocksInfoService() {
+		return stocksInfoService;
+	}
+
+	public void setStocksInfoService(StocksInfoService stocksInfoService) {
+		this.stocksInfoService = stocksInfoService;
 	}
 
 }

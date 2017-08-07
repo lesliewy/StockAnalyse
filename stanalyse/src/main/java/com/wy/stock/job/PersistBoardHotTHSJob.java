@@ -188,7 +188,7 @@ public class PersistBoardHotTHSJob {
 	}
 
 	private void genFiles(){
-		int year = 2017;
+		int year = Calendar.getInstance().get(Calendar.YEAR);
 		analyseStockTool.genIndustryHotCsv(year);
 	
 		year = 2017;

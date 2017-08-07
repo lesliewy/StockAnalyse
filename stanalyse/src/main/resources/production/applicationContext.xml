@@ -84,6 +84,9 @@
     <bean id="configDao" class="com.wy.stock.dao.impl.ConfigDaoImpl">
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
+    <bean id="stocksInfoDao" class="com.wy.stock.dao.impl.StocksDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
 	<!-- DAO end -->
 
 	<!-- Service begin -->
@@ -208,6 +211,9 @@
         <property name="notionInfoService" ref="notionInfoService" />
         <property name="industryInfoService" ref="industryInfoService" />
         <property name="indexService" ref="indexService" />
+    </bean>
+    <bean id="stocksInfoService" class="com.wy.stock.service.impl.StocksInfoServiceImpl">
+        <property name="stocksInfoDao" ref="stocksInfoDao" />
     </bean>
 	<!-- Service end -->
 	

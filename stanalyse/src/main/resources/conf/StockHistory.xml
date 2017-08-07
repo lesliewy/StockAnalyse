@@ -26,7 +26,7 @@
 		<result property="timestamp" column="TIMESTAMP" />
 	</resultMap>
 	
-    <resultMap id="StockInfoResult1" class="StockInfo">
+    <resultMap id="StockInfoResult1" class="ExchangeInfo">
         <result property="code" column="CODE" />
         <result property="type" column="TYPE" />
         <result property="exchange" column="EXCHANGE" />

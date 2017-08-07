@@ -38,5 +38,6 @@
     <sqlMap resource="conf/StockNotion.xml" />
     <sqlMap resource="conf/StockCapFlow.xml" />
     <sqlMap resource="conf/Config.xml" />
+    <sqlMap resource="conf/StocksInfo.xml" />
     
 </sqlMapConfig>

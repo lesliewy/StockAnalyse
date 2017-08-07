@@ -293,6 +293,10 @@ public class StockUtils {
 			result.put("1B0300", "沪深300");
 			result.put("1B0007", "上证180");
 			result.put("1B0016", "上证50");
+			result.put("000905", "中证500");
+			result.put("399673", "创业板50");
+			result.put("399012", "创业板300");
+			result.put("000852", "中证1000");
 		}
 		return result;
 	}

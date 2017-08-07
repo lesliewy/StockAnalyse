@@ -22,7 +22,7 @@ public class TestPersistBoardHotTHSJob {
 	private static ApplicationContext applicationContext = null; // 提供静态ApplicationContext
 	static {
 		applicationContext = new ClassPathXmlApplicationContext(
-				"applicationContext-dev.xml"); // 实例化
+				"development/applicationContext.xml"); // 实例化
 	}
 	
 	@Test

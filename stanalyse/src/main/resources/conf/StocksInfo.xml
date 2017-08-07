@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StocksInfo">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StocksInfo" type="com.wy.stock.domain.StocksInfo" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StocksInfoResult" class="StocksInfo">
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="code" column="CODE" />
+		<result property="turnoverRate" column="TURNOVER_RATE" />
+		<result property="volumnRate" column="VOLUMN_RATE" />
+		<result property="amplitude" column="AMPLITUDE" />
+		<result property="volumnAmount" column="VOLUMN_AMOUNT" />
+		<result property="tradableNum" column="TRADABLE_NUM" />
+		<result property="tradableAmount" column="TRADABLE_AMOUNT" />
+		<result property="peRatio" column="PE_RATIO" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insertStocksInfo" parameterClass="StocksInfo">
+		insert into ST_STOCKS_INFO (
+		TRADE_DATE,
+		CODE,
+		TURNOVER_RATE,
+		VOLUMN_RATE,
+		AMPLITUDE,
+		VOLUMN_AMOUNT,
+		TRADABLE_NUM,
+		TRADABLE_AMOUNT,
+		PE_RATIO,
+		TIMESTAMP)
+		values (
+		#tradeDate#, #code#, #turnoverRate#, #volumnRate#, #amplitude#, #volumnAmount#, #tradableNum#,
+		#tradableAmount#, #peRatio#, #timestamp#
+		)
+	</insert>
+	
+   <select id="queryStocksInfoByDate" parameterClass="java.lang.String" resultMap="StocksInfoResult">
+        select *
+        from ST_STOCKS_INFO
+         where TRADE_DATE = #tradeDate#
+   </select>
+    
+   <delete id="deleteStocksInfoByDate" parameterClass="java.lang.String">
+        delete from ST_STOCKS_INFO where TRADE_DATE = #tradeDate#
+   </delete>
+    
+</sqlMap>

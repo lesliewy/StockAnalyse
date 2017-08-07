@@ -29,7 +29,7 @@ public class ExchangeInfoDaoImpl extends SqlMapClientDaoSupport implements Excha
 		try{
 			getSqlMapClientTemplate().insert("insertExchangeInfo", info);
 		}catch(Exception e){
-			LOGGER.info("insertStockInfo: " + e);
+			LOGGER.info("insertExchangeInfo: " + e);
 		}
 	}
 
