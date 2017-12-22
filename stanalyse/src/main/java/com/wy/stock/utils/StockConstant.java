@@ -30,6 +30,11 @@ public interface StockConstant {
 	String CAP_FLOW_FILE_PATH = "/home/leslie/MyProject/StockAnalyse/html/capFlow/";
 	
 	/*
+	 * 龙虎榜文件目录.
+	 */
+	String LHB_FILE_PATH = "/home/leslie/MyProject/StockAnalyse/html/LHB/";
+	
+	/*
 	 * 需要清理的状态为R的超时时间. (单位: s)
 	 */
 	int DEL_R_UPPER_LIMIT = 12000;
@@ -102,6 +107,7 @@ public interface StockConstant {
 	String JOB_TYPE_CAP_FLOW_DETAIL = "E";
 	String JOB_TYPE_NOTION_INDUSTRY_INFO = "I";
 	String JOB_TYPE_FETCH_STOCK_INFO = "G";
+	String JOB_TYPE_THS_LHB = "R";
 	
 	/**
 	 * config 配置参数

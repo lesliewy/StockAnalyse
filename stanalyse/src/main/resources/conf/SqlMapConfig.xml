@@ -15,29 +15,33 @@
 		value="${username}"/> <property name="JDBC.Password" value="${password}"/> 
 		</dataSource> </transactionManager> -->
 
-    <!-- ibatis 默认对BigInteger不支持， 需要添加 -->
-    <typeHandler javaType="java.math.BigInteger" 
-                 callback="com.wy.ibatis.handler.BigIntegerTypeHandler"/> 
+	<!-- ibatis 默认对BigInteger不支持， 需要添加 -->
+	<typeHandler javaType="java.math.BigInteger"
+		callback="com.wy.ibatis.handler.BigIntegerTypeHandler" />
+
+	<typeHandler javaType="org.json.JSONObject"
+		callback="com.wy.ibatis.handler.JsonObjectTypeHandler" />
 
 	<!-- List the SQL Map XML files. They can be loaded from the classpath, 
 		as they are here (com.domain.data...) -->
-    <sqlMap resource="conf/ExchangeInfo.xml" />
-    <sqlMap resource="conf/StockHistory.xml" />
-    <sqlMap resource="conf/StockJob.xml" />
-    <sqlMap resource="conf/StockMovingAvg.xml" />
-    <sqlMap resource="conf/NotionHot.xml" />
-    <sqlMap resource="conf/IndustryHot.xml" />
-    <sqlMap resource="conf/NotionInfo.xml" />
-    <sqlMap resource="conf/IndustryInfo.xml" />
-    <sqlMap resource="conf/NotionHotStocks.xml" />
-    <sqlMap resource="conf/IndustryHotStocks.xml" />
-    <sqlMap resource="conf/Index.xml" />
-    <sqlMap resource="conf/NotionStock.xml" />
-    <sqlMap resource="conf/IndustryStock.xml" />
-    <sqlMap resource="conf/StockFiveChange.xml" />
-    <sqlMap resource="conf/StockNotion.xml" />
-    <sqlMap resource="conf/StockCapFlow.xml" />
-    <sqlMap resource="conf/Config.xml" />
-    <sqlMap resource="conf/StocksInfo.xml" />
-    
+	<sqlMap resource="conf/ExchangeInfo.xml" />
+	<sqlMap resource="conf/StockHistory.xml" />
+	<sqlMap resource="conf/StockJob.xml" />
+	<sqlMap resource="conf/StockMovingAvg.xml" />
+	<sqlMap resource="conf/NotionHot.xml" />
+	<sqlMap resource="conf/IndustryHot.xml" />
+	<sqlMap resource="conf/NotionInfo.xml" />
+	<sqlMap resource="conf/IndustryInfo.xml" />
+	<sqlMap resource="conf/NotionHotStocks.xml" />
+	<sqlMap resource="conf/IndustryHotStocks.xml" />
+	<sqlMap resource="conf/Index.xml" />
+	<sqlMap resource="conf/NotionStock.xml" />
+	<sqlMap resource="conf/IndustryStock.xml" />
+	<sqlMap resource="conf/StockFiveChange.xml" />
+	<sqlMap resource="conf/StockNotion.xml" />
+	<sqlMap resource="conf/StockCapFlow.xml" />
+	<sqlMap resource="conf/Config.xml" />
+	<sqlMap resource="conf/StocksInfo.xml" />
+	<sqlMap resource="conf/StockLhbDetail.xml" />
+
 </sqlMapConfig>

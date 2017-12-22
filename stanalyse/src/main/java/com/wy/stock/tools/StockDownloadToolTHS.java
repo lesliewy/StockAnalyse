@@ -6,6 +6,7 @@ package com.wy.stock.tools;
 import java.io.File;
 
 /**
+ * 
  * @author leslie
  *
  */
@@ -20,5 +21,7 @@ public interface StockDownloadToolTHS {
 	void downloadBoardHotStocksFiles(String date, String type);
 	
 	void downloadIndexFiles();
+	
+	void downloadLHBHtmlFiles(File savedDir, String dateStr);
 	
 }

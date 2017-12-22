@@ -498,6 +498,39 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 			LOGGER.error(e);
 		}
 	}
+	
+	/**
+	 * 
+	 * http://data.10jqka.com.cn/ifmarket/lhbggxq/report/2017-12-19/
+	 * 
+	 * @author leslie  
+	 * @param savedDir
+	 * @param dateStr
+	 * @since 1.0.0
+	 */
+	public void downloadLHBHtmlFiles(File savedDir, String dateStr) {
+		String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
+		String url = "";
+		File file = null;
+		url = "http://data.10jqka.com.cn/ifmarket/lhbggxq/report/" + dateStr;
+		file = new File(dirPath + "lhb.html");
+		try {
+			// 已经存在的不再重新下载.
+			if(!StringUtils.isEmpty(url) && file != null && !file.exists()){
+				HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+			}
+		} catch (FileNotFoundException e) {
+			if(file.exists()){
+				file.delete();
+			}
+			LOGGER.error(e);
+		} catch (IOException e) {
+			if(file.exists()){
+				file.delete();
+			}
+			LOGGER.error(e);
+		}
+	}
 
 	public NotionHotService getNotionHotService() {
 		return notionHotService;
@@ -530,5 +563,4 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 	public void setStockParseToolTHS(StockParseToolTHS stockParseToolTHS) {
 		this.stockParseToolTHS = stockParseToolTHS;
 	}
-	
 }

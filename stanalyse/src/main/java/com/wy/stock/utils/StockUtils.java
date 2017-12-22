@@ -165,9 +165,10 @@ public class StockUtils {
 					File.separatorChar;
 		}else if("B".equalsIgnoreCase(type)){
 			return StockConstant.BOARD_HOT_FILE_PATH + timeStr;
-					
 		}else if("C".equalsIgnoreCase(type)){
 			return StockConstant.CAP_FLOW_FILE_PATH + timeStr;
+		}else if("R".equalsIgnoreCase(type)){
+			return StockConstant.LHB_FILE_PATH + timeStr;
 		}
 		return null;
 	}

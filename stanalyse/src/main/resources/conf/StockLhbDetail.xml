@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="StockLhbDetail">
+
+	<!-- Use type aliases to avoid typing the full classname every time. -->
+	<typeAlias alias="StockLhbDetail" type="com.wy.stock.domain.StockLhbDetail" />
+
+	<!-- Result maps describe the mapping between the columns returned from 
+		a query, and the class properties. A result map isn't necessary if the columns 
+		(or aliases) match to the properties exactly. -->
+	<resultMap id="StockHistoryResult" class="StockHistory">
+		<result property="code" column="CODE" />
+		<result property="type" column="TYPE" />
+		<result property="exchange" column="EXCHANGE" />
+		<result property="tradeDate" column="TRADE_DATE" />
+		<result property="open" column="OPEN" />
+		<result property="high" column="HIGH" />
+		<result property="low" column="LOW" />
+		<result property="close" column="CLOSE" />
+		<result property="volumn" column="VOLUMN" />
+		<result property="adjClose" column="ADJ_CLOSE" />
+		<result property="timestamp" column="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insertStockLhbDetail" parameterClass="StockLhbDetail">
+		insert into ST_LHB_DETAIL (
+		TRADE_DATE,
+		CODE,
+		STOCK_NAME,
+		CLOSE,
+		CHANGE_PCT,
+		BUY_IN,
+		SELL_OUT,
+		VOLUMN_AMOUNT,
+		VOLUMN_AMOUNT_IN,
+		VOLUMN_AMOUNT_OUT,
+		VOLUMN_AMOUNT_NET,
+		LH_TYPE,
+		LH_TYPE_DESC,
+		TIMESTAMP)
+		values (
+		#tradeDate#, #code#, #stockName#, #close#, #changePercent#, #buyIn#, #sellOut#, #volumnAmount#, #volumnAmountIn#, #volumnAmountOut#, #volumnAmountNet#, #lhType#, #lhTypeDesc#, #timestamp#
+		)
+	</insert>
+    
+    <select id="queryAllHistStock" resultMap="StockInfoResult1">
+        select distinct EXCHANGE, CODE, TYPE
+        from ST_HISTORY
+    </select>
+    
+    <select id="queryHistListByKey" parameterClass="StockHistory" resultMap="StockHistoryResult">
+        select *
+          from ST_HISTORY
+         where CODE = #code#
+               AND EXCHANGE = #exchange#
+               AND TYPE = #type#
+               ORDER BY TRADE_DATE
+    </select>
+    
+    <select id="queryHistListByKeyRange" parameterClass="StockHistory" resultMap="StockHistoryResult">
+        select *
+          from ST_HISTORY
+         where CODE = #code#
+               AND EXCHANGE = #exchange#
+               AND TYPE = #type#
+               AND TRADE_DATE &gt;= #tradeDate#
+               ORDER BY TRADE_DATE
+    </select>
+    
+    <select id="queryAllHistStockMaxDate" resultMap="StockInfoResult2">
+        select CODE, EXCHANGE, TYPE, max(TRADE_DATE)
+          FROM ST_HISTORY
+               GROUP BY CODE, EXCHANGE, TYPE
+    </select>
+    
+</sqlMap>
