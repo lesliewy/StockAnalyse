@@ -58,6 +58,13 @@ public class StockJobServiceImpl implements StockJobService {
 		stockJobDao.deleteByDateType(job);
 	}
 	
+	public void deleteByDateTypeNoStatus(String date, String jobType) {
+		StockJob job = new StockJob();
+		job.setDate(date);
+		job.setJobType(jobType);
+		stockJobDao.deleteByDateTypeNoStatus(job);
+	}
+	
 	public StockJob queryLastStockJob(String jobType, String status) {
 		StockJob job = new StockJob();
 		job.setStatus(status);

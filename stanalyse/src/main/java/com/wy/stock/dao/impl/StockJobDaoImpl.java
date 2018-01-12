@@ -74,8 +74,17 @@ public class StockJobDaoImpl extends SqlMapClientDaoSupport implements StockJobD
 		}
 		getSqlMapClientTemplate().delete("deleteByDateType", job);
 	}
+	
+	public void deleteByDateTypeNoStatus(StockJob job) {
+		if(StringUtils.isBlank(job.getDate()) || StringUtils.isBlank(job.getJobType())){
+			LOGGER.info("date or jobType is null, return now...");
+			return;
+		}
+		getSqlMapClientTemplate().delete("deleteByDateTypeNoStatus", job); 
+	}
 
 	public StockJob queryLastStockJob(StockJob job) {
 		return (StockJob) getSqlMapClientTemplate().queryForObject("queryLastStockJob", job);
 	}
+
 }

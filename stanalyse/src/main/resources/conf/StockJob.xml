@@ -69,6 +69,12 @@
               AND STATUS = 'S'
     </delete>
     
+    <delete id="deleteByDateTypeNoStatus" parameterClass="StockJob">
+        delete from ST_JOB
+        WHERE LEFT(JOB_DATE, 6) = #date#
+              AND JOB_TYPE = #jobType#
+    </delete>
+    
     <select id="queryLastStockJob" parameterClass="StockJob" resultMap="StockJobResult">
         SELECT * 
           FROM ST_JOB

@@ -173,6 +173,26 @@ public class StockUtils {
 		return null;
 	}
 	
+	public static String getDailyStockSaveDirDate(String type, String dateStr){
+		// 构造目录中的时间部分.
+		String timeStr = dateStr.substring(0,4) + File.separator + dateStr.substring(4, 6) + File.separator + dateStr.substring(6, 8) + File.separator;
+		
+		if("H".equalsIgnoreCase(type)){
+			return StockConstant.HISTORY_FILE_PATH +
+					StringUtils.leftPad(String.valueOf(Calendar.getInstance().get(Calendar.MONTH) + 1), 2, "0") +
+					File.separatorChar + 
+					StringUtils.leftPad(String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)), 2, "0") + 
+					File.separatorChar;
+		}else if("B".equalsIgnoreCase(type)){
+			return StockConstant.BOARD_HOT_FILE_PATH + timeStr;
+		}else if("C".equalsIgnoreCase(type)){
+			return StockConstant.CAP_FLOW_FILE_PATH + timeStr;
+		}else if("R".equalsIgnoreCase(type)){
+			return StockConstant.LHB_FILE_PATH + timeStr;
+		}
+		return null;
+	}
+	
 	/**
 	 * 读取文件内容
 	 * 

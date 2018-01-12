@@ -8,6 +8,9 @@
  */
 package com.wy.stock.dao.impl;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
@@ -40,4 +43,31 @@ public class StockLhbDetailDaoImpl extends SqlMapClientDaoSupport implements
 		}
 	}
 
+	public void insertBatch(List<StockLhbDetail> stockLhbDetailList) {
+		if (stockLhbDetailList == null) {
+			LOGGER.info("stockLhbDetailList is null, return now...");
+			return;
+		}
+		for (StockLhbDetail stockLhbDetail : stockLhbDetailList) {
+			insertStockLhbDetail(stockLhbDetail);
+		}
+	}
+
+	public void deleteByDate(String tradeDate) {
+		if (StringUtils.isBlank(tradeDate)) {
+			LOGGER.info("tradeDate is null, return now...");
+			return;
+		}
+		try {
+			getSqlMapClientTemplate().delete("deleteByDate", tradeDate);
+		} catch (Exception e) {
+			LOGGER.info("deleteByDate: " + e);
+		}
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<StockLhbDetail> query(StockLhbDetail stockLhbDetail) {
+		return getSqlMapClientTemplate().queryForList("query", stockLhbDetail);
+	}
 }

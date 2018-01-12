@@ -14,7 +14,7 @@ import org.json.JSONObject;
  */
 public class StockLhbDetail {
 
-	private String tradeDate;
+	private Timestamp tradeDate;
 
 	private String code;
 
@@ -49,9 +49,17 @@ public class StockLhbDetail {
 	private String lhTypeDesc;
 
 	private Timestamp timestamp;
-
-	public String getTradeDate() {
+	
+	private String beginDate;
+	
+	private String endDate;
+	
+	public Timestamp getTradeDate() {
 		return tradeDate;
+	}
+
+	public void setTradeDate(Timestamp tradeDate) {
+		this.tradeDate = tradeDate;
 	}
 
 	public String getCode() {
@@ -106,10 +114,6 @@ public class StockLhbDetail {
 		return timestamp;
 	}
 
-	public void setTradeDate(String tradeDate) {
-		this.tradeDate = tradeDate;
-	}
-
 	public void setCode(String code) {
 		this.code = code;
 	}
@@ -161,9 +165,26 @@ public class StockLhbDetail {
 	public void setTimestamp(Timestamp timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	public String getBeginDate() {
+		return beginDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setBeginDate(String beginDate) {
+		this.beginDate = beginDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
 
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+	
 }

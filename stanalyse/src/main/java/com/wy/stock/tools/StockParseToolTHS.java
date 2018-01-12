@@ -49,6 +49,8 @@ public interface StockParseToolTHS {
 	
 	void persistIndexFromHtmls(File savedDir);
 	
+	void persistLhbFromHtml(String date);
+	
 	int getNotionIndustryHotTotalPages(File html, String type);
 	
 	List<NotionHot> parseNotionHotFromCsv(File csvFile);

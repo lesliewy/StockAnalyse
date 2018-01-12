@@ -509,13 +509,19 @@ public class StockDownloadToolTHSImpl implements StockDownloadToolTHS {
 	 * @since 1.0.0
 	 */
 	public void downloadLHBHtmlFiles(File savedDir, String dateStr) {
+		if(!savedDir.exists()){
+    		savedDir.mkdirs();
+    	}
 		String dirPath = savedDir.getAbsolutePath() + File.separatorChar;
 		String url = "";
 		File file = null;
 		url = "http://data.10jqka.com.cn/ifmarket/lhbggxq/report/" + dateStr;
-		file = new File(dirPath + "lhb.html");
+		file = new File(dirPath + StockConstant.LHB_FILE_NAME);
 		try {
-			// 已经存在的不再重新下载.
+			if(StockUtils.getTotalLines(dirPath + StockConstant.LHB_FILE_NAME) < 2000){
+				file.delete();
+			}
+			// 已经存在的不再重新下载
 			if(!StringUtils.isEmpty(url) && file != null && !file.exists()){
 				HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
 			}

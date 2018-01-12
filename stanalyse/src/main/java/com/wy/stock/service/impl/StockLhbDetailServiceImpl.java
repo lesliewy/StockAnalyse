@@ -8,6 +8,8 @@
  */
 package com.wy.stock.service.impl;
 
+import java.util.List;
+
 import com.wy.stock.dao.StockLhbDetailDao;
 import com.wy.stock.domain.StockLhbDetail;
 import com.wy.stock.service.StockLhbDetailService;
@@ -25,6 +27,18 @@ public class StockLhbDetailServiceImpl implements StockLhbDetailService {
 
 	public void insertStockLhbDetail(StockLhbDetail stockLhbDetail) {
 		stockLhbDetailDao.insertStockLhbDetail(stockLhbDetail);
+	}
+
+	public void deleteByDate(String tradeDate) {
+		stockLhbDetailDao.deleteByDate(tradeDate);
+	}
+
+	public void insertBatch(List<StockLhbDetail> stockLhbDetailList) {
+		stockLhbDetailDao.insertBatch(stockLhbDetailList);
+	}
+
+	public List<StockLhbDetail> query(StockLhbDetail stockLhbDetail) {
+		return stockLhbDetailDao.query(stockLhbDetail);
 	}
 
 	public StockLhbDetailDao getStockLhbDetailDao() {

@@ -25,5 +25,7 @@ public interface StockJobService {
 	
 	void deleteByDateType(String date, String jobType);
 	
+	void deleteByDateTypeNoStatus(String date, String jobType);
+	
 	StockJob queryLastStockJob(String jobType, String status);
 }

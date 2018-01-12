@@ -25,5 +25,7 @@ public interface StockJobDao {
 	
 	void deleteByDateType(StockJob job);
 	
+	void deleteByDateTypeNoStatus(StockJob job);
+	
 	StockJob queryLastStockJob(StockJob job);
 }

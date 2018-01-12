@@ -130,4 +130,8 @@ public interface StockConstant {
 	String THS_NOTION_TYPE0 = "A0";
 	String THS_NOTION_TYPE1 = "A1";
 	
+	/**
+	 * 龙虎榜的本地文件名称
+	 */
+	String LHB_FILE_NAME = "lhb.html";
 }

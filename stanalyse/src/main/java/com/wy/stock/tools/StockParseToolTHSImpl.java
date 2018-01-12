@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.wy.stock.domain.Index;
 import com.wy.stock.domain.IndustryHot;
@@ -42,6 +43,7 @@ import com.wy.stock.domain.NotionHotStocks;
 import com.wy.stock.domain.NotionInfo;
 import com.wy.stock.domain.NotionStock;
 import com.wy.stock.domain.StockFiveChange;
+import com.wy.stock.domain.StockLhbDetail;
 import com.wy.stock.domain.StocksInfo;
 import com.wy.stock.service.ExchangeInfoService;
 import com.wy.stock.service.IndexService;
@@ -54,6 +56,7 @@ import com.wy.stock.service.NotionHotStocksService;
 import com.wy.stock.service.NotionInfoService;
 import com.wy.stock.service.NotionStockService;
 import com.wy.stock.service.StockFiveChangeService;
+import com.wy.stock.service.StockLhbDetailService;
 import com.wy.stock.service.StocksInfoService;
 import com.wy.stock.utils.StockConstant;
 import com.wy.stock.utils.StockUtils;
@@ -91,6 +94,8 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	private ExchangeInfoService exchangeInfoService;
 	
 	private StocksInfoService stocksInfoService;
+	
+	private StockLhbDetailService stockLhbDetailService;
 	
 	private static Set<String> existedStocksInfoCode = new HashSet<String>();
 	
@@ -1988,6 +1993,195 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		}
 		return list;
 	}
+	
+	public List<StockLhbDetail> parseLhbDetailFromHtml(File htmlFile){
+		if(!htmlFile.exists()){
+			LOGGER.info(htmlFile.getAbsolutePath() + " not exists, return now...");
+			return null;
+		}
+		
+		String tradeDateStr =htmlFile.getParentFile().getParentFile().getParentFile().getName() + "-" 
+				+ htmlFile.getParentFile().getParentFile().getName() + "-"
+				+ htmlFile.getParentFile().getName();
+		Timestamp tradeDate = Timestamp.valueOf(tradeDateStr + " 00:00:00");
+		Timestamp timestamp = new Timestamp(Calendar.getInstance()
+				.getTimeInMillis());
+		Document doc = null;
+		LOGGER.info(" processing file: " + htmlFile.getAbsolutePath());
+		doc = Jsoup.parse(StockUtils.getFileContent(htmlFile));
+		if(doc == null){
+			LOGGER.error("doc is null, return now...");
+			return null;
+		}
+		Iterator<Element> trIter = doc.select("body > div.ggmx.clearfix > div.leftcol.fl > div > div > table > tbody > tr").iterator();
+		if(trIter == null){
+			LOGGER.error("trIter is null, return null now...");
+			return null;
+		}
+		List<StockLhbDetail> lhbList = new ArrayList();
+		// 先解析左边的列表;
+		while(trIter.hasNext()){
+			Element trElement = trIter.next();
+			// lhbType
+			Elements lhbTypeElement = trElement.select("> td:nth-child(1) > label");
+			String lhType = "1日";
+			if(lhbTypeElement != null && StringUtils.isNotBlank(lhbTypeElement.text())){
+				lhType = lhbTypeElement.text();
+			}
+			// CODE
+			String code = trElement.select("> td:nth-child(2)").text();
+			// stockName
+			String stockName = trElement.select("> td:nth-child(3) > a").text();
+			// close
+			String closeStr = trElement.select("> td:nth-child(4)").text();
+			Float close = Float.valueOf(0);
+			if(StringUtils.isNotBlank(closeStr)){
+				close = Float.valueOf(closeStr);
+			}
+			// 涨跌幅
+			String changePercentStr = trElement.select("> td:nth-child(5)").text().replace("%", "");
+			Float changePercent = Float.valueOf(0);
+			if(StringUtils.isNotBlank(changePercentStr)){
+				changePercent = Float.valueOf(changePercentStr);
+			}
+			// 成交金额, 转为万为单位
+			String volumnAmountStr = trElement.select("> td:nth-child(6)").text();
+			Float volumnAmount = transVolumnAmount(volumnAmountStr);
+			// 净买入额
+			String volumnAmountNetStr = trElement.select("> td:nth-child(7)").text();
+			Float volumnAmountNet = transVolumnAmount(volumnAmountNetStr);
+			
+			StockLhbDetail lhbDetail = new StockLhbDetail();
+			lhbDetail.setTradeDate(tradeDate);
+			lhbDetail.setCode(code);
+			lhbDetail.setStockName(stockName);
+			lhbDetail.setClose(close);
+			lhbDetail.setChangePercent(changePercent);
+			lhbDetail.setVolumnAmount(volumnAmount);
+			lhbDetail.setVolumnAmountNet(volumnAmountNet);
+			lhbDetail.setLhType(lhType);
+			lhbDetail.setTimestamp(timestamp);
+			lhbList.add(lhbDetail);
+		}
+		// 再解析右边的营业部.
+		trIter = doc.select("body > div.ggmx.clearfix > div.rightcol.fr > div").iterator();
+		if(trIter == null){
+			LOGGER.error("trIter is null, return null now...");
+			return null;
+		}
+		while(trIter.hasNext()){
+			Element trElement = trIter.next();
+			String code = trElement.select("div").attr("stockcode").toString();
+			
+			// 龙虎榜类型详细 body > div.ggmx.clearfix > div.rightcol.fr > div:nth-child(1) > p
+			String[] lhTypeDescArr = trElement.select("> p").text().split("：");
+			String lhTypeDesc = "";
+			if(lhTypeDescArr != null && lhTypeDescArr.length > 1){
+				lhTypeDesc = lhTypeDescArr[1];
+			}
+			
+			// 用于计算合计买入
+			Float totalVolumnAmountIn = Float.valueOf(0);
+			// 用于计算合计卖出
+			Float totalVolumnAmountOut = Float.valueOf(0);
+			
+			JSONObject buyIn = new JSONObject();
+			Iterator<Element> buyInIter = trElement.select("> div.cell-cont.cjmx > table:nth-child(2) > tbody > tr").iterator();
+			int buyInseq = 0;
+			while(buyInIter.hasNext()){
+				Element buyInElement = buyInIter.next();
+				buyInseq++;
+			   // 买入机构名称
+				String buyInName = buyInElement.select("> td:nth-child(1) > a").attr("title");
+				// 机构标识: 一线游资、毒瘤...
+				Elements buyInBusFlagEle = buyInElement.select("> td:nth-child(1) > label");
+				String buyInBusFlag = "";
+				if(buyInBusFlagEle != null){
+					buyInBusFlag = buyInBusFlagEle.text();
+				}
+				// 该机构买入金额
+				String volumnAmountInStr = buyInElement.select("> td:nth-child(2)").text().trim();
+				Float volumnAmountIn = StringUtils.isNotBlank(volumnAmountInStr) ? Float.valueOf(volumnAmountInStr) : Float.valueOf(0);
+				totalVolumnAmountIn += volumnAmountIn;
+				// 该机构卖出金额
+				String volumnAmountOutStr = buyInElement.select("> td:nth-child(3)").text().trim();
+				Float volumnAmountOut = StringUtils.isNotBlank(volumnAmountOutStr) ? Float.valueOf(volumnAmountOutStr) : Float.valueOf(0);
+				totalVolumnAmountOut += volumnAmountOut;
+				// 该机构净额
+				String volumnAmountNetStr = buyInElement.select("> td:nth-child(4)").text().trim();
+				Float volumnAmountNet = StringUtils.isNotBlank(volumnAmountNetStr) ? Float.valueOf(volumnAmountNetStr) : Float.valueOf(0);
+				
+				
+				JSONObject busJson = new JSONObject();
+				busJson.put("name", buyInName);
+				busJson.put("bus_flag", buyInBusFlag);
+				busJson.put("v_in", volumnAmountIn);
+				busJson.put("v_out", volumnAmountOut);
+				busJson.put("v_net", volumnAmountNet);
+				buyIn.put(String.valueOf(buyInseq), busJson);
+			}
+			
+			JSONObject sellOut = new JSONObject();
+			Iterator<Element> sellOutIter = trElement.select("> div.cell-cont.cjmx > table:nth-child(3) > tbody > tr").iterator();
+			int sellOutseq = 0;
+			while(sellOutIter.hasNext()){
+				Element sellOutElement = sellOutIter.next();
+				sellOutseq++;
+			   // 卖出机构名称
+				String sellOutName = sellOutElement.select("> td:nth-child(1) > a").attr("title");
+				// 机构标识: 一线游资、毒瘤...
+				Elements sellOutBusFlagEle = sellOutElement.select("> td:nth-child(1) > label");
+				String sellOutBusFlag = "";
+				if(sellOutBusFlagEle != null){
+					sellOutBusFlag = sellOutBusFlagEle.text();
+				}
+				// 该机构买入金额
+				String volumnAmountInStr = sellOutElement.select("> td:nth-child(2)").text().trim();
+				Float volumnAmountIn = StringUtils.isNotBlank(volumnAmountInStr) ? Float.valueOf(volumnAmountInStr) : Float.valueOf(0);
+				totalVolumnAmountIn += volumnAmountIn;
+				// 该机构卖出金额
+				String volumnAmountOutStr = sellOutElement.select("> td:nth-child(3)").text().trim();
+				Float volumnAmountOut = StringUtils.isNotBlank(volumnAmountOutStr) ? Float.valueOf(volumnAmountOutStr) : Float.valueOf(0);
+				totalVolumnAmountOut += volumnAmountOut;
+				// 该机构净额
+				String volumnAmountNetStr = sellOutElement.select("> td:nth-child(4)").text().trim();
+				Float volumnAmountNet = StringUtils.isNotBlank(volumnAmountNetStr) ? Float.valueOf(volumnAmountNetStr) : Float.valueOf(0);
+				
+				JSONObject busJson = new JSONObject();
+				busJson.put("name", sellOutName);
+				busJson.put("bus_flag", sellOutBusFlag);
+				busJson.put("v_in", volumnAmountIn);
+				busJson.put("v_out", volumnAmountOut);
+				busJson.put("v_net", volumnAmountNet);
+				sellOut.put(String.valueOf(sellOutseq), busJson);
+			}
+			
+			// 放入list
+			for(StockLhbDetail lhbDetail : lhbList){
+				if(!code.equalsIgnoreCase(lhbDetail.getCode())){
+					continue;
+				}
+				lhbDetail.setLhTypeDesc(lhTypeDesc);
+				lhbDetail.setVolumnAmountIn(totalVolumnAmountIn);
+				lhbDetail.setVolumnAmountOut(totalVolumnAmountOut);
+				lhbDetail.setBuyIn(buyIn);
+				lhbDetail.setSellOut(sellOut);
+			}
+		}
+		return lhbList;
+	}
+	
+	private Float transVolumnAmount(String volumnAmountStr){
+		Float result = Float.valueOf(0);
+		if(StringUtils.isNotBlank(volumnAmountStr)){
+			if(volumnAmountStr.endsWith("亿")){
+				result = Float.valueOf(volumnAmountStr.replace("亿", "")) * 10000;
+			}else if(volumnAmountStr.endsWith("万")){
+				result = Float.valueOf(volumnAmountStr.replace("万", ""));
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * 将JOB-T未开始之前的数据(2016-04-25)从爱问财上下载，并插入 ST_NOTION_HOT_STOCKS:
@@ -2186,6 +2380,17 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 	
 	}
 	
+	public void persistLhbFromHtml(String date){
+		String dirPath = StockConstant.LHB_FILE_PATH + date.substring(0, 4) + File.separatorChar + 
+				 date.substring(4, 6) + File.separatorChar + date.substring(6, 8) + File.separatorChar;
+		String tradeDate = date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8);
+		File file = new File(dirPath + "lhb.html");
+		// 先删除掉ST_LHB_DETAIL 中当天的数据.
+		stockLhbDetailService.deleteByDate(tradeDate);
+		List<StockLhbDetail> lhbDetailList = parseLhbDetailFromHtml(file);
+		stockLhbDetailService.insertBatch(lhbDetailList);
+	}
+	
 	private Set<String> excludeNotionNameForChromeUrl(){
 		Set<String> result = new HashSet<String>();
 		result.add("草甘霖");
@@ -2331,4 +2536,11 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 		this.stocksInfoService = stocksInfoService;
 	}
 
+	public StockLhbDetailService getStockLhbDetailService() {
+		return stockLhbDetailService;
+	}
+
+	public void setStockLhbDetailService(StockLhbDetailService stockLhbDetailService) {
+		this.stockLhbDetailService = stockLhbDetailService;
+	}
 }
