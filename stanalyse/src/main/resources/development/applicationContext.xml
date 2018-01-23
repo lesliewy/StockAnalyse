@@ -228,6 +228,11 @@
     </bean>
 	<!-- Service end -->
 	
+	<!-- controller for test -->
+	 <bean id="analyseLhbController" class="com.wy.stock.controller.AnalyseLhbController">
+        <property name="analyseLhbTool" ref="analyseLhbTool" />
+    </bean>
+	
 	<!-- job service begin -->
     <bean id="persistHistFilesJob" class="com.wy.stock.job.PersistHistFilesJob">
         <property name="stockJobService" ref="stockJobService" />

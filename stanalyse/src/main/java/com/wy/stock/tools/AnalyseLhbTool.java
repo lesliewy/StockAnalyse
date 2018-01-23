@@ -12,6 +12,9 @@ import java.util.Map;
  */
 public interface AnalyseLhbTool {
 
+	Map<String, Map<String, String>> queryAggregate(String lowTradeDateStr,
+			String highTradeDateStr);
+
 	List<Map<String, String>> queryLhbStatics(String lowTradeDateStr,
 			String highTradeDateStr);
 }

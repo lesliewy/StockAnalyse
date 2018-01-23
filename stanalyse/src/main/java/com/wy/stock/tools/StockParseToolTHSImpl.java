@@ -2161,6 +2161,11 @@ public class StockParseToolTHSImpl implements StockParseToolTHS {
 				if(!code.equalsIgnoreCase(lhbDetail.getCode())){
 					continue;
 				}
+				// 同一只股票可能有3日，1日, 不能混了.
+				if("3日".equalsIgnoreCase(lhbDetail.getLhType()) && lhTypeDesc != null && !lhTypeDesc.contains("连续三个交易日")){
+					continue;
+				}
+				
 				lhbDetail.setLhTypeDesc(lhTypeDesc);
 				lhbDetail.setVolumnAmountIn(totalVolumnAmountIn);
 				lhbDetail.setVolumnAmountOut(totalVolumnAmountOut);

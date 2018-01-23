@@ -28,7 +28,7 @@ import com.ibatis.sqlmap.engine.type.BaseTypeHandler;
 public class JsonObjectTypeHandler extends BaseTypeHandler {
 
 	public Object getResult(ResultSet resultset, String s) throws SQLException {
-		return JSONObject.stringToValue(resultset.getString(s));
+		return new JSONObject(resultset.getString(s));
 	}
 
 	public Object getResult(ResultSet resultset, int i) throws SQLException {

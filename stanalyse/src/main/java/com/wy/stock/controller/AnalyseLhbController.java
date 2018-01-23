@@ -61,5 +61,35 @@ public class AnalyseLhbController {
 		 */
 		return "";
 	}
+	
+	public String queryAggregate(
+			@RequestParam(value = "from", required = true) String from,
+			@RequestParam(value = "to", required = true) String to,
+			@RequestParam(value = "callback", required = true) String callback) {
+		LOGGER.info("from: " + from + " to: " + to + " callback: " + callback);
+		if (StringUtils.isBlank(from) || StringUtils.isBlank(to)) {
+			LOGGER.error("from or to must not be blank, return now...");
+			return null;
+		}
+
+		Map<String, Map<String, String>> sb = analyseLhbTool.queryAggregate(from, to);
+		/*
+		 * String result = sb == null ? "null" : sb.toString();
+		 * LOGGER.info(result);
+		 * 
+		 * JSONObject json = new JSONObject(); json.put("notionHot", result);
+		 * 
+		 * return callback + "(" + json.toString() + ")";
+		 */
+		return "";
+	}
+
+	public AnalyseLhbTool getAnalyseLhbTool() {
+		return analyseLhbTool;
+	}
+
+	public void setAnalyseLhbTool(AnalyseLhbTool analyseLhbTool) {
+		this.analyseLhbTool = analyseLhbTool;
+	}
 
 }

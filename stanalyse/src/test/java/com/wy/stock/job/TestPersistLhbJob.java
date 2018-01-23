@@ -42,7 +42,7 @@ public class TestPersistLhbJob {
 				.getBean("persistLhbJob");
 		String month = "1712";
 		for(int i = 1; i <= 31; i++){
-			String jobDate = month + StringUtils.leftPad(String.valueOf(i), 2, "0") + "2154";
+			String jobDate = month + StringUtils.leftPad(String.valueOf(i), 2, "0");
 			persistLhbJob.persistLHB(jobDate);
 		}
 	}
