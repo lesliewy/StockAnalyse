@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -96,13 +98,45 @@ public class AnalyseLhbToolImpl implements AnalyseLhbTool {
 	/** 卖出一线游资家数， 只包含卖出 **/
 	private static final String NUM_OF_ONLY_SELLOUT_TOP_YZ = "numOfOnlySelloutTopYz";
 
-	public Map<String, Map<String, String>> queryAggregate(String lowTradeDateStr, String highTradeDateStr){
-		List<Map<String, String>>  staticsList = queryLhbStatics(lowTradeDateStr, highTradeDateStr);
-		if(CollectionUtils.isEmpty(staticsList)){
+	private static final String CSV_SPLIT = ",";
+
+	public String queryAggregateString(String lowTradeDateStr,
+			String highTradeDateStr) {
+		TreeMap<String, Map<String, String>> map = queryAggregate(lowTradeDateStr,
+				highTradeDateStr);
+		if (CollectionUtils.isEmpty(map)) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder("");
+		for (Entry<String, Map<String, String>> entry : map.entrySet()) {
+			Map<String, String> dayMap = entry.getValue();
+			sb.append(entry.getKey()).append(CSV_SPLIT)
+					.append(dayMap.get(NUM_OF_BUS)).append(CSV_SPLIT)
+					.append(dayMap.get(NUM_OF_TOP_YZ)).append(CSV_SPLIT)
+					.append(dayMap.get(VOLUMN_OF_BUYIN_BUS)).append(CSV_SPLIT)
+					.append(dayMap.get(VOLUMN_OF_BUYIN_TOP_YZ)).append(CSV_SPLIT)
+					.append(dayMap.get(VOLUMN_OF_SELLOUT_BUS)).append(CSV_SPLIT)
+					.append(dayMap.get(VOLUMN_OF_SELLOUT_TOP_YZ)).append(CSV_SPLIT)
+					.append(dayMap.get(NET_VOLUMN_OF_BUS)).append(CSV_SPLIT)
+					.append(dayMap.get(NET_VOLUMN_OF_TOP_YZ)).append(CSV_SPLIT)
+					.append(dayMap.get(NUM_OF_ONLY_BUYIN_BUS)).append(CSV_SPLIT)
+					.append(dayMap.get(NUM_OF_ONLY_SELLOUT_BUS)).append(CSV_SPLIT)
+					.append(dayMap.get(NUM_OF_ONLY_BUYIN_TOP_YZ)).append(CSV_SPLIT)
+					.append(dayMap.get(NUM_OF_ONLY_SELLOUT_TOP_YZ))
+					.append(CSV_SPLIT).append("\n");
+		}
+		return sb.toString();
+	}
+
+	public TreeMap<String, Map<String, String>> queryAggregate(
+			String lowTradeDateStr, String highTradeDateStr) {
+		List<Map<String, String>> staticsList = queryLhbStatics(lowTradeDateStr,
+				highTradeDateStr);
+		if (CollectionUtils.isEmpty(staticsList)) {
 			return null;
 		}
-		Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
-		for(Map<String, String> map : staticsList){
+		TreeMap<String, Map<String, String>> result = new TreeMap<String, Map<String, String>>();
+		for (Map<String, String> map : staticsList) {
 			String tradeDate = map.get(TRADE_DATE);
 			Map<String, String> oneDayMap = result.get(tradeDate);
 			int numOfBus = getIntFromMap(map, NUM_OF_BUS);
@@ -110,71 +144,132 @@ public class AnalyseLhbToolImpl implements AnalyseLhbTool {
 			int sumOfBusTopYz = getIntFromMap(map, SUM_OF_BUS_TOP_YZ);
 			float volumnOfBuyInBus = getFloatFromMap(map, VOLUMN_OF_BUYIN_BUS);
 			float volumnOfBuyInTopYz = getFloatFromMap(map, VOLUMN_OF_BUYIN_TOP_YZ);
-			float sumVolumnOfBuyInBusTopYz = getFloatFromMap(map, SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ);
+			float sumVolumnOfBuyInBusTopYz = getFloatFromMap(map,
+					SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ);
 			float volumnOfSellOutBus = getFloatFromMap(map, VOLUMN_OF_SELLOUT_BUS);
-			float volumnOfSellOutTopYz = getFloatFromMap(map, VOLUMN_OF_SELLOUT_TOP_YZ);
-			float sumVolumnOfSellOutBusTopYz = getFloatFromMap(map, SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ);
+			float volumnOfSellOutTopYz = getFloatFromMap(map,
+					VOLUMN_OF_SELLOUT_TOP_YZ);
+			float sumVolumnOfSellOutBusTopYz = getFloatFromMap(map,
+					SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ);
 			float netVolumnOfBus = getFloatFromMap(map, NET_VOLUMN_OF_BUS);
 			float netVolumnOfTopYz = getFloatFromMap(map, NET_VOLUMN_OF_TOP_YZ);
 			int numOfOnlyBuyInBus = getIntFromMap(map, NUM_OF_ONLY_BUYIN_BUS);
 			int numOfOnlySellOutBus = getIntFromMap(map, NUM_OF_ONLY_SELLOUT_BUS);
 			int numOfOnlyBuyInTopYz = getIntFromMap(map, NUM_OF_ONLY_BUYIN_TOP_YZ);
-			int numOfOnlySellOutTopYz = getIntFromMap(map, NUM_OF_ONLY_SELLOUT_TOP_YZ);
-			if(oneDayMap == null){
+			int numOfOnlySellOutTopYz = getIntFromMap(map,
+					NUM_OF_ONLY_SELLOUT_TOP_YZ);
+			if (oneDayMap == null) {
 				oneDayMap = new HashMap<String, String>();
 				oneDayMap.put(NUM_OF_BUS, String.valueOf(numOfBus));
 				oneDayMap.put(NUM_OF_TOP_YZ, String.valueOf(numOfTopYz));
 				oneDayMap.put(SUM_OF_BUS_TOP_YZ, String.valueOf(sumOfBusTopYz));
-				oneDayMap.put(VOLUMN_OF_BUYIN_BUS, String.valueOf(volumnOfBuyInBus));
-				oneDayMap.put(VOLUMN_OF_BUYIN_TOP_YZ, String.valueOf(volumnOfBuyInTopYz));
-				oneDayMap.put(SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ, String.valueOf(sumVolumnOfBuyInBusTopYz));
-				oneDayMap.put(VOLUMN_OF_SELLOUT_BUS, String.valueOf(volumnOfSellOutBus));
-				oneDayMap.put(VOLUMN_OF_SELLOUT_TOP_YZ, String.valueOf(volumnOfSellOutTopYz));
-				oneDayMap.put(SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ, String.valueOf(sumVolumnOfSellOutBusTopYz));
+				oneDayMap
+						.put(VOLUMN_OF_BUYIN_BUS, String.valueOf(volumnOfBuyInBus));
+				oneDayMap.put(VOLUMN_OF_BUYIN_TOP_YZ,
+						String.valueOf(volumnOfBuyInTopYz));
+				oneDayMap.put(SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ,
+						String.valueOf(sumVolumnOfBuyInBusTopYz));
+				oneDayMap.put(VOLUMN_OF_SELLOUT_BUS,
+						String.valueOf(volumnOfSellOutBus));
+				oneDayMap.put(VOLUMN_OF_SELLOUT_TOP_YZ,
+						String.valueOf(volumnOfSellOutTopYz));
+				oneDayMap.put(SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ,
+						String.valueOf(sumVolumnOfSellOutBusTopYz));
 				oneDayMap.put(NET_VOLUMN_OF_BUS, String.valueOf(netVolumnOfBus));
-				oneDayMap.put(NET_VOLUMN_OF_TOP_YZ, String.valueOf(netVolumnOfTopYz));
-				oneDayMap.put(NUM_OF_ONLY_BUYIN_BUS, String.valueOf(numOfOnlyBuyInBus));
-				oneDayMap.put(NUM_OF_ONLY_SELLOUT_BUS, String.valueOf(numOfOnlySellOutBus));
-				oneDayMap.put(NUM_OF_ONLY_BUYIN_TOP_YZ, String.valueOf(numOfOnlyBuyInTopYz));
-				oneDayMap.put(NUM_OF_ONLY_SELLOUT_TOP_YZ, String.valueOf(numOfOnlySellOutTopYz));
-			}else{
-				oneDayMap.put(NUM_OF_BUS, String.valueOf(Integer.valueOf(oneDayMap.get(NUM_OF_BUS)) + numOfBus));
-				oneDayMap.put(NUM_OF_TOP_YZ, getSumFromMap(oneDayMap.get(NUM_OF_TOP_YZ), numOfTopYz));
-				oneDayMap.put(SUM_OF_BUS_TOP_YZ, getSumFromMap(oneDayMap.get(SUM_OF_BUS_TOP_YZ), sumOfBusTopYz));
-				oneDayMap.put(VOLUMN_OF_BUYIN_BUS, getSumFromMap(oneDayMap.get(VOLUMN_OF_BUYIN_BUS), volumnOfBuyInBus));
-				oneDayMap.put(VOLUMN_OF_BUYIN_TOP_YZ, getSumFromMap(oneDayMap.get(VOLUMN_OF_BUYIN_TOP_YZ), volumnOfBuyInTopYz));
-				oneDayMap.put(SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ, getSumFromMap(oneDayMap.get(SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ), sumVolumnOfBuyInBusTopYz));
-				oneDayMap.put(VOLUMN_OF_SELLOUT_BUS, getSumFromMap(oneDayMap.get(VOLUMN_OF_SELLOUT_BUS), volumnOfSellOutBus));
-				oneDayMap.put(VOLUMN_OF_SELLOUT_TOP_YZ, getSumFromMap(oneDayMap.get(VOLUMN_OF_SELLOUT_TOP_YZ), volumnOfSellOutTopYz));
-				oneDayMap.put(SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ, getSumFromMap(oneDayMap.get(SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ), sumVolumnOfSellOutBusTopYz));
-				oneDayMap.put(NET_VOLUMN_OF_BUS, getSumFromMap(oneDayMap.get(NET_VOLUMN_OF_BUS), netVolumnOfBus));
-				oneDayMap.put(NET_VOLUMN_OF_TOP_YZ, getSumFromMap(oneDayMap.get(NET_VOLUMN_OF_TOP_YZ), netVolumnOfTopYz));
-				oneDayMap.put(NUM_OF_ONLY_BUYIN_BUS, getSumFromMap(oneDayMap.get(NUM_OF_ONLY_BUYIN_BUS), numOfOnlyBuyInBus));
-				oneDayMap.put(NUM_OF_ONLY_SELLOUT_BUS, getSumFromMap(oneDayMap.get(NUM_OF_ONLY_SELLOUT_BUS), numOfOnlySellOutBus));
-				oneDayMap.put(NUM_OF_ONLY_BUYIN_TOP_YZ, getSumFromMap(oneDayMap.get(NUM_OF_ONLY_BUYIN_TOP_YZ), numOfOnlyBuyInTopYz));
-				oneDayMap.put(NUM_OF_ONLY_SELLOUT_TOP_YZ, getSumFromMap(oneDayMap.get(NUM_OF_ONLY_SELLOUT_TOP_YZ), numOfOnlySellOutTopYz));
+				oneDayMap.put(NET_VOLUMN_OF_TOP_YZ,
+						String.valueOf(netVolumnOfTopYz));
+				oneDayMap.put(NUM_OF_ONLY_BUYIN_BUS,
+						String.valueOf(numOfOnlyBuyInBus));
+				oneDayMap.put(NUM_OF_ONLY_SELLOUT_BUS,
+						String.valueOf(numOfOnlySellOutBus));
+				oneDayMap.put(NUM_OF_ONLY_BUYIN_TOP_YZ,
+						String.valueOf(numOfOnlyBuyInTopYz));
+				oneDayMap.put(NUM_OF_ONLY_SELLOUT_TOP_YZ,
+						String.valueOf(numOfOnlySellOutTopYz));
+			} else {
+				oneDayMap.put(
+						NUM_OF_BUS,
+						String.valueOf(Integer.valueOf(oneDayMap.get(NUM_OF_BUS))
+								+ numOfBus));
+				oneDayMap.put(NUM_OF_TOP_YZ,
+						getSumFromMap(oneDayMap.get(NUM_OF_TOP_YZ), numOfTopYz));
+				oneDayMap
+						.put(SUM_OF_BUS_TOP_YZ,
+								getSumFromMap(oneDayMap.get(SUM_OF_BUS_TOP_YZ),
+										sumOfBusTopYz));
+				oneDayMap.put(
+						VOLUMN_OF_BUYIN_BUS,
+						getSumFromMap(oneDayMap.get(VOLUMN_OF_BUYIN_BUS),
+								volumnOfBuyInBus));
+				oneDayMap.put(
+						VOLUMN_OF_BUYIN_TOP_YZ,
+						getSumFromMap(oneDayMap.get(VOLUMN_OF_BUYIN_TOP_YZ),
+								volumnOfBuyInTopYz));
+				oneDayMap.put(
+						SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ,
+						getSumFromMap(oneDayMap.get(SUM_VOLUMN_OF_BUYIN_BUS_TOP_YZ),
+								sumVolumnOfBuyInBusTopYz));
+				oneDayMap.put(
+						VOLUMN_OF_SELLOUT_BUS,
+						getSumFromMap(oneDayMap.get(VOLUMN_OF_SELLOUT_BUS),
+								volumnOfSellOutBus));
+				oneDayMap.put(
+						VOLUMN_OF_SELLOUT_TOP_YZ,
+						getSumFromMap(oneDayMap.get(VOLUMN_OF_SELLOUT_TOP_YZ),
+								volumnOfSellOutTopYz));
+				oneDayMap.put(
+						SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ,
+						getSumFromMap(
+								oneDayMap.get(SUM_VOLUMN_OF_SELLOUT_BUS_TOP_YZ),
+								sumVolumnOfSellOutBusTopYz));
+				oneDayMap.put(
+						NET_VOLUMN_OF_BUS,
+						getSumFromMap(oneDayMap.get(NET_VOLUMN_OF_BUS),
+								netVolumnOfBus));
+				oneDayMap.put(
+						NET_VOLUMN_OF_TOP_YZ,
+						getSumFromMap(oneDayMap.get(NET_VOLUMN_OF_TOP_YZ),
+								netVolumnOfTopYz));
+				oneDayMap.put(
+						NUM_OF_ONLY_BUYIN_BUS,
+						getSumFromMap(oneDayMap.get(NUM_OF_ONLY_BUYIN_BUS),
+								numOfOnlyBuyInBus));
+				oneDayMap.put(
+						NUM_OF_ONLY_SELLOUT_BUS,
+						getSumFromMap(oneDayMap.get(NUM_OF_ONLY_SELLOUT_BUS),
+								numOfOnlySellOutBus));
+				oneDayMap.put(
+						NUM_OF_ONLY_BUYIN_TOP_YZ,
+						getSumFromMap(oneDayMap.get(NUM_OF_ONLY_BUYIN_TOP_YZ),
+								numOfOnlyBuyInTopYz));
+				oneDayMap.put(
+						NUM_OF_ONLY_SELLOUT_TOP_YZ,
+						getSumFromMap(oneDayMap.get(NUM_OF_ONLY_SELLOUT_TOP_YZ),
+								numOfOnlySellOutTopYz));
 			}
 			result.put(tradeDate, oneDayMap);
 		}
 		return result;
 	}
-	
-	private Integer getIntFromMap(Map<String, String> map, String key){
-		return StringUtils.isNotBlank(map.get(key)) ? Integer.valueOf(map.get(key)) : 0;
+
+	private Integer getIntFromMap(Map<String, String> map, String key) {
+		return StringUtils.isNotBlank(map.get(key)) ? Integer.valueOf(map
+				.get(key)) : 0;
 	}
-	
-	private Float getFloatFromMap(Map<String, String> map, String key){
-		return StringUtils.isNotBlank(map.get(key)) ? Float.valueOf(map.get(key)) : 0;
+
+	private Float getFloatFromMap(Map<String, String> map, String key) {
+		return StringUtils.isNotBlank(map.get(key)) ? Float.valueOf(map.get(key))
+				: 0;
 	}
-	
-	private String getSumFromMap(String a, int b){
+
+	private String getSumFromMap(String a, int b) {
 		return String.valueOf(Integer.parseInt(a) + b);
 	}
-	
-	private String getSumFromMap(String a, float b){
+
+	private String getSumFromMap(String a, float b) {
 		return String.valueOf(Float.valueOf(a) + b);
 	}
-	
+
 	/**
 	 * 每天的机构家数，一线游资家数，两者总家数，机构总金额
 	 */
@@ -448,7 +543,8 @@ public class AnalyseLhbToolImpl implements AnalyseLhbTool {
 		return stockLhbDetailService;
 	}
 
-	public void setStockLhbDetailService(StockLhbDetailService stockLhbDetailService) {
+	public void setStockLhbDetailService(
+			StockLhbDetailService stockLhbDetailService) {
 		this.stockLhbDetailService = stockLhbDetailService;
 	}
 

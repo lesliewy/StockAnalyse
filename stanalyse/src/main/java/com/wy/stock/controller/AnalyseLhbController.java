@@ -61,7 +61,8 @@ public class AnalyseLhbController {
 		 */
 		return "";
 	}
-	
+
+	@RequestMapping(value = "/query", method = RequestMethod.GET)
 	public String queryAggregate(
 			@RequestParam(value = "from", required = true) String from,
 			@RequestParam(value = "to", required = true) String to,
@@ -72,16 +73,13 @@ public class AnalyseLhbController {
 			return null;
 		}
 
-		Map<String, Map<String, String>> sb = analyseLhbTool.queryAggregate(from, to);
-		/*
-		 * String result = sb == null ? "null" : sb.toString();
-		 * LOGGER.info(result);
-		 * 
-		 * JSONObject json = new JSONObject(); json.put("notionHot", result);
-		 * 
-		 * return callback + "(" + json.toString() + ")";
-		 */
-		return "";
+		String sb = analyseLhbTool.queryAggregateString(from, to);
+		String result = sb == null ? "null" : sb.toString();
+		LOGGER.info(result);
+		JSONObject json = new JSONObject();
+		json.put("lhb", result);
+
+		return callback + "(" + json.toString() + ")";
 	}
 
 	public AnalyseLhbTool getAnalyseLhbTool() {

@@ -33,7 +33,7 @@ public class TestAnalyseLhbController {
 		AnalyseLhbController analyseLhbController = (AnalyseLhbController) applicationContext
 				.getBean("analyseLhbController");
 		String from = "2017-12-01 15:00:00";
-		String to = "2017-12-30 15:00:00";
+		String to = "2018-01-30 15:00:00";
 		String callback = "000001";
 		String a = analyseLhbController.queryAggregate(from, to, callback);
 	}

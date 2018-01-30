@@ -438,7 +438,6 @@
         <property name="jobDetail" ref="fetchStockInfoJobDetail" />
         <property name="cronExpression" value="0 0/5 * * * ?" />
     </bean>
-    <!-- 
     <bean lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
         <property name="triggers">
             <list>
@@ -448,6 +447,5 @@
             </list>
         </property>
     </bean>
-     -->
     <!-- JOB 配置 END -->
 </beans>

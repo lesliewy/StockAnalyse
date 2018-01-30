@@ -51,6 +51,7 @@ public class PersistLhbJob {
 		/*
 		 * 周六、日不执行.注意法定节假日等不开市时也会执行,暂时没有添加.
 		 */
+		// TODO
 		/*
 		if (StockUtils.isWeekend(cal)) {
 			LOGGER.info("Saturday or Sunday, return now...");
@@ -62,7 +63,7 @@ public class PersistLhbJob {
 		 * 清理超长R状态的job, 修改状态为D.
 		 */
 		stockJobService.cleanLongTimeJob(StockConstant.DEL_R_UPPER_LIMIT, jobType);
-		// TODO 先注释掉
+		// TODO 
 //		String jobDate = new SimpleDateFormat("YYMMddHHmm").format(Calendar.getInstance().getTime());
 		
 		
@@ -105,7 +106,7 @@ public class PersistLhbJob {
 		/*
 		 * 获取龙虎榜文件, 放入指定的目录下.
 		 */
-		// TODO 先注释掉
+		// TODO
 //		String dateStr = String.valueOf(cal.get(Calendar.YEAR))
 //				+ StringUtils.leftPad(String.valueOf(cal.get(Calendar.MONTH) + 1), 2, "0")
 //				+ StringUtils.leftPad(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)), 2, "0");

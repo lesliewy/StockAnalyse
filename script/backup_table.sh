@@ -15,4 +15,5 @@ mysqldump -u root --password=mysql mysql ST_NOTION_INFO > ../backup/database/tab
 mysqldump -u root --password=mysql mysql ST_NOTION_STOCK > ../backup/database/tables/170830/ST_NOTION_STOCK.sql;
 mysqldump -u root --password=mysql mysql ST_STOCK_CAP_FLOW > ../backup/database/tables/170830/ST_STOCK_CAP_FLOW.sql;
 mysqldump -u root --password=mysql mysql ST_STOCK_FIVE_CHANGE > ../backup/database/tables/170830/ST_STOCK_FIVE_CHANGE.sql;
+mysqldump -u root --password=mysql mysql ST_LHB_DETAIL > ../backup/database/tables/170830/ST_LHB_DETAIL.sql;
 

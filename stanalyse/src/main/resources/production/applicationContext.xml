@@ -84,7 +84,10 @@
     <bean id="configDao" class="com.wy.stock.dao.impl.ConfigDaoImpl">
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
-    <bean id="stocksInfoDao" class="com.wy.stock.dao.impl.StocksDaoImpl">
+    <bean id="stocksInfoDao" class="com.wy.stock.dao.impl.StocksInfoDaoImpl">
+        <property name="sqlMapClient" ref="sqlMapClient" />
+    </bean>
+    <bean id="stockLhbDetailDao" class="com.wy.stock.dao.impl.StockLhbDetailDaoImpl">
         <property name="sqlMapClient" ref="sqlMapClient" />
     </bean>
 	<!-- DAO end -->
@@ -133,6 +136,8 @@
         <property name="industryStockService" ref="industryStockService" />
         <property name="stockFiveChangeService" ref="stockFiveChangeService" />
         <property name="exchangeInfoService" ref="exchangeInfoService" />
+        <property name="stocksInfoService" ref="stocksInfoService" />
+        <property name="stockLhbDetailService" ref="stockLhbDetailService" />
     </bean>
     <bean id="candlestickService" class="com.wy.stock.service.impl.CandlestickServiceImpl">
         <property name="stockHistoryService" ref="stockHistoryService" />
@@ -215,7 +220,18 @@
     <bean id="stocksInfoService" class="com.wy.stock.service.impl.StocksInfoServiceImpl">
         <property name="stocksInfoDao" ref="stocksInfoDao" />
     </bean>
+    <bean id="stockLhbDetailService" class="com.wy.stock.service.impl.StockLhbDetailServiceImpl">
+        <property name="stockLhbDetailDao" ref="stockLhbDetailDao" />
+    </bean>
+    <bean id="analyseLhbTool" class="com.wy.stock.tools.AnalyseLhbToolImpl">
+        <property name="stockLhbDetailService" ref="stockLhbDetailService" />
+    </bean>
 	<!-- Service end -->
+	
+	<!-- controller for test -->
+	 <bean id="analyseLhbController" class="com.wy.stock.controller.AnalyseLhbController">
+        <property name="analyseLhbTool" ref="analyseLhbTool" />
+    </bean>
 	
 	<!-- job service begin -->
     <bean id="persistHistFilesJob" class="com.wy.stock.job.PersistHistFilesJob">
@@ -269,6 +285,12 @@
     <bean id="fetchStockInfoJob" class="com.wy.stock.job.FetchStockInfoJob">
         <property name="stockJobService" ref="stockJobService" />
         <property name="stockParseTool" ref="stockParseTool" />
+    </bean>
+    
+    <bean id="persistLhbJob" class="com.wy.stock.job.PersistLhbJob">
+        <property name="stockJobService" ref="stockJobService" />
+        <property name="stockDownloadToolTHS" ref="stockDownloadToolTHS" />
+        <property name="stockParseToolTHS" ref="stockParseToolTHS" />
     </bean>
 	<!-- job service end -->
 
@@ -416,8 +438,6 @@
         <property name="jobDetail" ref="fetchStockInfoJobDetail" />
         <property name="cronExpression" value="0 0/5 * * * ?" />
     </bean>
-    
-    <!-- ecs 上不需要job -->
     <!-- 
     <bean lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
         <property name="triggers">
