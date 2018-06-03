@@ -6,3 +6,5 @@ stanalyse/target/
 stanalyseweb/target/
 stanalyse/.settings/
 stanalyse/stanalyselog/
+stanalyse/.idea/
+stanalyse/*.iml
