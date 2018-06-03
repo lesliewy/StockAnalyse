@@ -40,8 +40,8 @@ public class TestPersistLhbJob {
 	public void testPersistLHBBefore(){
 		PersistLhbJob persistLhbJob = (PersistLhbJob) applicationContext
 				.getBean("persistLhbJob");
-		String month = "1801";
-		for(int i = 29; i <= 29; i++){
+		String month = "1804";
+		for(int i = 1; i <= 4; i++){
 			String jobDate = month + StringUtils.leftPad(String.valueOf(i), 2, "0");
 			persistLhbJob.persistLHB(jobDate);
 		}

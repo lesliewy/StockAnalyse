@@ -470,6 +470,49 @@ public class StockDownloadToolImpl implements StockDownloadTool {
 		}
 		return file;
 	}
+	
+	public void downloadBKJsonDFCF(String type) {
+		int totalPage = 20;
+		String url = "";
+		// 两个文件大小完全一样就退出.
+		long preFileSize = -1;
+		long curFileSize = -1;
+		if(StockConstant.NOTION_IDENTIFIER.equals(type)){
+			url = "http://nufm.dfcfw.com/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=C._BKGN&sty=FPGBKI&sortType=(ChangePercent)&sortRule=-1&page=$$&pageSize=50&js=var%20rMbsmXAc={rank:[(x)],pages:(pc),total:(tot)}&token=7bc05d0d4c3c22ef9fca8c2a912d779c&jsName=quote_123&_g=0.628606915911589&_=1521465899533";
+		}else if(StockConstant.INDUSTRY_IDENTIFIER.equals(type)){
+			
+		}
+		for(int i = 1; i <= totalPage; i++){
+			File file =  new File(StockUtils.getDailyStockSaveDir("A")  + type +  "_dfcf" + "_" + i + ".json");
+			// 创建父目录
+			if(!file.getParentFile().exists()){
+				file.getParentFile().mkdirs();
+			}
+			// 先删除之前的
+			if(file.exists()){
+				file.delete();
+			}
+			url = url.replace("$$", String.valueOf(i));
+			try {
+	    		HttpUtils.httpDownload(url, "UTF-8", 10 * 1000, file);
+			} catch (FileNotFoundException e) {
+				if(file.exists()){
+					file.delete();
+				}
+				LOGGER.error(e);
+			} catch (IOException e) {
+				if(file.exists()){
+					file.delete();
+				}
+				LOGGER.error(e);
+			}
+			curFileSize = file.length();
+			if(curFileSize == preFileSize && curFileSize != -1){
+				break;
+			}
+			preFileSize = file.length();
+		}
+	}
 
 	public ExchangeInfoService getExchangeInfoService() {
 		return exchangeInfoService;

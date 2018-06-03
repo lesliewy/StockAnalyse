@@ -169,6 +169,8 @@ public class StockUtils {
 			return StockConstant.CAP_FLOW_FILE_PATH + timeStr;
 		}else if("R".equalsIgnoreCase(type)){
 			return StockConstant.LHB_FILE_PATH + timeStr;
+		}else if("A".equalsIgnoreCase(type)){
+			return StockConstant.BK_STOCK_FILE_PATH + timeStr;
 		}
 		return null;
 	}

@@ -463,10 +463,11 @@ public class StockParseToolImpl implements StockParseTool {
         		LOGGER.info(file.getAbsoluteFile() + " exists, return now...");
         		return;
         	}
-        	String url = "http://quote.eastmoney.com/center/BKList.html#notion_0_0?sortRule=0";
+        	//String url = "http://quote.eastmoney.com/center/BKList.html#notion_0_0?sortRule=0";
+        	String url = "http://quote.eastmoney.com/centerv2/hsbk/gnbk";
         	LOGGER.info("notionInfo downloading");
         	try {
-        		HttpUtils.httpDownload(url, "GB2312", 10 * 1000, file);
+        		HttpUtils.httpDownload(url, "UTF-8", 10 * 1000, file);
     		} catch (FileNotFoundException e) {
     			if(file.exists()){
     				file.delete();
@@ -509,7 +510,9 @@ public class StockParseToolImpl implements StockParseTool {
 			return null;
 		}
 		
-		Document doc = Jsoup.parse(StockUtils.getFileContent(file));
+		String content = StockUtils.getFileContent(file);
+		LOGGER.info("content: " + content);
+		Document doc = Jsoup.parse(content);
 		
 		if(doc == null){
 			LOGGER.error("doc is null, return now...");
@@ -521,15 +524,15 @@ public class StockParseToolImpl implements StockParseTool {
 	/**
 	 * 解析html获取概念信息对象, NotionInfo
 	 */
-	public List<NotionInfo> parseNotionInfoFromDoc(Document notionInfoDoc) {
+	public List<NotionInfo> parseNotionInfoFromDoc(Document notionInfoDoc, String source) {
 		// #treemenu > div.bd > dl.node-section.js-section-open > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul:nth-child(1) > li:nth-child(1) > a
 		// #treemenu > div.bd > dl.node-section.js-section-open > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul:nth-child(1)
 		// #treemenu > div.bd > dl.node-section.js-section-open > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul:nth-child(2)
 		
 		// list.html#28003498_0_2:  #treemenu > div.bd > dl.node-section.js-section-open > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul:nth-child(1) > li:nth-child(1) > a
-		// AB股:                    #treemenu > div.bd > dl.node-section.js-section-open > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul:nth-child(1) > li:nth-child(1) > a > span
+		// AB股:                    #treemenu > div.bd > dl.node-section.js-section-open > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul:nth-child(1) > li:nth-child(1) > a > span	
+		Iterator<Element> ulIter = notionInfoDoc.select("#treemenu > div.bd ul > li:nth-child(1) ul").iterator();
 		
-		Iterator<Element> ulIter = notionInfoDoc.select("#treemenu > div.bd > dl:nth-child(2) > dd:nth-child(10) > ul > li:nth-child(1) > div.hover-pop.col-6 > ul").iterator();
 		if(ulIter == null){
 			LOGGER.error("ulIter is null, reutrn null now...");
 			return null;
@@ -557,6 +560,8 @@ public class StockParseToolImpl implements StockParseTool {
 				NotionInfo notionInfo = new NotionInfo();
 				notionInfo.setNotionUrl(notionUrl);
 				notionInfo.setNotionName(notionName);
+				notionInfo.setSource(source);
+				notionInfo.setType("");
 				notionInfo.setTimestamp(timestamp);
 				list.add(notionInfo);
 			}
@@ -567,13 +572,13 @@ public class StockParseToolImpl implements StockParseTool {
 	/**
 	 * 解析html获取行业信息对象, IndustryInfo
 	 */
-	public List<IndustryInfo> parseIndustryInfoFromDoc(Document industryInfoDoc) {
+	public List<IndustryInfo> parseIndustryInfoFromDoc(Document industryInfoDoc, String source) {
 		// #treemenu > div.bd > dl.node-section.js-section-open > dd.js-sub-open > ul > li:nth-child(3) > div.hover-pop.col-4 > ul:nth-child(1) > li:nth-child(1) > a
 		
 		// list.html#28002474_0_2:  #treemenu > div.bd > dl.node-section.js-section-open > dd.js-sub-open > ul > li:nth-child(3) > div.hover-pop.col-4 > ul:nth-child(1) > li:nth-child(1) > a
 		// 保险:                    #treemenu > div.bd > dl.node-section.js-section-open > dd.js-sub-open > ul > li:nth-child(3) > div.hover-pop.col-4 > ul:nth-child(1) > li:nth-child(1) > a > span
 		
-		Iterator<Element> ulIter = industryInfoDoc.select("#treemenu > div.bd > dl:nth-child(2) > dd:nth-child(10) > ul > li:nth-child(3) > div.hover-pop.col-4 > ul").iterator();
+		Iterator<Element> ulIter = industryInfoDoc.select("#treemenu > div.bd > dl:nth-child(2) > dd:nth-child(10) > ul > li:nth-child(3) > div > ul").iterator();
 		if(ulIter == null){
 			LOGGER.error("ulIter is null, reutrn null now...");
 			return null;
@@ -601,6 +606,7 @@ public class StockParseToolImpl implements StockParseTool {
 				IndustryInfo industryInfo = new IndustryInfo();
 				industryInfo.setIndustryUrl(industryUrl);
 				industryInfo.setIndustryName(industryName);
+				industryInfo.setSource(source);
 				industryInfo.setTimestamp(timestamp);
 				list.add(industryInfo);
 			}
@@ -1269,6 +1275,9 @@ public class StockParseToolImpl implements StockParseTool {
             	}
             	stockCapFlow.setClose(Float.valueOf(closeStr));
             	stockCapFlow.setChangePercent(Float.valueOf(stockCapFlowArray[4]));
+            	if(!NumberUtils.isNumber(stockCapFlowArray[5])){
+            		continue;
+            	}
             	stockCapFlow.setMainNetIn(new BigDecimal(stockCapFlowArray[5]));
             	stockCapFlow.setMainNetInPercent(Float.valueOf(stockCapFlowArray[6]));
             	stockCapFlow.setSuperLarge(new BigDecimal(stockCapFlowArray[7]));
@@ -1419,6 +1428,8 @@ public class StockParseToolImpl implements StockParseTool {
      * 下载html文件: http://quote.eastmoney.com/center/BKList.html#notion_0_0?sortRule=0
      * 解析左边的树中的板块下面的概念板块、行业板块获取对应的url.
      * 东方财富网的.
+     * 
+     * 2018-03-18: 不能使用了，新加的板块在下载的html中没有.
      */
 	public void downloadParseBoardCode(String source) {
 		// 下载html, 只需要下载一个,左侧的树是一样的.
@@ -1436,7 +1447,7 @@ public class StockParseToolImpl implements StockParseTool {
 		 * 概念
 		 */
     	// 解析文件.
-		List<NotionInfo> notionInfoList = parseNotionInfoFromDoc(doc);
+		List<NotionInfo> notionInfoList = parseNotionInfoFromDoc(doc, source);
 		if(notionInfoList != null && !notionInfoList.isEmpty()){
 			notionInfoService.deleteNotionInfoBySource(source);
 			notionInfoService.insertNotionInfoBatch(notionInfoList);
@@ -1446,7 +1457,7 @@ public class StockParseToolImpl implements StockParseTool {
 		 * 行业
 		 */
     	// 解析文件.
-		List<IndustryInfo> industryInfoList = parseIndustryInfoFromDoc(doc);
+		List<IndustryInfo> industryInfoList = parseIndustryInfoFromDoc(doc, source);
 		if(industryInfoList != null && !industryInfoList.isEmpty()){
 			industryInfoService.deleteIndustryInfoBySource(source);
 			industryInfoService.insertIndustryInfoBatch(industryInfoList);

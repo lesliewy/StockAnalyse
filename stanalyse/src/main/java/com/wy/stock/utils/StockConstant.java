@@ -35,6 +35,11 @@ public interface StockConstant {
 	String LHB_FILE_PATH = "/home/leslie/MyProject/StockAnalyse/html/LHB/";
 	
 	/*
+	 * 东方财富的板块-股票映射关系目录.
+	 */
+	String BK_STOCK_FILE_PATH = "/home/leslie/MyProject/StockAnalyse/html/bkStock/";
+	
+	/*
 	 * 需要清理的状态为R的超时时间. (单位: s)
 	 */
 	int DEL_R_UPPER_LIMIT = 12000;

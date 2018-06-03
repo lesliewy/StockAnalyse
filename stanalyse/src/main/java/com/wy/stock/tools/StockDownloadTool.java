@@ -28,4 +28,6 @@ public interface StockDownloadTool {
 	File downloadStockCapFlowHist(File dir, String code);
 	
 	File downloadStockCapFlowDetail(File dir, String code);
+	
+	void downloadBKJsonDFCF(String type);
 }

@@ -19,7 +19,7 @@ public class TestStockParseTool {
 	private static ApplicationContext applicationContext = null; // 提供静态ApplicationContext
 	static {
 		applicationContext = new ClassPathXmlApplicationContext(
-				"applicationContext-dev.xml"); // 实例化
+				"development/applicationContext.xml"); // 实例化
 	}
 	
 	@Test
@@ -37,6 +37,13 @@ public class TestStockParseTool {
 		stockParse.parseAllHistCsv(dir);
 	}
 	
+	/**
+	 * 更新ST_NOTION_INFO, ST_INDUSTRY_INFO;
+	 * 2018-03-18: 不能使用了，新加的板块在下载的html中没有.
+	 *  
+	 * @author leslie    
+	 * @since 1.0.0
+	 */
 	@Test
 	public void testDownloadParseBoardCode(){
 		StockParseTool stockParse = (StockParseTool) applicationContext

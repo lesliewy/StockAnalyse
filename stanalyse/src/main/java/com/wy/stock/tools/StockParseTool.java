@@ -31,7 +31,7 @@ public interface StockParseTool {
 	
 	void parseAllHistCsv(File dir);
 	
-	List<NotionInfo> parseNotionInfoFromDoc(Document industryInfoDoc);
+	List<NotionInfo> parseNotionInfoFromDoc(Document industryInfoDoc, String source);
 	
 	void downloadParseBoardCode(String source);
 	
